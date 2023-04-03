@@ -315,9 +315,6 @@ class ProtocolHandler {
                             break;
                         // // If we get CR from IDS(calibration)
                         case "CR":
-                            this.sendProtocol("CR0", str_IpAddress);
-                            return;
-                            
                             let tempObj = globalData.arrUsers.find(k => k.IdsNo == idsNo);
                             objMonitor.monit({ case: 'ID', idsNo: idsNo, data: tempObj });
 
@@ -1851,7 +1848,7 @@ class ProtocolHandler {
                     } else if (DTModel == 'Electrolab-ED3PO') {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentDTED3PO(idsNo, str_Protocol);
                         this.sendProtocol(returnProtocol, str_IpAddress);
-                    } else if(DTModel == 'Electrolab EDI-2SA'){
+                    } else if(DTModel == 'Electrolab-EDI-2SA-Bolus'){
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentDTEDI2SABolus(idsNo, str_Protocol);
                         this.sendProtocol(returnProtocol, str_IpAddress);
                     }else {

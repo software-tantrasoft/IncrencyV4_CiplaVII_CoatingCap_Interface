@@ -1,6 +1,6 @@
 // Server Config modules
 // maintain by - Pradip Shinde
-var config = require('../../../increncyV4ConfigGlobal.json')
+var config = require('../../../increncyV4Cipla7GoaConfig.json')
 var configForProject = require('./projectName.json');
 var units = require('./units.json')
 strIpSeries = config.strIpSeries;

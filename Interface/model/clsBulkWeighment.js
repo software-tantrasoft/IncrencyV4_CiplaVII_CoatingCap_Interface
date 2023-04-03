@@ -1829,18 +1829,18 @@ class BulkWeighment {
                     str_startDate = str_startDate[0].trim();
 
                        //
-                    //    var format1 = moment(str_startDate, "YYYY/MM/DD", true).isValid();
-                    //    var format2 = moment(str_startDate, "DD/MM/YYYY", true).isValid();
-                    //    if (format1 || format2) {
-                    //        console.log("startdate is ok ")
-                    //    } else {
-                    //        const BulkInvalid = new bulkInvalid();
-                    //        BulkInvalid.invalidObj.idsNo = IdsNo;
-                    //        BulkInvalid.invalidObj.DT.invalid = true;
-                    //        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED START DATE,IS NOT VALID";
-                    //        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                       var format1 = moment(str_startDate, "YYYY/MM/DD", true).isValid();
+                       var format2 = moment(str_startDate, "DD/MM/YYYY", true).isValid();
+                       if (format1 || format2) {
+                           console.log("startdate is ok ")
+                       } else {
+                           const BulkInvalid = new bulkInvalid();
+                           BulkInvalid.invalidObj.idsNo = IdsNo;
+                           BulkInvalid.invalidObj.DT.invalid = true;
+                           BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED START DATE,IS NOT VALID";
+                           Object.assign(objInvalid, BulkInvalid.invalidObj);
    
-                    //    }
+                       }
                        //
 
 
@@ -1867,7 +1867,7 @@ class BulkWeighment {
 
                         if (productObj.Sys_RotaryType == 'Single' && jartypeST == "A") {
 
-                            if (!this.isValidTime(startTime.split("|")[1].trim()) || startTime.split("|")[2].trim().match(/\d+/g) != null) {
+                            if (!moment(startTime.split("|")[1].trim(), TimeFormat, true).isValid()) {
 
                                 const BulkInvalid = new bulkInvalid();
                                 BulkInvalid.invalidObj.idsNo = IdsNo;
@@ -1878,9 +1878,10 @@ class BulkWeighment {
                             }
 
                         }
-                        else if (productObj.Sys_RotaryType == 'Single' && jartypeST == "B" ) {
+                        else if (productObj.Sys_RotaryType == 'Single' && jartypeST == "B") {
 
-                                if (!this.isValidTime(startTime.split("|")[2].trim())  || startTime.split("|")[1].trim().match(/\d+/g) != null) {
+                            if (!moment(startTime.split("|")[2].trim(), TimeFormat, true).isValid()) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -1892,7 +1893,8 @@ class BulkWeighment {
                         }
                         else {
                             // Check the time value is valid or not 
-                            if (!this.isValidTime(startTime.split("|")[1].trim()) && objInvalid.DT.invalid == false) {
+                            if (!moment(startTime.split("|")[1].trim(), TimeFormat, true).isValid() && objInvalid.DT.invalid == false) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -1901,7 +1903,7 @@ class BulkWeighment {
                                 Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
                             }
-                            if (!this.isValidTime(startTime.split("|")[2].trim()) && objInvalid.DT.invalid == false) {
+                            if (!moment(startTime.split("|")[2].trim(), TimeFormat, true).isValid() && objInvalid.DT.invalid == false) {
 
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
@@ -1925,7 +1927,9 @@ class BulkWeighment {
 
                         if (productObj.Sys_RotaryType == 'Single' && jar == "A") {
 
-                            if (!this.isValidTime(endTime.split("|")[1].trim()) || endTime.split("|")[2].trim().match(/\d+/g) != null) {
+                            if (!moment(endTime.split("|")[1].trim(), TimeFormat, true).isValid()
+                            ) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -1937,7 +1941,9 @@ class BulkWeighment {
                         }
                         else if (productObj.Sys_RotaryType == 'Single' && jar == "B") {
 
-                            if (!this.isValidTime(endTime.split("|")[2].trim()) || endTime.split("|")[1].trim().match(/\d+/g) != null) {
+                            if (!moment(endTime.split("|")[2].trim(), TimeFormat, true).isValid()
+                            ) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -1948,7 +1954,8 @@ class BulkWeighment {
 
                         }
                         else {
-                              if (!this.isValidTime(endTime.split("|")[1].trim()) && objInvalid.DT.invalid == false) {
+                            if (!moment(endTime.split("|")[1].trim(), TimeFormat, true).isValid() && objInvalid.DT.invalid == false) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -1958,7 +1965,8 @@ class BulkWeighment {
 
                             }
 
-                            if (!this.isValidTime(endTime.split("|")[2].trim()) && objInvalid.DT.invalid == false) {
+                            if (!moment(endTime.split("|")[2].trim(), TimeFormat, true).isValid() && objInvalid.DT.invalid == false) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2001,20 +2009,18 @@ class BulkWeighment {
 
                         console.log(ModeType1);
                     }
-                  
+                    // var str_mode = actualProtocol.includes("Dual");
+                    // if (str_mode == true) {
+                    //     ModeType = actualProtocol.split(":")[1].trim();
+                    //     ModeType = ModeType.substring(0, 4);
+                    //     tempDTObj.mode = 'Dual'
+
+                    // }
+
                     var testBasketType = actualProtocol.includes("BASKET TYPE ");
 
                     if (testBasketType == true) {
                         var basketA = actualProtocol.split("|")[1].trim()
-                        if(!(basketA.includes('10 Mesh'))){
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,DURATION TIME,IS NOT VALID";
-
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                        }
                         tempDTObj.basketType = basketA;
                     }
 
@@ -2030,7 +2036,7 @@ class BulkWeighment {
                             var sample = actualProtocol;
                             var jar = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
                             if (productObj.Sys_RotaryType == 'Single' && jar.JarType == "A") {
-                                if (!this.isValidTime(sample.split("|")[1].trim())) {
+                                if (!moment(sample.split("|")[1].trim(), TimeFormat, true).isValid()) {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2040,7 +2046,7 @@ class BulkWeighment {
 
                                 }
                             } else if (productObj.Sys_RotaryType == 'Single' && jar.JarType == "B") {
-                                if (!this.isValidTime(sample.split("|")[2].trim())) {
+                                if (!moment(sample.split("|")[2].trim(), TimeFormat, true).isValid()) {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2050,7 +2056,7 @@ class BulkWeighment {
 
                                 }
                             } else {
-                                if (!this.isValidTime(sample.split("|")[1].trim())) {
+                                if (!moment(sample.split("|")[1].trim(), TimeFormat, true).isValid()) {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2059,7 +2065,7 @@ class BulkWeighment {
                                     Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
                                 }
-                                if (!this.isValidTime(sample.split("|")[2].trim())) {
+                                if (!moment(sample.split("|")[2].trim(), TimeFormat, true).isValid()) {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2275,32 +2281,11 @@ class BulkWeighment {
                                 var temp = globalData.arrTDTData[0].strsettemp.split('|')[2].trim();
                                 globalData.arrTDTData = []
                             }
-                            if (isNaN(temp) || temp.length === 0) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
                             tempDTObj.Bath_Temp = temp;
                         }
                         else {
                             tempDTObj.Bath_Temp = globalData.arrTDTData[0].strsettemp.split('|')[1].trim();
                             tempDTObj.bsetdata = globalData.arrTDTData[0].strsettemp.split('|')[2].trim();
-                            if(isNaN(tempDTObj.Bath_Temp) || tempDTObj.Bath_Temp.length === 0){
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                            if(isNaN(tempDTObj.bsetdata) ||  tempDTObj.bsetdata.length === 0){
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
                             globalData.arrTDTData = []
 
                         }
@@ -2316,7 +2301,11 @@ class BulkWeighment {
                         //console.log(haltDuration);
                         if (productObj.Sys_RotaryType == 'Single') {
                             let index = jar.JarType == 'A' ? 1 : 2;
-                            if (!this.isValidTime(haltDuration.split("|")[index].trim())) {
+
+                            if (!moment(haltDuration.split("|")[index].trim(), TimeFormat, true).isValid()
+
+                            ) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2327,7 +2316,11 @@ class BulkWeighment {
 
                         }
                         else {
-                            if (!this.isValidTime(haltDuration.split("|")[1].trim()) && objInvalid.DT.invalid == false) {
+                            if (!moment(haltDuration.split("|")[1].trim(), TimeFormat, true).isValid() &&
+
+
+                                objInvalid.DT.invalid == false) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2337,7 +2330,10 @@ class BulkWeighment {
 
                             }
 
-                            if (!this.isValidTime(haltDuration.split("|")[2].trim()) && objInvalid.DT.invalid == false) {
+                            if (!moment(haltDuration.split("|")[2].trim(), TimeFormat, true).isValid()
+                                &&
+                                objInvalid.DT.invalid == false) {
+
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
@@ -2685,33 +2681,6 @@ class BulkWeighment {
                         return `${protocolIncomingType}R40Invalid String,,,,`
                         //return `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
 
-                    }
-                    else if(tempTDObj.mode == undefined || tempTDObj.Bath_Temp == undefined || tempTDObj.basketType == undefined || tempTDObj.arr_reading.length == 0 ){
-                        var tempTDObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
-                        if (tempTDObj == undefined) {
-                            globalData.arrDTData.push({
-                                idsNo: IdsNo, arr_heading: [], arr_reading: [], arr_info: [],
-                                rotaryType: undefined,
-                                mode: undefined,
-                                Bath_Temp: undefined,
-                                bsetdata: undefined,
-
-
-                            })
-                        } else {
-                            tempTDObj.arr_heading = [];
-                            tempTDObj.arr_reading = [];
-                            tempTDObj.arr_info = [];
-                            tempTDObj.rotaryType = undefined;
-                            tempTDObj.mode = undefined;
-                            tempTDObj.Bath_Temp = undefined;
-                            tempTDObj.bsetdata = undefined;
-
-
-                        }
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
-                        objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', '', 'ended');
-                        return `${protocolIncomingType}R40Invalid String,,,,`
                     }
                     else {
 
@@ -4608,7 +4577,7 @@ class BulkWeighment {
                                             { str_colName: 'RepSerNo', value: lastInsertedID },
                                             { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
                                             { str_colName: 'RecSeqNo', value: i + 1 },
-                                            { str_colName: 'DT_Side', value: "NA" },
+                                            { str_colName: 'DT_Side', value: jarType == "NA" },
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
                                             { str_colName: 'DT_StartTm', value: startTime },
@@ -5019,20 +4988,6 @@ class BulkWeighment {
      * @description for Electrolab-ED3PO
      */
 
-    isValidTime(time) {
-        let [hh, mm, ss] = time.split(':');
-        if(hh.length != 0  && mm.length != 0 && ss.length != 0  ){
-        if ((Number(hh) || hh == 0) && (Number(mm) || mm == 0) && (Number(ss) || ss == 0)) {
-            if (hh > 23 || mm > 59 || ss > 59) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-     } else {
-            return false;
-        }
-    }
 
 
     async validateTwoSaTime(countOne, productObj, JARTypeobj, IdsNo) {
@@ -5177,13 +5132,6 @@ class BulkWeighment {
                         var Battemp = actualProtocol.split(':')[1]
                         Battemp = Battemp.replace(/[NRrn]+/g, "|").trim();
                         Battemp = Battemp.split("|")[0];
-                        if(isNaN(parseFloat(Battemp)) || parseFloat(Battemp.length) == 0){
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,BATH TEMP IS NOT VALID";
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
                         tempDTObj.Bath_Temp = parseFloat(Battemp);
                     }
 
@@ -5191,13 +5139,7 @@ class BulkWeighment {
                     if (testBasketType == true) {
                         var basketType = actualProtocol.split(":")[1];
                         basketType = basketType.split(/[NRnr]+/)[0].trim();
-                        if(basketType.length == 0){
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,BASKET TYPE IS NOT VALID";
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
+
                         tempDTObj.basketType = basketType;
                     }
 
@@ -9300,7 +9242,7 @@ class BulkWeighment {
                                     await objActivityLog
                                         .ActivityLogEntry(objActivity)
                                         .catch((error) => {
-                                           // logFromPC.addtoProtocolLog(error, "error");
+                                            logFromPC.addtoProtocolLog(error, "error");
                                             console.log(error);
                                         });
                                     var productObj = globalData.arrIdsInfo.find(
@@ -10136,7 +10078,7 @@ class BulkWeighment {
                                  { activity: "Hardness Weighment Started on IDS" + IdsNo }
                              );
                              await objActivityLog.ActivityLogEntry(objActivity).catch((error) => {
-                                          //logFromPC.addtoProtocolLog(error, "error");
+                                          logFromPC.addtoProtocolLog(error, "error");
                                           console.log(error);
                              });
                              var productObj = globalData.arrIdsInfo.find(
@@ -10491,7 +10433,7 @@ class BulkWeighment {
                                    await objActivityLog
                                        .ActivityLogEntry(objActivity)
                                        .catch((error) => {
-                                           //logFromPC.addtoProtocolLog(error, "error");
+                                           logFromPC.addtoProtocolLog(error, "error");
                                            console.log(error);
                                        });
                                    var productObj = globalData.arrIdsInfo.find(
@@ -10914,7 +10856,7 @@ class BulkWeighment {
                            { activity: "Hardness Weighment Started on IDS" + IdsNo }
                        );
                        await objActivityLog.ActivityLogEntry(objActivity).catch((error) => {
-                          // logFromPC.addtoProtocolLog(error, "error");
+                           logFromPC.addtoProtocolLog(error, "error");
                            console.log(error);
                        });
                        var productObj = globalData.arrIdsInfo.find(
@@ -11316,7 +11258,7 @@ class BulkWeighment {
                                 { activity: "Hardness Weighment Started on IDS" + IdsNo }
                             );
                             await objActivityLog.ActivityLogEntry(objActivity).catch((error) => {
-                                //logFromPC.addtoProtocolLog(error, "error");
+                                logFromPC.addtoProtocolLog(error, "error");
                                 console.log(error);
                             });
                             var productObj = globalData.arrIdsInfo.find(
@@ -11848,7 +11790,7 @@ class BulkWeighment {
                                     await objActivityLog
                                         .ActivityLogEntry(objActivity)
                                         .catch((error) => {
-                                            //logFromPC.addtoProtocolLog(error, "error");
+                                            logFromPC.addtoProtocolLog(error, "error");
                                             console.log(error);
                                         });
                                     var productObj = globalData.arrIdsInfo.find(
@@ -13031,7 +12973,7 @@ class BulkWeighment {
                                         await database.save(insertDetailObj)
                                     }
                                     else {
-                                        //logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo} reading`)
+                                        logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo} reading`)
                                         objHardness.sampleNo = objHardness.sampleNo - 1
                                     }
 
@@ -14944,7 +14886,7 @@ class BulkWeighment {
                                 await database.save(detailObj)
                             }
                             else {
-                                //logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo}`)
+                                logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo}`)
                                 objHardness.sampleNo = objHardness.sampleNo - 1
                             }
                         }
@@ -15006,7 +14948,7 @@ class BulkWeighment {
                                         await database.save(detailObj)
                                     }
                                     else {
-                                        //logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo}`)
+                                        logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo}`)
                                         objHardness.sampleNo = objHardness.sampleNo - 1
                                     }
 
@@ -15575,7 +15517,7 @@ class BulkWeighment {
                                         let detailRes = await database.save(detailObj);
                                     }
                                     else {
-                                       // logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo}`)
+                                        logFromPC.addtoProtocolLog(`sample no ${entries} recieved instead of ${objHardness.sampleNo}`)
                                         objHardness.sampleNo = objHardness.sampleNo - 1
                                     }
 
@@ -15968,12 +15910,6 @@ class BulkWeighment {
                     objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
                     // Instrument usage for LOD started
                     objInstrumentUsage.InstrumentUsage('LOD', IdsNo, 'tbl_instrumentlog_lod', 'LOD', 'started');
-                }
-                var startTime = actualProtocol.includes("Time");
-                if (startTime == true) {
-                     var startTime1 = date.format(now, 'HH:mm:ss');
-                    //globalData.arrLodData.push(iniWeight);
-                    objLodData.arr.push(startTime1);
                 }
                 var setTemp = actualProtocol.includes("Fin. temp");
                 if (setTemp == true) {
@@ -16658,7 +16594,7 @@ class BulkWeighment {
                 console.log(logQ);
                 //commented by vivek on 31-07-2020********************************
                 //logFromPC.info(logQ);
-                //logFromPC.addtoProtocolLog(logQ)
+                logFromPC.addtoProtocolLog(logQ)
                 //************************************************************** */
                 if (str_Protocol != 'DM0G0Group Weighment, Pending,,,,') {
                     // objClsLogger.protocolLogFromPC(str_Protocol,str_IpAddress);
