@@ -1686,7 +1686,7 @@ class MenuRequestModel {
                                                     dp: result[0][0].Param8_DP,
                                                     isonstd: result[0][0].Param8_IsOnStd,
                                                     port: portNo,
-                                                    noOfSamples:  productSamples.Friability,
+                                                    noOfSamples: productSamples.Friability == 0 ? productSamples.Individual : productSamples.Friability,
                                                     side: side,
                                                     unit: '%'// added by vivek on 18-08-2020
                                                 }
