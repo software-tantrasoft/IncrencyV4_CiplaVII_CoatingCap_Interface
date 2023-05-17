@@ -152,6 +152,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                                     //}
                                     //else {
                                     return `CR${calibPId}1Periodic Calibration,Pending,,,`;
+                                    // return `CRH1Periodic Calibration,Pending,,,`;
                                     //}
 
                                 }

@@ -23,11 +23,13 @@ class ProcessWTModel {
     //**************************************************************************************************** */
     // Below function use for WS protocol when comes for Balance and Vernier,
     //*************************************************************************************************** */
-    async processWS(IDSSrNo, str_Protocol,idsIPAddress) {
+    async processWS(IDSSrNo, str_Protocol) {
 
         var tempLimObj = globalData.arr_limits.find(k => k.idsNo == IDSSrNo);
-
+        let arrPaticleData = globalData.arrPaticleData.find(ht => ht.idsNo == IDSSrNo);
+        let arrpercentFineData = globalData.arrpercentFineData.find(ht => ht.idsNo == IDSSrNo);
         var cubicalObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IDSSrNo);
+        var objLotData = globalData.arrLot.find(k => k.idsNo == IDSSrNo);
 
         //var productTypeObj = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo)
         var objProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IDSSrNo)
@@ -150,46 +152,64 @@ class ProcessWTModel {
                     return (sendProtocol);
                 }
                 break;
-            case'H':
-                  var Sys_PortNo = cubicalObj.Sys_PortNo;
-                  if (Sys_PortNo == 101 || Sys_PortNo == 102) {
-                       var instrument = cubicalObj.Sys_Port1;
-                       if(instrument == 'Hardness'){
-                          objHardness.dataFlowStatus = true;
-                          objHardness.protocolIncomingType = 'H';
-                          objHardness.idsIPAddress = idsIPAddress;
-                       } 
-                  } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
-                       var instrument = cubicalObj.Sys_Port4;
-                       if(instrument == 'Hardness'){
-                          objHardness.dataFlowStatus = true;
-                          objHardness.protocolIncomingType = 'H';
-                          objHardness.idsIPAddress = idsIPAddress;
-                       }
-                  } 
-                  sendProtocol = '+';
-                  return (sendProtocol);  
+            case 'H':
+                var Sys_PortNo = cubicalObj.Sys_PortNo;
+                if (Sys_PortNo == 101 || Sys_PortNo == 102) {
+                    var instrument = cubicalObj.Sys_Port1;
+                    if (instrument == 'Hardness') {
+                        objHardness.dataFlowStatus = true;
+                        objHardness.protocolIncomingType = 'H';
+                        objHardness.idsIPAddress = idsIPAddress;
+                    }
+                    if (instrument == "Balance") {
+                        if (objLotData.MS.substring(2, 3) == "P") {   // for particle size handle 
+                            if (arrPaticleData.sampleNo > 0 && arrPaticleData.message != "") {
+                                return (`DL03${arrPaticleData.message},`);
+                            }
+                            else {
+                                return ("DL03TESTSAMPLE,");
+                            }
+                        }
+                        if (objLotData.MS.substring(2, 3) == "F") {   // for %Fine handle 
+                            if (arrpercentFineData.sampleNo > 0 && arrpercentFineData.message != "") {
+                                return (`DL03${arrpercentFineData.message},`);
+                            }
+                            else {
+                                return ("DL03TESTSAMPLE,");
+                            }
+                        }
+                    }
+                } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
+                    var instrument = cubicalObj.Sys_Port4;
+                    if (instrument == 'Hardness') {
+                        objHardness.dataFlowStatus = true;
+                        objHardness.protocolIncomingType = 'H';
+                        objHardness.idsIPAddress = idsIPAddress;
+                    }
+                }
+                sendProtocol = '+';
+                return (sendProtocol);
                 break;
             case 'T':
-                 var Sys_PortNo = cubicalObj.Sys_PortNo;
-                 if (Sys_PortNo == 101 || Sys_PortNo == 102) {
-                     var instrument = cubicalObj.Sys_Port2;
-                     if(instrument == 'Hardness'){
+                var Sys_PortNo = cubicalObj.Sys_PortNo;
+                if (Sys_PortNo == 101 || Sys_PortNo == 102) {
+                    var instrument = cubicalObj.Sys_Port2;
+                    if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'T';
                         objHardness.idsIPAddress = idsIPAddress;
-                     } 
-                 } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
-                     var instrument = cubicalObj.Sys_Port3;
-                     if(instrument == 'Hardness'){
+                    }
+                } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
+                    var instrument = cubicalObj.Sys_Port3;
+                    if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'T';
                         objHardness.idsIPAddress = idsIPAddress;
-                     }            
-                 }
-                  sendProtocol = '+';
-                  return (sendProtocol);  
-                break;        
+                    }
+                }
+                sendProtocol = '+';
+                return (sendProtocol);
+                break;
             default:
                 sendProtocol = '+';
                 return (sendProtocol);
@@ -307,9 +327,9 @@ class ProcessWTModel {
         var VlimitCal = resultBal[0][0].Bal_LeastCnt.split(".")
         var VLvalue = parseInt(VlimitCal[1])
         var DecimalCount = VLvalue.toString()
-        if(DecimalCount.length <= 2){
+        if (DecimalCount.length <= 2) {
             var VLimit = 0.0014;
-        }else{
+        } else {
             var VLimit = 0.014;
         }
 

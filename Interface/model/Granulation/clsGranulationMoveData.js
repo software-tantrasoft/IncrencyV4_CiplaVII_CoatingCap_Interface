@@ -273,6 +273,18 @@ class MoveGranulationData {
                     { str_colName: 'RepSerNo', value: result.incompleteData.RepSerNo, comp: 'eq' },
                 ]
             }
+            var data = globalData.arrPaticleData.find(k => k.idsNo == IdsNo);
+            if(data!=undefined){
+                data.datecount = false;
+                data.timecount = false;
+                data.dataValues = undefined;
+                data.actualSampleValue = 1;
+                data.unit = undefined;
+                data.side = undefined
+                data.sampleNo = 0;
+                data.message = ""
+
+            }
             await objRemarkInComplete.deleteEntry(IdsNo,"P")
             await clspowerbackup.deletePowerBackupData(IdsNo);
             await database.delete(deleteIncompleteDetailData);
@@ -431,6 +443,17 @@ class MoveGranulationData {
                 ]
             }
             await database.delete(deleteIncompleteDetailData);
+
+            var data = globalData.arrpercentFineData.find(k => k.idsNo == IdsNo);
+            if(data!=undefined){
+                data.datecount = false;
+                data.timecount = false;
+                data.dataValues = [];
+                data.actualSampleValue = 1;
+                data.unit = undefined;
+                data.side = undefined
+
+            }
             // Update Weighment is Completed
             objRemarkInComplete.deleteEntry(IdsNo,"F")
             await clspowerbackup.deletePowerBackupData(IdsNo);

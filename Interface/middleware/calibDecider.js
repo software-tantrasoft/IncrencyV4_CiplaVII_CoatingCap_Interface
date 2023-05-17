@@ -33,7 +33,7 @@ async function calibPendingDecider(str_Protocol, IDSSrNo) {
                 var result = await dailyCalibrationModel.getCalibWeights(str_Protocol, IDSSrNo);
                 return result;
             case 'periodic':
-                var result = await  periodiccalibrationModel.getCalibWeights(str_Protocol, IDSSrNo)
+                var result = await  periodiccalibrationModel.getCalibWeights(str_Protocol, IDSSrNo);
                 return result;
             case 'vernierPeriodic':
                 var result = await  periodicCalibrationVernierModel.getCalibWeights(str_Protocol, IDSSrNo)
@@ -73,9 +73,12 @@ async function calibDecider(str_Protocol, IDSSrNo) {
         switch (calibType) {
             case 'daily':
                 var result = await dailyCalibrationModel.verifyWeights(str_Protocol, IDSSrNo);
+              
                 return result;
             case 'periodic':
                 var result = await periodiccalibrationModel.verifyWeights(str_Protocol, IDSSrNo); 
+         
+            
                 return result;
             case 'vernierPeriodic':
                 var result = await  periodicCalibrationVernierModel.verifyWeights(str_Protocol, IDSSrNo)
@@ -103,5 +106,27 @@ async function calibDecider(str_Protocol, IDSSrNo) {
         throw new Error(err);
     }
 }
+
+async function calibDeciderforhardness(str_Protocol, IDSSrNo) {
+    try{
+    var tempCailibType = globalData.arrcalibType.find(k=>k.idsNo == IDSSrNo); 
+    var calibType = tempCailibType.calibType;
+    const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+    switch (calibType) {
+        case 'daily':
+            var result = await dailyCalibrationModel.newverifyWeights(str_Protocol, IDSSrNo);
+            return result;
+        case 'periodic':
+            var result = await periodiccalibrationModel.newverifyWeights(str_Protocol, IDSSrNo); 
+            return result;
+        default:
+            console.log('Cal Decider not set');
+            break;
+    }
+} catch (err) {
+    throw new Error(err);
+}
+}
 module.exports.calibPendingDecider = calibPendingDecider;
 module.exports.calibDecider = calibDecider;
+module.exports.calibDeciderforhardness = calibDeciderforhardness;

@@ -361,6 +361,50 @@ class ProtocolHandler {
                                     (tempCubicInfo.Sys_Port1 == 'Balance' || tempCubicInfo.Sys_Port2 == 'Balance' || tempCubicInfo.Sys_Port1 == 'IPC Balance'
                                         || tempCubicInfo.Sys_Port3 == 'Balance' || tempCubicInfo.Sys_Port3 == 'IPC Balance')) {
                                     var strReturnProtocol = await dailyCalibrationModel.checkDailyCalibrationPending(str_IpAddress.split('.')[3]);
+
+                                    if (tempCubicInfo.Sys_Area == 'Granulation') {
+                                        if (strReturnProtocol.includes('Pending')) {
+                                            if (strReturnProtocol.includes('Daily')) {
+                                                strReturnProtocol = `CRH1Daily Calibration,Pending,,,`;
+                                                // strReturnProtocol = `CRH1Periodic Calibration,Pending,,,`;
+                                            } else if (strReturnProtocol.includes('Periodic')) {
+                                                strReturnProtocol = `CRH1Periodic Calibration,Pending,,,`;
+                                            }
+                                            var tempcalibObj = globalData.calibrationforhard.find(td => td.idsNo == idsNo);
+                                            ///foreasycheck
+                                            if (tempcalibObj == undefined) {
+                                                const obj = {
+                                                    idsNo: idsNo,
+                                                    unit: "",
+                                                    datetimecount: 0,
+                                                    sampleNoforDaily: 0,
+                                                    sampleNoforPeriodic: 0,
+                                                    sampleNoforUncertainty: 0,
+                                                    sampleNoforEccentricity: 0,
+                                                    sampleNoforRepetability: 0,
+                                                    Daily: {},
+                                                    Periodic: {},
+                                                    Uncertainty: {},
+                                                    Eccentricity: {},
+                                                    Repetability: {},
+                                                };
+                                                globalData.calibrationforhard.push(obj);
+                                            } else {
+                                                tempcalibObj.sampleNoforDaily = 0,
+                                                    unit = "",
+                                                    tempcalibObj.datetimecount = 0,
+                                                    tempcalibObj.sampleNoforPeriodic = 0,
+                                                    tempcalibObj.sampleNoforUncertainty = 0,
+                                                    tempcalibObj.sampleNoforEccentricity = 0,
+                                                    tempcalibObj.sampleNoforRepetability = 0,
+                                                    tempcalibObj.Daily = {},
+                                                    tempcalibObj.Periodic = {},
+                                                    tempcalibObj.Uncertainty = {},
+                                                    tempcalibObj.Eccentricity = {},
+                                                    tempcalibObj.Repetability = {}
+                                            }
+                                        }
+                                    }
                                     let obj;
                                     if (strReturnProtocol.substring(0, 3) == `CR${calibDId}`) {
                                         objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
@@ -536,6 +580,19 @@ class ProtocolHandler {
                             this.sendProtocol(strReturnProtocol, str_IpAddress);
 
                             break;
+
+                        // if Caibration pending in granulation
+                        case "CH":
+                            objMonitor.monit({ case: 'CP', idsNo: idsNo });
+                            let objFlagCalibWeightinch = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
+                            if (objFlagCalibWeightinch != undefined) {
+                                objFlagCalibWeightinch.alertFlag = true;
+                            }
+
+                            var strReturnProtocol = await caliDecider.calibPendingDecider(str_Protocol, str_IpAddress.split('.')[3]);
+
+                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+                            break;
                         // for incoming calibration weights 
                         case "CB":
                             var tempIM = globalData.arrHexInfo.find(k => k.idsNo == idsNo);
@@ -568,21 +625,6 @@ class ProtocolHandler {
                                 appendVal = "T"
                             }
 
-
-                            // if (tempBalace != undefined) {
-                            //     let balSrNo = tempBalace.balance_info[0].Bal_SrNo;
-                            //     var appendVal = 'Z';
-                            //     if (balSrNo.includes('ML')) {
-                            //         appendVal = 'T';
-                            //         //appendVal = '0x1B0x540x000x0D0x0A';
-                            //     } else {
-                            //         appendVal = 'Z';
-                            //     }
-                            //     if (serverConfig.tareFlag == 'MLH') {
-                            //         appendVal = 'T ';
-                            //     }
-                            // }
-                            // SP10 0x1B 0x54 0x00 0x0D 0x0A 
                             var escChar = String.fromCharCode(27);
                             let currentCubic = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
                             if (tempIM.IM != "IMC3") {
@@ -671,6 +713,95 @@ class ProtocolHandler {
                             }
 
                             break;
+
+                        // for incoming calibration weights 
+                        case "HC":
+                            var tempIM = globalData.arrHexInfo.find(k => k.idsNo == idsNo);
+                            var tempBalace = globalData.arrBalance.find(k => k.idsNo == idsNo);
+                            var cubicObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
+                            var vernierId = cubicObj.Sys_VernierID;
+
+                            var escChar = String.fromCharCode(27);
+                            let currentCubicc = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
+                            if (tempIM.IM != "IMC3") {
+                                if (currentCubicc.Sys_Area == "Effervescent Granulation" || currentCubicc.Sys_Area == "Granulation") {
+                                    TareCmd = ""
+                                }
+                                else if (appendVal == "T" && tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
+                                    TareCmd = `SP10${escChar}${appendVal},`
+                                }
+                                else {
+                                    TareCmd = `SP10${appendVal},`
+                                }
+
+                                //this.sendProtocol('SP10Z,', str_IpAddress);
+                            } else {
+                                if (currentCubicc.Sys_Area == "Effervescent Granulation" || currentCubicc.Sys_Area == "Granulation") {
+                                    TareCmd = ""
+                                }
+                                else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
+                                    TareCmd = `SP20${escChar}${appendVal},`
+                                }
+                                else {
+                                    TareCmd = `SP20${appendVal},`
+                                }
+                                //this.sendProtocol('SP20Z,', str_IpAddress);
+                            }
+                            var tempCailibType = globalData.arrcalibType.find(k => k.idsNo == idsNo);
+                            var calibType = tempCailibType.calibType;
+                            var strReturnProtocol = await caliDecider.calibDeciderforhardness(str_Protocol, str_IpAddress.split('.')[3]);
+                            if (strReturnProtocol != undefined) {
+                                if (strReturnProtocol.includes("CR0") || strReturnProtocol.includes("HRcF")) {
+                                    if (strReturnProtocol.includes("CR0") && calibType != 'vernierPeriodic') {
+
+                                        // strReturnProtocol = await objFetchDetails.checkVernierCalibration(idsNo);
+                                        if (strReturnProtocol.includes("CR0") || strReturnProtocol.includes("HRcF")) {
+                                            let objUpdateCubicle = {
+                                                str_tableName: 'tbl_cubical',
+                                                data: [
+                                                    { str_colName: 'Sys_CalibInProcess', value: 0 },
+                                                ],
+                                                condition: [
+                                                    { str_colName: 'Sys_IDSNo', value: idsNo }
+                                                ]
+                                            }
+                                            console.log('Sys_CalibInProcess set from HC=0')
+                                            await database.update(objUpdateCubicle);
+                                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                        } else {
+                                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                        }
+                                    } else {
+                                        let objUpdateCubicle = {
+                                            str_tableName: 'tbl_cubical',
+                                            data: [
+                                                { str_colName: 'Sys_CalibInProcess', value: 0 },
+                                            ],
+                                            condition: [
+                                                { str_colName: 'Sys_IDSNo', value: idsNo }
+                                            ]
+                                        }
+                                        console.log('Sys_CalibInProcess set from HC=0');
+                                        await database.update(objUpdateCubicle);
+                                        this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                    }
+
+                                } else {
+                                    if (strReturnProtocol.includes("CR") == true) {
+                                        //this.sendProtocol(strReturnProtocol + TareCmd, str_IpAddress);
+                                        strReturnProtocol = strReturnProtocol.substring(0, strReturnProtocol.length - 1)
+                                        this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                    }
+                                    else {
+                                        this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                    }
+                                }
+                            }
+
+                            break;
+
+
+    
                         // For menu Printing
                         case "MP":
                             var tempVerify = await objCommanFun.calibrationVerification(idsNo);
@@ -727,7 +858,13 @@ class ProtocolHandler {
                             }
                             break;
 
+
+                        case "Hc":
+                            this.sendProtocol("HRcB", str_IpAddress);
+
+                            break;
                         // Menu request
+
                         case "MR":
 
                             var selectedIds;
@@ -759,6 +896,7 @@ class ProtocolHandler {
                                 var strReturnData = "ID3 " + res + ",,,";
                                 this.sendProtocol(strReturnData, str_IpAddress);
                             }
+
                             else {
                                 let objFlagCalibWeigh1 = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
                                 if (objFlagCalibWeigh1 != undefined) {
@@ -781,9 +919,9 @@ class ProtocolHandler {
                                     let objFetchpowerbackup = await clspowerbackup.fetchPowerBackupData(idsNo);
                                     if (objFetchpowerbackup.status && objFetchpowerbackup.result.length > 0) {
                                         var protocol = await clspowerbackup.sendPowerBackupData(objFetchpowerbackup.result, idsNo);
-                                        if(protocol == 'MR'){
+                                        if (protocol == 'MR') {
                                             this.handleProtocol('MRN￻', str_IpAddress, '');
-                                        }else {
+                                        } else {
                                             this.sendProtocol(protocol, str_IpAddress);
                                         }
                                         await handleLoginModal.updateWeighmentStatus(idsNo, 1);
@@ -971,6 +1109,7 @@ class ProtocolHandler {
 
                             var weightment_type = str_Protocol.substring(2, 3);
                             if (weightment_type == '0') {//handling powerbackup discard condition 
+                                await menuSelectModel.handleCLProtocol(idsNo);
                                 await objIncompleteRemark.updateReportRemark(idsNo);
                                 console.log('powerbakup discard');
                                 // TO-DO // We can direct call MR from here
@@ -1021,7 +1160,7 @@ class ProtocolHandler {
                             var ObjCheckPoweBackUp = await clspowerbackup.fetchPowerBackupData(idsNo);
                             if (ObjCheckPoweBackUp.status && ObjCheckPoweBackUp.result.length > 0) {
                                 objMonitor.monit({ case: 'WS', idsNo: idsNo });
-                                var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol,str_IpAddress);
+                                var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol);
                                 this.sendProtocol(returnProtocol, str_IpAddress);
                             }
                             else {
@@ -1125,7 +1264,7 @@ class ProtocolHandler {
 
                                 }
 
-                                var response = await objRemarkInComplete.checkEntry(idsNo,selectedIds, 0, testType);
+                                var response = await objRemarkInComplete.checkEntry(idsNo, selectedIds, 0, testType);
                                 if (response != false) {
                                     var actualData = `ID3 Remark Pending For,${response.param.toUpperCase()} Test,,`;
 
@@ -1133,7 +1272,7 @@ class ProtocolHandler {
 
                                 } else {
                                     objMonitor.monit({ case: 'WS', idsNo: idsNo });
-                                    var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol,str_IpAddress);
+                                    var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol);
                                     this.sendProtocol(returnProtocol, str_IpAddress);
                                 }
                             }
@@ -1198,7 +1337,7 @@ class ProtocolHandler {
                             } else {
                                 var returnProtocol = "";
                                 var tempIM = globalData.arrHexInfo.find(k => k.idsNo == idsNo);
-                                if (tempIM.IM == "IMC4" || tempIM.IM == "IMC2") {
+                                if (tempIM.IM == "IMC4" && tempCubic.Sys_Port1 != "Balance" || tempIM.IM == "IMC2") {
                                     returnProtocol = "+";
                                 }
                                 else {
@@ -1605,7 +1744,7 @@ class ProtocolHandler {
                             objMonitor.monit({ case: 'CL', idsNo: idsNo });
                             await menuSelectModel.handleCLProtocol(idsNo);
                             var weightment_type = str_Protocol.substring(2, 3);
-                            await objCommanFun.updateactivitylogfortesttermination(idsNo,weightment_type);
+                            await objCommanFun.updateactivitylogfortesttermination(idsNo, weightment_type);
                             await objIncompleteRemark.updateReportRemark(idsNo);
                             console.log('powerback up clear after cl');
                             await clspowerbackup.deletePowerBackupData(idsNo);
@@ -1848,10 +1987,10 @@ class ProtocolHandler {
                     } else if (DTModel == 'Electrolab-ED3PO') {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentDTED3PO(idsNo, str_Protocol);
                         this.sendProtocol(returnProtocol, str_IpAddress);
-                    } else if(DTModel == 'Electrolab-EDI-2SA-Bolus'){
+                    } else if (DTModel == 'Electrolab-EDI-2SA') {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentDTEDI2SABolus(idsNo, str_Protocol);
                         this.sendProtocol(returnProtocol, str_IpAddress);
-                    }else {
+                    } else {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentDT(idsNo, str_Protocol, DTModel);
                         this.sendProtocol(returnProtocol, str_IpAddress);
                     }
@@ -1938,6 +2077,48 @@ class ProtocolHandler {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentLOD(idsNo, str_Protocol);
                         this.sendProtocol(returnProtocol, str_IpAddress);
                     }
+
+                } else if (instrument == 'BALANCE') {  // for particle size handle 
+                    //WEIGHMENT//
+                    var objLotData = globalData.arrLot.find(k => k.idsNo == idsNo);
+                    var MenuType;
+                    if (objLotData != undefined) {
+                        let strMsProtocol = objLotData.MS;
+                        MenuType = strMsProtocol.substring(2, 3);
+                    }
+                    if (MenuType != undefined) {
+                        if (MenuType == "P") {
+                            var returnProtocol = await bulkWeighment.insertBalanceString(idsNo, str_Protocol);
+                            if (returnProtocol.includes("DL03")) {
+                                if (returnProtocol.length > 5) {
+                                    this.sendProtocol("HR0,,,,,", str_IpAddress);
+                                    this.sendProtocol(returnProtocol, str_IpAddress);
+                                }
+                                if (returnProtocol.length == 5) {
+                                    this.sendProtocol("HR3,,,,,", str_IpAddress);
+                                }
+
+                            } else {
+                                this.sendProtocol(returnProtocol, str_IpAddress);
+                            }
+                        }
+                        if (MenuType == "F") {
+                            var returnProtocol = await bulkWeighment.insertBalanceStringFine(idsNo, str_Protocol);
+                            if (returnProtocol.includes("DL03")) {
+                                if (returnProtocol.length > 5) {
+                                    this.sendProtocol("HR0,,,,,", str_IpAddress);
+                                    this.sendProtocol(returnProtocol, str_IpAddress);
+                                }
+                                if (returnProtocol.length == 5) {
+                                    this.sendProtocol("HR3,,,,,", str_IpAddress);
+                                }
+
+                            } else {
+                                this.sendProtocol(returnProtocol, str_IpAddress);
+                            }
+                        }
+                    }
+
 
                 }
             } else {

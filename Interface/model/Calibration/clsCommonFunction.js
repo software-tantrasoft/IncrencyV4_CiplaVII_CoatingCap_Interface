@@ -655,7 +655,7 @@ class CommanFunction {
     // Below function copies data from incomplete tables to complete tables after successfull calibration 
     // of all types
     //****************************************************************************************************** */
-    async incompleteToComplete(CalibrationType, strBalId, IDSSrNo) {
+    async incompleteToComplete(CalibrationType, strBalId, IDSSrNo,grancalib =false) {
         try {
             // CalibrationType - OnGoing caaibration type i-e P, R, L .....
             var res = await obj_getRepSrNo.getRepSrNoWRTBalance(strBalId, IDSSrNo);
@@ -665,7 +665,13 @@ class CommanFunction {
             // we are finding length of sorted array that we have 
             let length = arr_sortedCalibArray.length;
             // here we finding last calibration
-            let lastCalibration = arr_sortedCalibArray[length - 1];
+            let lastCalibration ;
+            if(grancalib){
+                 lastCalibration = "P";
+            }else{
+                 lastCalibration = arr_sortedCalibArray[length - 1];
+            }
+           
             // If current calibration is last calibration then we can proceed for copying
             //data from incomplete to complete tabled
             if (CalibrationType == lastCalibration) {

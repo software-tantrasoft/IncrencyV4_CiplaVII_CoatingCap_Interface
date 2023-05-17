@@ -18,10 +18,16 @@ const objInstrumentUsage = new InstrumentUsage();
 const FormulaFunction = require('../Product/clsformulaFun');
 const objFormulaFunction = new FormulaFunction();
 const jsonTareCmd = require('../../global/tare.json');
-
+const PeriodicCalibrationModel = require('../Calibration/clsPeriodicCalibrationModel');
+const periodiccalibrationModel = new PeriodicCalibrationModel();
 const objMonitor = new clsMonitor();
 // Creating object for Database Class
+
+async function containsNumber(str) {
+  return /\d/.test(str);
+}
 class CalibrationModel {
+
   // ***********************************************************************************************************//
   // Below function checks if daily calibration is pending or not                                               //
   //*********************************************************************************************************** */
@@ -329,6 +335,8 @@ class CalibrationModel {
       throw new Error(err);
     }
   }
+
+
   //********************************************************************************************************** */
   // This function called when We recives CP protocol also here we send first weight for calibration
   //********************************************************************************************************** */
@@ -349,7 +357,12 @@ class CalibrationModel {
       var spiritLevel = str_Protocol.substring(4, 5);
       // If any parameter fails the caibration fails
       if (generalCare == '1' || zeroError == '1' || spiritLevel == '1') {
-        return "CF";
+        if (tempCubicInfo.Sys_Area == 'Granulation') {
+          return "HRcF";
+        } else {
+          return "CF";
+        }
+
       } else {
         // get all the balance details form 'tbl_balance' in global array :arrBalance
         var selectBalObj = {
@@ -478,9 +491,14 @@ class CalibrationModel {
         // Instrument Usage log for balance start
         await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', 'Daily Calibration', 'started');
 
-        var strunit = tempBalace.balance_info[0].Bal_Unit.trim()
-        return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP)
-          + strunit + `, 0.000,Daily Calib,${TareCmd}`;
+        var strunit = tempBalace.balance_info[0].Bal_Unit.trim();
+        if (tempCubicInfo.Sys_Area == 'Granulation') {
+          return "HRC" + "Daily Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strunit + "," + `STD. 001 :` + ",";
+        } else {
+          return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP)
+            + strunit + `, 0.000,Daily Calib,${TareCmd}`;
+        }
+
 
 
       }
@@ -587,9 +605,9 @@ class CalibrationModel {
             combineLowerLimit = combineLowerLimit + i.Bal_NegTol + ",";
             combineUpperLimit = combineUpperLimit + i.Bal_PosTol + ",";
           }
-          combineStdWt = combineStdWt.slice(0, -1)
-          combineLowerLimit = combineLowerLimit.slice(0, -1)
-          combineUpperLimit = combineUpperLimit.slice(0, -1)
+          combineStdWt = combineStdWt.slice(0, -1);
+          combineLowerLimit = combineLowerLimit.slice(0, -1);
+          combineUpperLimit = combineUpperLimit.slice(0, -1);
 
           // Inserting entries in master table for daily calibration
           // Object for inserting data for Incommplete master
@@ -926,6 +944,336 @@ class CalibrationModel {
       throw new Error(err);
     }
   }
+
+
+
+
+
+  async newverifyWeights(str_Protocol, IDSSrNo) {
+    try {
+      let now = new Date();
+      const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IDSSrNo));
+      var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == parseInt(IDSSrNo));
+      if (objOwner.owner == 'analytical') {
+        var strBalId = tempCubicInfo.Sys_BalID;
+      } else {
+        var strBalId = tempCubicInfo.Sys_BinBalID;
+      }
+      var protocolValue = str_Protocol.substring(0, 5); // starting 5 character
+      var protocolValueData = str_Protocol.substring(5); // starting 5 character
+      var protocolIncomingType = str_Protocol.substring(0, 1); //Check incoming Protocol is from "T" or "H"
+      var tempcalibObj = globalData.calibrationforhard.find(td => td.idsNo == IDSSrNo);
+      const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
+      const balanceInfo = tempBalObject.balance_info[0];
+      var objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
+      if (objFailedFlag == undefined) {
+        globalData.arrFlagForFailCalib.push({
+          idsNo: IDSSrNo,
+          failFlagDaily: false,
+          failFlagPeriodic: false
+        });
+        objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
+      }
+
+
+      if (protocolValue != protocolIncomingType + "C000") {
+        if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await containsNumber(protocolValueData))) {
+          if (tempcalibObj.sampleNoforDaily != 0) {
+            tempcalibObj.sampleNoforDaily -= 1;
+          }
+          tempcalibObj.Daily = {};
+          tempcalibObj.datetimecount = 0;
+          return `HR40Invalid String,,,,` ;
+          // `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,
+        }
+        if (protocolValueData != '' && protocolValueData.includes('Date') == true) {
+          tempcalibObj.datetimecount = 1;
+          // var date ;
+          // if (str_Protocol.split('Date')[1].includes('N')) {
+          //     date = str_Protocol.split('Date')[1].split('N')[0].trim(" ");;
+          // } else if (str_Protocol.split('Date')[1].includes('n')) {
+          //     date = str_Protocol.split('Date')[1].split('n')[0].trim(" ");
+          // } else {
+          //     date = str_Protocol.split('Date')[1].split('R')[0].trim(" ");
+          // }
+          //   tempcalibObj.periodic.date = date;
+        } else if (protocolValueData != '' && protocolValueData.includes('Time') == true) {
+          // var time;
+          tempcalibObj.datetimecount = 2;
+          // if (str_Protocol.split('Time')[1].includes('N')) {
+          //     time = str_Protocol.split('Time')[1].split('N')[0].trim(" ");;
+          // } else if (str_Protocol.split('Time')[1].includes('n')) {
+          //     time = str_Protocol.split('Time')[1].split('n')[0].trim(" ");
+          // } else {
+          //     time = str_Protocol.split('Time')[1].split('R')[0].trim(" ");
+          // }
+          // tempcalibObj.periodic.time = time;
+        } else if (protocolValueData != '' && tempcalibObj.datetimecount == 2 && (protocolValueData.includes('MG') == true || protocolValueData.includes('mg') == true || protocolValueData.includes('GM') == true || protocolValueData.includes('gm') == true || protocolValueData.includes('kg') == true || protocolValueData.includes('KG') == true)) {
+          tempcalibObj.datetimecount = 3;
+          var unitarr = ["gm", "GM", "MG", "mg", "KG", "kg"];
+          var unit;
+          var resultofunit = unitarr.some(i => {
+            if (protocolValueData.includes(i)) {
+              unit = i;
+              return true
+            }
+          });
+          if (resultofunit == false) {
+            tempcalibObj.Daily = {};
+            tempcalibObj.datetimecount = 0;
+            return `HR40Invalid String,,,,`
+          } else {
+            tempcalibObj.Daily.WT = protocolValueData.split(/mg|MG|GM|gm|KG|kg/)[0].trim();
+            tempcalibObj.Daily.unit = unit;
+            if (await periodiccalibrationModel.calibstringiswrong(tempcalibObj.Daily.WT, tempcalibObj.Daily.unit, balanceInfo.Bal_Unit)) {
+              tempcalibObj.Daily = {};
+              tempcalibObj.datetimecount = 0;
+              return `HR40Invalid String,,,,`
+            } else {
+              tempcalibObj.sampleNoforDaily += 1;
+            }
+          }
+
+        }
+        return protocolValue;
+      } else {
+        if (tempcalibObj.datetimecount == 3) {
+          var srNo = tempcalibObj.sampleNoforDaily;
+          var recieveWt = tempcalibObj.Daily.WT;
+          var objBalRelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
+          const objSentWt = objBalRelWt.calibWt[parseFloat(srNo) - 1];
+
+          const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+          var RepFromPC = "";
+          var objSendWt = objBalRelWt.calibWt[parseFloat(srNo) - 1]
+          if (parseInt(srNo) != 0 && parseInt(srNo) <= objBalRelWt.calibWt.length) {
+            var srNotobepalced = parseInt(srNo) + 1;
+            var intDaily_RepNo;
+            var ResponseFrmPC = ""
+            if (objOwner.owner == 'analytical') {
+              var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatus.find(k => k.Bal_ID == strBalId);
+            } else {
+              var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatusBin.find(k => k.Bal_ID == strBalId);
+            }
+
+            if (parseInt(srNo) == 1) {
+              var combineStdWt = "";
+              var combineLowerLimit = "";
+              var combineUpperLimit = "";
+              for (let i of objBalRelWt.calibWt) {
+                combineStdWt = combineStdWt + i.Bal_StdWt + ",";
+                combineLowerLimit = combineLowerLimit + i.Bal_NegTol + ",";
+                combineUpperLimit = combineUpperLimit + i.Bal_PosTol + ",";
+              }
+              combineStdWt = combineStdWt.slice(0, -1)
+              combineLowerLimit = combineLowerLimit.slice(0, -1)
+              combineUpperLimit = combineUpperLimit.slice(0, -1)
+              const insertObj = {
+                str_tableName: 'tbl_calibration_daily_master_incomplete',
+                data: [
+                  { str_colName: 'Daily_CalbDate', value: date.format(now, 'YYYY-MM-DD') },
+                  { str_colName: 'Daily_CalbTime', value: date.format(now, 'HH:mm:ss') },
+                  { str_colName: 'Daily_BalID', value: balanceInfo.Bal_ID },
+                  { str_colName: 'Daily_BalSrNo', value: balanceInfo.Bal_SrNo, },
+                  { str_colName: 'Daly_Make', value: balanceInfo.Bal_Make },
+                  { str_colName: 'Daily_Model', value: balanceInfo.Bal_Model },
+                  { str_colName: 'Daily_Unit', value: balanceInfo.Bal_Unit },
+                  { str_colName: 'Daily_Dept', value: tempCubicInfo.Sys_dept },
+                  { str_colName: 'Daily_LeastCnt', value: balanceInfo.Bal_LeastCnt },
+                  { str_colName: 'Daily_MaxCap', value: balanceInfo.Bal_MaxCap },
+                  { str_colName: 'Daily_MinCap', value: balanceInfo.Bal_MinCap },
+                  { str_colName: 'Daily_ZeroError', value: 0 },
+                  { str_colName: 'Daily_SpiritLevel', value: 0 },
+                  { str_colName: 'Daily_GeneralCare', value: 0 },
+                  { str_colName: 'Daily_UserID', value: tempUserObject.UserId },
+                  { str_colName: 'Daily_UserName', value: tempUserObject.UserName },
+                  { str_colName: 'Daily_PrintNo', value: 0 },
+                  { str_colName: 'Daily_IsRecalib', value: BalanceRecalibStatusObject.DailyBalRecalib },
+                  // { str_colName: 'Daily_Location', value: serverConfig.ProjectName == 'SunHalolGuj1' ? tempCubicInfo.Sys_Location : tempCubicInfo.Sys_dept },
+                  { str_colName: 'Daily_Location', value: serverConfig.ProjectName == 'SunHalolGuj1' ? tempCubicInfo.Sys_Location : tempCubicInfo.Sys_Area },//as discussed with pushkar
+                  { str_colName: 'Daily_CubicalNo', value: tempCubicInfo.Sys_CubicNo },
+                  { str_colName: 'Daily_Bal_MaxoptRange', value: balanceInfo.Bal_MaxoptRange },
+                  { str_colName: 'Daily_Bal_MinoptRange', value: balanceInfo.Bal_MinoptRange },
+                  { str_colName: 'Decimal_Point', value: balanceInfo.Bal_DP },
+                  { str_colName: 'Daily_RoomNo', value: balanceInfo.Bal_CalbDuration },
+                  { str_colName: 'Daily_StdWeight', value: combineStdWt },
+                  { str_colName: 'Daily_NegTol', value: combineLowerLimit },
+                  { str_colName: 'Daily_PosTol', value: combineUpperLimit },
+                  { str_colName: 'Daily_NextPeriodicDate', value: date.format(balanceInfo.Bal_CalbDueDt, 'YYYY-MM-DD') },
+                  { str_colName: 'Daily_IsBinBalance', value: balanceInfo.IsBinBalance }
+                ]
+              }
+              var result = await database.save(insertObj);
+              intDaily_RepNo = result[0].insertId;
+              const selectPrecalibSelWtObj = {
+                str_tableName: 'tbl_precalibration_daily',
+                data: '*',
+                condition: [
+                  { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
+                  { str_colName: 'Standard_Weight_Block', value: objSendWt.Bal_StdWt, comp: 'eq' },
+                  { str_colName: 'UID', value: objSendWt.Id, comp: 'eq' },
+
+                ]
+              }
+              var result1 = await database.select(selectPrecalibSelWtObj)
+              const daily_precalib_weight = result1[0][0];
+              const insertDetailObj = {
+                str_tableName: 'tbl_calibration_daily_detail_incomplete',
+                data: [
+                  { str_colName: 'Daily_RepNo', value: intDaily_RepNo },
+                  { str_colName: 'Daily_RecNo', value: 1 },
+                  { str_colName: `Daily_BalStdWt${srNo}`, value: objSendWt.Bal_StdWt },
+                  { str_colName: `Daily_BalNegTol${srNo}`, value: objSendWt.Bal_NegTol },
+                  { str_colName: `Daily_BalPosTol${srNo}`, value: objSendWt.Bal_PosTol },
+                  { str_colName: `Daily_ActualWt${srNo}`, value: tempcalibObj.Daily.WT },
+                  { str_colName: `Daily_StdWtBoxID${srNo}`, value: daily_precalib_weight.CalibrationBox_ID },
+                  { str_colName: `Daily_StdWtIDNo${srNo}`, value: daily_precalib_weight.CalibrationBox_Elements_IDNo },
+                  { str_colName: `Daily_WeightBox_certfctNo${srNo}`, value: daily_precalib_weight.CalibrationBox_Calibration_CertificateNo },
+                  { str_colName: `Daily_ValDate${srNo}`, value: daily_precalib_weight.CalibrationBox_Validity_Date },
+                  { str_colName: `Daily_StdWt${srNo}`, value: daily_precalib_weight.CalibrationBox_Selected_Elements },
+                  { str_colName: `PercentofCapacity${srNo}`, value: 0 },
+                  { str_colName: `Decimal_Point`, value: 0 },
+                ]
+              }
+              var res = await database.save(insertDetailObj);
+              objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: tempcalibObj.Daily.WT } });
+
+              var objActivity = {};
+              objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
+              Object.assign(objActivity,
+                { strUserId: tempUserObject.UserId },
+                { strUserName: tempUserObject.UserName },
+              );
+              if (objFailedFlag.failFlagDaily == true) {
+                Object.assign(objActivity,
+                  { activity: `Daily Calibration Started On IDS ${IDSSrNo} After Failure` }
+                );
+              }
+              else {
+                Object.assign(objActivity,
+                  { activity: 'Daily Calibration Started On IDS ' + IDSSrNo }
+                );
+              }
+              await objActivityLog.ActivityLogEntry(objActivity);
+            } else {
+              var Daily_RecNo1;
+              const selectDaily_RepNoObj = {
+                str_tableName: 'tbl_calibration_daily_master_incomplete',
+                data: 'MAX(Daily_RepNo) AS Daily_RepNo',
+                condition: [
+                  { str_colName: 'Daily_BalID', value: strBalId, comp: 'eq' },
+                ]
+              }
+              var result = await database.select(selectDaily_RepNoObj);
+              let intDaily_RepNo = result[0][0].Daily_RepNo;
+
+              const selectDaily_RecNoObj = {
+                str_tableName: 'tbl_calibration_daily_detail_incomplete',
+                data: 'MAX(Daily_RecNo) AS  Daily_RecNo',
+                condition: [
+                  { str_colName: 'Daily_RepNo', value: intDaily_RepNo, comp: 'eq' },
+                ]
+              }
+              var resultRecNo = await database.select(selectDaily_RecNoObj)
+              const Daily_RecNo = resultRecNo[0][0].Daily_RecNo;
+              Daily_RecNo1 = Daily_RecNo + 1;
+              const selectPrecalibSelWtObj = {
+                str_tableName: 'tbl_precalibration_daily',
+                data: '*',
+                condition: [
+                  { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
+                  { str_colName: 'Standard_Weight_Block', value: objSendWt.Bal_StdWt, comp: 'eq' },
+                  // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
+                ]
+              }
+              var result = await database.select(selectPrecalibSelWtObj)
+              const daily_precalib_weight = result[0][0];
+              const updateObj = {
+                str_tableName: 'tbl_calibration_daily_detail_incomplete',
+                data: [
+                  { str_colName: `Daily_BalStdWt${srNo}`, value: objSendWt.Bal_StdWt },
+                  { str_colName: `Daily_BalNegTol${srNo}`, value: objSendWt.Bal_NegTol },
+                  { str_colName: `Daily_BalPosTol${srNo}`, value: objSendWt.Bal_PosTol },
+                  { str_colName: `Daily_ActualWt${srNo}`, value: tempcalibObj.Daily.WT },
+                  { str_colName: `Daily_StdWtBoxID${srNo}`, value: daily_precalib_weight.CalibrationBox_ID },
+                  { str_colName: `Daily_StdWtIDNo${srNo}`, value: daily_precalib_weight.CalibrationBox_Elements_IDNo },
+                  { str_colName: `Daily_StdWt${srNo}`, value: daily_precalib_weight.CalibrationBox_Selected_Elements },
+                  { str_colName: `Daily_WeightBox_certfctNo${srNo}`, value: daily_precalib_weight.CalibrationBox_Calibration_CertificateNo },
+                  { str_colName: `Daily_ValDate${srNo}`, value: daily_precalib_weight.CalibrationBox_Validity_Date },
+                  { str_colName: `PercentofCapacity${srNo}`, value: 0 },
+                ],
+                condition: [
+                  { str_colName: 'Daily_RepNo', value: intDaily_RepNo },
+                ]
+              }
+              await database.update(updateObj)
+              objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: tempcalibObj.Daily.WT } });
+            }
+            if (parseInt(srNo) == objBalRelWt.calibWt.length) {
+              if (objSendWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSendWt.Bal_PosTol)) {
+                objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                console.log('done');
+                await this.saveToCompleteTable(strBalId, IDSSrNo);
+                await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed');
+                objFailedFlag.failFlagDaily = false;
+
+
+
+                BalanceRecalibStatusObject.DailyBalRecalib = 0;
+
+                if (BalanceRecalibStatusObject.PeriodicBalRecalib == 1) {
+
+                  let TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                  if (TempCalibType != undefined) {
+                    TempCalibType.calibType = 'periodic';
+                  } else {
+                    globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                  }
+                  await fetchDetails.pushCalibrationObj(strBalId, IDSSrNo);
+                  RepFromPC = `CRH1Periodic Calibration,Pending,,,`;
+                } else {
+                  RepFromPC = await fetchDetails.checkForPeriodicDue(IDSSrNo);
+                }
+                tempcalibObj.Daily = {};
+                tempcalibObj.datetimecount = 0;
+                tempcalibObj.sampleNoforDaily = 0;
+              } else {
+                objFailedFlag.failFlagDaily = true;
+                tempcalibObj.Daily = {};
+                tempcalibObj.datetimecount = 0;
+                tempcalibObj.sampleNoforDaily = 0;
+                return 'HRcF';
+              }
+            } else {
+              RepFromPC = "HRC" + "Daily Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[parseInt(srNo)].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+            }
+
+            if (parseFloat(objSentWt.Bal_NegTol) <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= parseFloat(objSentWt.Bal_PosTol))) {
+              tempcalibObj.Daily = {};
+              tempcalibObj.datetimecount = 0;
+              return RepFromPC;
+            } else {
+              objFailedFlag.failFlagDaily = true;
+              await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed');
+              tempcalibObj.Daily = {};
+              tempcalibObj.datetimecount = 0;
+              tempcalibObj.sampleNoforDaily = 0;
+              return 'HRcF';
+            }
+          }
+        } else {
+          tempcalibObj.Daily = {};
+          tempcalibObj.datetimecount = 0;
+          return `+`
+        }
+      }
+    }
+    catch (err) {
+      console.log("Error from verifyWeights of Daily", err)
+      return `Error from verifyWeights of Daily  ${err}`;
+    }
+
+  }
   // **************************************************************************************//
   // Asynchronous function for storing data from incomplete to complete daily tables and 
   // deleting entries from incomplete tables
@@ -1096,7 +1444,7 @@ class CalibrationModel {
   //*************************************************************************************************** */
   // Below function deletes the data from incomplete tables (daily)
   //***************************************************************************************************** */
-  deleteEntriesFromIncomplete(oldRepSrNo) {
+  async deleteEntriesFromIncomplete(oldRepSrNo) {
     const deleteMasterObj = {
       str_tableName: 'tbl_calibration_daily_master_incomplete',
       condition: [
@@ -1116,7 +1464,7 @@ class CalibrationModel {
   //***************************************************************************************************8 */
   //Below function is to update the Recalibration flag of Daily
   //****************************************************************************************** */
-  UpdateRecalibFLagDaily(strBalId, IDSSrNo) {
+  async UpdateRecalibFLagDaily(strBalId, IDSSrNo) {
     var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == IDSSrNo);
     if (objOwner.owner == 'analytical') {
       var recalliTable = `tbl_recalibration_balance_status`;

@@ -3,7 +3,7 @@ var globalData = require('../../global/globalData')
 const database = new Database();
 
 class CheckGranulationData{
-    checkGranulation(cubicalObj,typeValue,weightValue,IdsNo)
+    checkGranulation(cubicalObj,typeValue,data,IdsNo)
     {
         return new Promise((resolve, reject) => {
             let responseObj = {};
@@ -29,7 +29,7 @@ class CheckGranulationData{
                     detailTable = 'tbl_cap_detail17_incomplete';  
                 }
             }
-            var incomingWt = parseFloat(weightValue);
+            var incomingWt = parseFloat(data.dataValues);
             const masterData = {
                 str_tableName:masterTable,
                 data:'MAX(RepSerNo) AS serialNo',

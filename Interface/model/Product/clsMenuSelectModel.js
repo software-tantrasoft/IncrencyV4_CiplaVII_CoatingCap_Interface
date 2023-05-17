@@ -1043,6 +1043,9 @@ class MenuSelect {
                 (k) => k.MenuName == "Particle Seizing"
               );
 
+
+          globalData.arrPaticleData.push({ idsNo: IdsNo , actualSampleValue:1, sampleNo : 0, message : ""});  // for particle size handle 
+
               var upperLimit = tempLimitObj.PartSize.T1Pos;
               var lowerLimit = tempLimitObj.PartSize.T1Neg;
               var noOfsamples = tempLimitObj.PartSize.noOfSamples;
@@ -1050,7 +1053,8 @@ class MenuSelect {
               // last 0/1 for Edit sample 0- editable 1- Not editable
               //***************commented and adde by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
               //strReturnProtocol = `MSP${menuObj.InstruId}NPRTSIZ,${upperLimit},${lowerLimit},${noOfsamples},0000,0`;
-              strReturnProtocol = `MSP${menuObj.InstruId}NPRTSIZ,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PartSize.unit},`;
+              //strReturnProtocol = `MSP${menuObj.InstruId}NPRTSIZ,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PartSize.unit},`;
+              strReturnProtocol = `MSH${menuObj.InstruId}NPRTSIZ,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PartSize.unit},`;
               //************************************************************************* *****************************************************/
               await this.activityLogEntryForMs("Particle Size", IdsNo);
               return strReturnProtocol;
@@ -1064,6 +1068,8 @@ class MenuSelect {
               var menuObj = globalData.arr_menuList.find(
                 (k) => k.MenuName == "%Fine"
               );
+
+              globalData.arrpercentFineData.push({ idsNo: IdsNo , actualSampleValue:1, sampleNo : 0, message : "" }); 
               var upperLimit = tempLimitObj.PerFine.T1Pos;
               var lowerLimit = tempLimitObj.PerFine.T1Neg;
               var noOfsamples = tempLimitObj.PerFine.noOfSamples;
@@ -1071,7 +1077,8 @@ class MenuSelect {
               // last 0/1 for Edit sample 0- editable 1- Not editable
               //***************commented and adde by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
               //strReturnProtocol = `MSF${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,0`;
-              strReturnProtocol = `MSF${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
+             // strReturnProtocol = `MSF${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
+              strReturnProtocol = `MSH${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
               //************************************************************************* *****************************************************/
               await this.activityLogEntryForMs("% Fine", IdsNo);
               return strReturnProtocol;
@@ -2373,6 +2380,32 @@ class MenuSelect {
         (tempHardnessReadings.arr = []),
         (tempHardnessReadings.opPosTol = 0);
     }
+
+    var tempparticleData = globalData.arrPaticleData.find(k => k.idsNo == IdsNo);
+    if (tempparticleData == undefined) {
+      globalData.arrPaticleData.push({ idsNo: IdsNo, actualSampleValue: 1 });
+  } else {
+      tempparticleData.datecount = false;
+      tempparticleData.timecount = false;
+      tempparticleData.dataValues = undefined;
+      tempparticleData.actualSampleValue = 1;
+      tempparticleData.unit = undefined;
+      tempparticleData.side = undefined;
+
+  }
+
+    var temppercentFineData = globalData.arrpercentFineData.find(k => k.idsNo == IdsNo);
+    if (temppercentFineData == undefined) {
+      globalData.arrpercentFineData.push({ idsNo: IdsNo, actualSampleValue: 1 });
+  } else {
+      temppercentFineData.datecount = false;
+      temppercentFineData.timecount = false;
+      temppercentFineData.dataValues = undefined;
+      temppercentFineData.actualSampleValue = 1;
+      temppercentFineData.unit = undefined;
+      temppercentFineData.side = undefined;
+
+  }
     return "+";
   }
   async CheckDTModel(idsNo) {

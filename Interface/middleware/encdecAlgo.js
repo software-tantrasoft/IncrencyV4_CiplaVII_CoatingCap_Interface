@@ -1,7 +1,7 @@
 // ***********************************************************************************************//
 //  Below Mechanism - taking encrypted protocol then decrypt it                                  //
 //***********************************************************************************************//
-function decrypt(strRecievedProtocol, blnEncryptReq = true) {
+async function decrypt(strRecievedProtocol, blnEncryptReq = true) {
     return new Promise((resolve, reject) => {
         var length = strRecievedProtocol.length;
         var strDecryptProtocol = '';
@@ -21,7 +21,7 @@ function decrypt(strRecievedProtocol, blnEncryptReq = true) {
 // ***********************************************************************************************//
 //  Below Mechanism - taking plain protocol then encrypt it                                  //
 //***********************************************************************************************//
-function encrypt(strRecievedProtocol, blnEncryptReq = true) {
+async function encrypt(strRecievedProtocol, blnEncryptReq = true) {
     strRecievedProtocol = strRecievedProtocol.toString('utf8');
     return new Promise((resolve, reject) => {
         var length = strRecievedProtocol.length;

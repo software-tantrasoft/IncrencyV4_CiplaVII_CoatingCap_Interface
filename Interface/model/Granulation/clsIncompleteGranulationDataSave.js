@@ -5,13 +5,14 @@ const database = new Database();
 const globalData = require('../../global/globalData');
 const date = require('date-and-time');
 class IncompleteGranulationData {
-    async saveIncompleteData(cubicalObj, protocol, intNos, typeValue, tempUserObject, IdsNo) {
+    async saveIncompleteData(cubicalObj,data,actualSampleValue, intNos, typeValue, tempUserObject, IdsNo) {
 
-        var actualWt = protocol.split(" ");
+        //var actualWt = protocol.split(" "); // for particle size handle 
         var now = new Date();
-        var side = actualWt[0].substring(4, 3);
-        var actualSampleValue = actualWt[1].substring(4, 3);
-        actualSampleValue = parseInt(actualSampleValue);
+       // var side = actualWt[0].substring(4, 3);
+       var side = data.side
+        // var actualSampleValue = actualWt[1].substring(4, 3);
+        // actualSampleValue = parseInt(actualSampleValue);
         var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
         var ProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo);
         var currentCubic = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
@@ -24,8 +25,10 @@ class IncompleteGranulationData {
             sideValue = 'RHS';
         }
 
-        var wtVal = actualWt[2].split(",")[0];//weight value
-        actualUnit = actualWt[3].substring(0, 1);//unit value
+        // var wtVal = actualWt[2].split(",")[0];//weight value
+        var wtVal = data.dataValues;//weight value
+        // actualUnit = actualWt[3].substring(0, 1);//unit value
+        actualUnit = data.unit;//unit value
         //var numval = wtVal.length;
         if (wtVal.match(/^\d+$/)) {
             newWeight = wtVal;
@@ -93,7 +96,8 @@ class IncompleteGranulationData {
                         { str_colName: 'Qty', value: noOfSample },
                         { str_colName: 'GrpQty', value: noOfSample },
                         { str_colName: 'GrpFreq', value: noOfSample },
-                        { str_colName: 'Idsno', value: cubicalObj.Sys_IDSNo },
+                        // { str_colName: 'Idsno', value: cubicalObj.Sys_IDSNo },
+                        { str_colName: 'Idsno', value: IdsNo },
                         { str_colName: 'CubicalNo', value: cubicalObj.Sys_CubicNo },
                         { str_colName: 'BalanceId', value: currentCubic.Sys_BalID },
                         //{ str_colName: 'BalanceNo', value: productObj.Sys_BalID },

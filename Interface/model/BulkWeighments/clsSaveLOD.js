@@ -15,7 +15,7 @@ const objPrintReport = new printReport();
 const clsActivityLog = require('../clsActivityLogModel');
 const objActivityLog = new clsActivityLog();
 class LOD {
-    async saveLodData(productObj, arrLodData, tempUserObject, IdsNo, protocolIncomingType) {
+    async saveLodData(productObj, arrLodData, tempUserObject, IdsNo, protocolIncomingType,objLodDatas) {
         try {
             var department = "";
             let responseObj = {};
@@ -86,6 +86,7 @@ class LOD {
                 }
             } else {
                 // For Compression and coating
+                department = productObj.Sys_dept;
                 cubicType = 0;
                 GranuRepoHeading = 0;
             }
@@ -100,6 +101,8 @@ class LOD {
                     }
                     else {
                         objLodData.arr = [];
+                        objLodData.Time = undefined;
+                        
                     }
                     console.log('InValid LOD data string');
                     return 'Invalid data string';
@@ -212,8 +215,8 @@ class LOD {
                         //lossOnWt = arrLodData[2].finalWt
 
                     }
-
-
+                    var abort=arrLodData.filter(k => k.hasOwnProperty('abort'))
+                    var Aborted=abort.length==1?"Test Aborted":null
                     if (!lossOnWt == 0) {
                         var saveLodData = {
                             str_tableName: 'tbl_lodmaster',
@@ -238,7 +241,7 @@ class LOD {
                                 { str_colName: 'UserName', value: tempUserObject.UserName },
                                 { str_colName: 'IsArchived', value: 0 },
                                 { str_colName: 'PrDate', value: date.format(now, 'YYYY-MM-DD') },
-                                { str_colName: 'PrTime', value: date.format(now, 'HH:mm:ss') },
+                                { str_colName: 'PrTime', value: objLodDatas.Time },
                                 { str_colName: 'PrintNo', value: 0 },
                                 { str_colName: 'Remark', value: 0 },
                                 { str_colName: 'ReportType', value: productObj.Sys_RptType },
@@ -271,6 +274,7 @@ class LOD {
                                 { str_colName: 'IsRepoComp', value: cubicType },
                                 { str_colName: 'GranuRepoHeading', value: GranuRepoHeading },
                                 { str_colName: 'RepoLabel11', value: currentCubicle.Sys_Validation },
+                                { str_colName: 'RepoLabel13', value: Aborted },
                                 { str_colName: 'Lot', value: objLotData.LotNo },
                                 { str_colName: 'Area', value: productObj.Sys_Area },
                                 { str_colName: 'AppearanceDesc', value: productObj.Sys_Appearance },
@@ -346,6 +350,7 @@ class LOD {
                 }
                 else {
                     objLodData.arr = [];
+                    objLodData.Time = undefined;
                 }
                 console.log('InValid LOD data string');
                 return 'Invalid data string';
@@ -357,6 +362,7 @@ class LOD {
             }
             else {
                 objLodData.arr = [];
+                objLodData.Time = undefined;
             }
             // Error loging in Error file
             var logError = date.format(new Date(), 'DD-MM-YYYY HH:mm:ss') + " , ";
@@ -440,6 +446,7 @@ class LOD {
         }
         else {
             objLodData.arr = [];
+            objLodData.Time = undefined;
         }
         return resultRemark;
 

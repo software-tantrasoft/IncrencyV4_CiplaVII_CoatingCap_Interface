@@ -292,6 +292,14 @@ class PowerBackup {
             //let currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == Idsno);
             let protocol;
             // here ids sending 8 for indivisual layer 1 // Dosa dry // softshell
+            if(Weightment_type == "H" && powerbackupdata[0].WeighmentType == "P"){
+                Weightment_type = "P"   
+            }
+
+            if(Weightment_type == "H" && powerbackupdata[0].WeighmentType == "F"){
+                Weightment_type = "F"   
+            }
+            
             switch (Weightment_type) {
                 case "1":
                     if (ProductType == 5) {//dosa dry
@@ -402,8 +410,15 @@ class PowerBackup {
 
                     let Weightment_type = 'P'
 
-
-                    protocol = `WP${Weightment_type}00${parseInt(cnt)}${message},`;
+                    var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
+                    let arrPaticleData = globalData.arrPaticleData.find(ht => ht.idsNo == IdsNo);
+                    if(objLotData != undefined){
+                        arrPaticleData.sampleNo = parseInt(cnt);
+                        arrPaticleData.message = message;
+                    }
+                  
+                    // protocol = `WP${Weightment_type}00${parseInt(cnt)}${message},`;
+                    protocol = `PC0${count}${sidevalue}`;
                 }
                 else if (Weightment_type == '17') {
                     var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
@@ -416,14 +431,22 @@ class PowerBackup {
                     switch (cnt) {
 
                         case 2:
-                            message = "ABOVE 60 MESH";
+                            message = "BELOW 60 MESH";
                             break;
                     }
 
                     let Weightment_type = 'F';
 
 
-                    protocol = `WP${Weightment_type}00${parseInt(cnt)}${message},`;
+                    // protocol = `WP${Weightment_type}00${parseInt(cnt)}${message},`;
+
+                    var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
+                    let arrpercentFineData = globalData.arrpercentFineData.find(ht => ht.idsNo == IdsNo);
+                    if(objLotData != undefined){
+                        arrpercentFineData.sampleNo = parseInt(cnt);
+                        arrpercentFineData.message = message;
+                    }
+                    protocol = `PC0${count}${sidevalue}`;
                 }
                 else {
                     protocol = `PC0${count}${sidevalue}`;

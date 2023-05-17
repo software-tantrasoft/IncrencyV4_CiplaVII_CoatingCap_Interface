@@ -15,7 +15,7 @@ class InstrumentUsageLog {
      * @param {*} activity Weighment type
      * @param {*} options Whether started or completed
      */
-    InstrumentUsage(instrument, IdsNo, tableName, activity, options) {
+    async InstrumentUsage(instrument, IdsNo, tableName, activity, options) {
         var selectedIds;
         // here we are selecting IDS functionality for that cubicle 
         const IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
@@ -34,9 +34,9 @@ class InstrumentUsageLog {
             case 'Balance':
                 instrumentId = tempCubicInfo.Sys_BalID;
                 if (objOwner.owner == 'analytical') {
-                     instrumentId = tempCubicInfo.Sys_BalID;
+                    instrumentId = tempCubicInfo.Sys_BalID;
                 } else {
-                     instrumentId = tempCubicInfo.Sys_BinBalID;
+                    instrumentId = tempCubicInfo.Sys_BinBalID;
                 }
                 //instrumentId = tempCubicInfo.Sys_BalID;
                 break;

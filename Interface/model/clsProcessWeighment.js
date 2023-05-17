@@ -1648,15 +1648,21 @@ class ProcessWeighment {
             };
             var objCubic = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
             console.log("WC");
+            var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
+            var MenuType;
+            if (objLotData != undefined) {
+                let strMsProtocol = objLotData.MS;
+                MenuType = strMsProtocol.substring(2, 3);
+            }
             // for particle seizing
-            if (typeValue == 'P') {
-                var result = await objCompleteGran.saveCompleteData(objCubic, typeValue, tempUserObject, IdsNo)
+            if (MenuType == 'P') {
+                var result = await objCompleteGran.saveCompleteData(objCubic, MenuType, tempUserObject, IdsNo)
                 var objresMoveGran = await objMoveGranData.moveGranulation(result, IdsNo);
                 objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', '', 'completed');
                 return "+";
             }
-            else if (typeValue == 'F') {
-                var result = await objCompleteGran.saveCompleteData(objCubic, typeValue, tempUserObject, IdsNo)
+            else if (MenuType == 'F') {
+                var result = await objCompleteGran.saveCompleteData(objCubic, MenuType, tempUserObject, IdsNo)
                 var objresMoveGran = await objMoveGranData.moveGranulation(result, IdsNo)
                 objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', '', 'completed');
                 return "+";

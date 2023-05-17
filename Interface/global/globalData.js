@@ -31,6 +31,7 @@ var arrCubicleType = []; //holds the cubicle type [{idsNo:IDSSrNo, cubicleType:'
 var arrBulkDataFlag = []; // [{IdsNo:200, flgDTFlag:true/false, flgHTFlag:true/false},..]
 // var arrDTDataReading = [];
 var arrDTData = []; // [{idsNo:200,arr_heading:[]},.....]
+var calibrationforhard = [];
 // var arrHardnessReading = [];
 var sampleNo = 0;
 var hardnessIncompleteId = []; // [{idsNo:200,incompRepSerNo:},....] 
@@ -122,6 +123,8 @@ var arrContentCapsule = [] // This array hold the content Number {idsNo:200, con
 var arrLLsampleRemark = []; //[{idsNo:200, remark:LE0/LE1}]
 var arrRotaryTypeDT = [];
 var arrHardnessPowerbackupFlag = [];
+var arrPaticleData = [];  
+var arrpercentFineData = [];   // for particle size handle 
 module.exports.arrGroupIPC = arrGroupIPC;
 module.exports.arrHardnessPowerbackupFlag = arrHardnessPowerbackupFlag;
 module.exports.arrHardnessTH1050=arrHardnessTH1050
@@ -221,4 +224,8 @@ module.exports.arrHardnessMT50Reading = arrHardnessMT50Reading;
 module.exports.arrHardnessST50LAN = arrHardnessST50LAN;
 module.exports.arrContentCapsule = arrContentCapsule;
 module.exports.arrLLsampleRemark = arrLLsampleRemark;
+module.exports.arrPaticleData = arrPaticleData;
+module.exports.arrpercentFineData = arrpercentFineData;
+module.exports.calibrationforhard = calibrationforhard ;
+
 

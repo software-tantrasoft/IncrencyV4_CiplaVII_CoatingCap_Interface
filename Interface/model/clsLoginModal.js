@@ -306,12 +306,12 @@ class LoginModal {
                                                                 globalData.arrUsers.push({
                                                                     IdsNo: IdsIp,
                                                                     UserId: strUserId,
-                                                                    UserName:  sarr_UserData[0].UserInitials,
+                                                                    UserName: sarr_UserData[0].UserInitials,
                                                                 });
                                                             } else {
-                                                                    tmpUserobj.UserId = strUserId;
-                                                                    tmpUserobj.UserName = sarr_UserData[0].UserInitials;
-                                                                     // tmpUserobj.ForceLogin = false;
+                                                                tmpUserobj.UserId = strUserId;
+                                                                tmpUserobj.UserName = sarr_UserData[0].UserInitials;
+                                                                // tmpUserobj.ForceLogin = false;
                                                             }
                                                             // globalData.arrUsers.push({
                                                             //     IdsNo: IdsIp,
@@ -629,7 +629,12 @@ class LoginModal {
                 .filter(k => k.idsNo != strIdsNo)
         }
         //----------------------------------------------------------------------
-
+        //new calibration array////////////////////////////////////////////////////
+        if (globalData.calibrationforhard != undefined) {
+            globalData.calibrationforhard = globalData.calibrationforhard
+                .filter(k => k.idsNo != strIdsNo)
+        }
+        //
 
         if (globalData.arrIPCPeriodicFlag != undefined) { // added by vivek11101997
             globalData.arrIPCPeriodicFlag = globalData.arrIPCPeriodicFlag
@@ -889,6 +894,7 @@ class LoginModal {
             globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
                 .filter(k => k.idsNo != strIdsNo);
         }
+       
     }
 
     releaseUserFromIds(obj) {
@@ -909,7 +915,7 @@ class LoginModal {
             }
             this.updateWeighmentStatus(obj.IdsNo, 0);
             objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
-            objIncompleteUpdation.updateReportRemarkaftercommunicationoff(activeUser);
+           // objIncompleteUpdation.updateReportRemarkaftercommunicationoff(activeUser);
 
             if (strUserObj != undefined) {
                 var userID = strUserObj.UserId;
