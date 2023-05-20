@@ -78,6 +78,10 @@ const ErrorLog = require('../model/clsErrorLog');
 const PowerBackup = require('../model/clsPowerBackupModel');
 const clspowerbackup = new PowerBackup();
 const jsonTareCmd = require('../global/tare.json');
+
+const ClassCalibPowerBackup = require("../model/Calibration/clsCalibPowerbackup");
+const CalibPowerBackup = new ClassCalibPowerBackup();
+/**
 /**
  * handleProtocol() - `this is entry point for all protocol takes two arguments as listed`;
  * @description Below class is comman gateway for input and output to protocols
@@ -504,7 +508,94 @@ class ProtocolHandler {
                                             await database.update(objUpdateCubicle);
 
                                             strReturnProtocol = strReturnProtocol.substring(0, strReturnProtocol.length - 1)
-                                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+
+                                            //sending powerbackup
+                                            var calibtype = strReturnProtocol.substring(2, 3);
+                                            switch (calibtype) {
+                                                case "1":
+                                                    calibtype = "Daily";
+                                                    break;
+                                                case "2":
+                                                    calibtype = "Periodic";
+                                                    break;
+                                                case "E":
+                                                    calibtype = "Eccentricity";
+                                                    break;
+                                                case "R":
+                                                    calibtype = "Repeatability";
+                                                    break;
+                                                case "U":
+                                                    calibtype = "Uncertainty";
+                                                    break;
+                                            }
+                                            let objFetchcalibpowerbackup =
+                                                await CalibPowerBackup.fetchCalibPowerBackupData(
+                                                    idsNo,
+                                                    calibtype,
+                                                    tempBalace
+                                                );
+                                            if (
+                                                objFetchcalibpowerbackup.status &&
+                                                objFetchcalibpowerbackup.result.length > 0
+                                            ) {
+                                                strReturnProtocol =
+                                                    await CalibPowerBackup.sendCalibPowerBackupData(
+                                                        strReturnProtocol,
+                                                        objFetchcalibpowerbackup.result,
+                                                        idsNo,
+                                                        str_IpAddress
+                                                    );
+                                            } else {
+                                                //clearing of different user entry if entry is not present in calibrationpowerbackup table
+                                                var tempCalibStatus = globalData.calibrationStatus.find(
+                                                    (k) => k.BalId == tempBalace
+                                                );
+                                                const tempUserObject = globalData.arrUsers.find(
+                                                    (k) => k.IdsNo == idsNo
+                                                );
+                                                var curruser = tempUserObject.UserId;
+                                                var calibrationentrypresent = false;
+                                                var differentuserentrypresent = false;
+
+                                                for (var i in tempCalibStatus.status) {
+                                                    if (tempCalibStatus.status[i] == "1") {
+                                                        calibrationentrypresent = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (calibrationentrypresent) {
+                                                    var selectCalibData = {
+                                                        str_tableName:
+                                                            "tbl_calibration_periodic_master_incomplete",
+                                                        data: "*",
+                                                        condition: [
+                                                            // { str_colName: "IdsNo", value: IdsNo },
+                                                            {
+                                                                str_colName: "Periodic_BalID",
+                                                                value: tempBalace,
+                                                            },
+                                                        ],
+                                                    };
+                                                    var result = await database.select(selectCalibData);
+                                                    if (result[0][0].Periodic_UserID != curruser) {
+                                                        differentuserentrypresent = true;
+                                                    }
+                                                }
+
+                                                if (differentuserentrypresent) {
+                                                    await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                                                        tempBalace,
+                                                        idsNo
+                                                    );
+                                                    strReturnProtocol = "DIFUSER";
+                                                }
+                                            }
+                                            if (strReturnProtocol == "DIFUSER") {
+                                                this.handleProtocol("CRN￻", str_IpAddress, "");
+                                            } else {
+                                                this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            }
+
                                         } else {
                                             //message change for mesage validation*******************
                                             // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
@@ -512,8 +603,6 @@ class ProtocolHandler {
                                             this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
                                         }
                                     }
-
-
                                 } else if (tempVernier != 'None' && tempCubicInfo.Sys_Port2 == 'Vernier') {
                                     let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
                                     // if (tempRightsObj.rights.includes('Calibration')) {
@@ -800,8 +889,83 @@ class ProtocolHandler {
 
                             break;
 
+                        //calibration Powerbackup
+                        case "VI":
+                            var powerbackuptype = str_Protocol.substring(3, 4);
+                            var tempCubicInfo = globalData.arrIdsInfo.find(
+                                (ids) => ids.Sys_IDSNo == idsNo
+                            );
 
-    
+                            var CalibrationType = str_Protocol.substring(2, 3);
+                            if (powerbackuptype == "0") {
+                                await CalibPowerBackup.deleteCalibPowerBackupData(
+                                    CalibrationType,
+                                    idsNo
+                                );
+
+                                if (
+                                    CalibrationType != "1" &&
+                                    CalibrationType != "4"
+                                ) {
+                                    await CalibPowerBackup.movingtocalibfailaftercalibpowerbackupdiscard(
+                                        CalibrationType,
+                                        idsNo
+                                    );
+                                }
+                                console.log("calibpowerbakup discard");
+                                //activitylog
+                                var calibrationname = "";
+                                switch (CalibrationType) {
+                                    case "1":
+                                    case "4":
+                                        calibrationname = "Daily";
+                                        break;
+
+                                    case "2":
+                                    case "5":
+                                        calibrationname = "Periodic";
+                                        break;
+
+                                    case "E":
+                                        calibrationname = "Eccentricity";
+                                        break;
+
+                                    case "R":
+                                        calibrationname = "Repeatability";
+                                        break;
+                                    case "U":
+                                        calibrationname = "Uncertainty";
+                                        break;
+                                }
+
+                                var objActivity = {};
+                                var userObj = globalData.arrUsers.find((k) => k.IdsNo == idsNo);
+                                Object.assign(
+                                    objActivity,
+                                    { strUserId: userObj.UserId },
+                                    {
+                                        strUserName: userObj.UserName, //sarr_UserData[0].UserName
+                                    },
+                                    {
+                                        activity:
+                                            `${calibrationname}  Calibration Discarded on IDS ` +
+                                            idsNo,
+                                    }
+                                );
+                                await objActivityLog.ActivityLogEntry(objActivity);
+                                //
+
+                                this.handleProtocol("CRN￻", str_IpAddress, "");
+                            } else {
+                                var strReturnProtocol = await caliDecider.calibPendingDecider(
+                                    str_Protocol,
+                                    str_IpAddress.split(".")[3]
+                                );
+                                this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                break;
+                            }
+                            break;
+
                         // For menu Printing
                         case "MP":
                             var tempVerify = await objCommanFun.calibrationVerification(idsNo);
@@ -1422,6 +1586,13 @@ class ProtocolHandler {
                             break;
                         case "LO":
                             var logOutType = str_Protocol.substring(2, 3);
+                            //powerbackup/////////////////////////////////////////////////////////////////////////////
+                            if (logOutType == "U") {
+                                await CalibPowerBackup.deletepowerbackupaftercalibterminated(
+                                    idsNo
+                                );
+                            }
+                            ///////////////////////////////////////////////////////////////////////////////////////////////////////
                             await objIncompleteRemark.updateReportRemarkOnLO(idsNo);
                             await handleLoginModal.logOut(str_IpAddress.split('.')[3], logOutType);
                             this.sendProtocol('+', str_IpAddress);
