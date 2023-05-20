@@ -12,6 +12,8 @@ var logFromPC = require('../model/clsLogger');
 const sort = require('../model/Calibration/checkForPendingCalib');
 const PreCalibCheck = require('./clsPreWeighmentChecks');
 const clsPreWeighmentChecks = new PreCalibCheck();
+const ClassCalibPowerBackup = require("../model/Calibration/clsCalibPowerbackup");
+const CalibPowerBackup = new ClassCalibPowerBackup();
 let now = new Date();
 /**
  * @description Class to call startUp function
