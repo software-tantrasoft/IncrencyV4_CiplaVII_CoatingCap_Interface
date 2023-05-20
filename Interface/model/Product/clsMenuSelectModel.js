@@ -1044,12 +1044,16 @@ class MenuSelect {
               );
 
 
-          globalData.arrPaticleData.push({ idsNo: IdsNo , actualSampleValue:1, sampleNo : 0, message : ""});  // for particle size handle 
+              globalData.arrPaticleData.push({ idsNo: IdsNo, actualSampleValue: 1, sampleNo: 0, message: "" });  // for particle size handle 
 
               var upperLimit = tempLimitObj.PartSize.T1Pos;
               var lowerLimit = tempLimitObj.PartSize.T1Neg;
               var noOfsamples = tempLimitObj.PartSize.noOfSamples;
               noOfsamples = ("00" + noOfsamples).slice(-3);
+
+              await this.updateParticleSeizingParameters(IdsNo, MenuType);
+
+              let arrparticleSizingContainer = globalData.arrparticleSizingCurrentTest.find(k => k.idsNo == IdsNo);
               // last 0/1 for Edit sample 0- editable 1- Not editable
               //***************commented and adde by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
               //strReturnProtocol = `MSP${menuObj.InstruId}NPRTSIZ,${upperLimit},${lowerLimit},${noOfsamples},0000,0`;
@@ -1069,19 +1073,78 @@ class MenuSelect {
                 (k) => k.MenuName == "%Fine"
               );
 
-              globalData.arrpercentFineData.push({ idsNo: IdsNo , actualSampleValue:1, sampleNo : 0, message : "" }); 
-              var upperLimit = tempLimitObj.PerFine.T1Pos;
-              var lowerLimit = tempLimitObj.PerFine.T1Neg;
-              var noOfsamples = tempLimitObj.PerFine.noOfSamples;
-              noOfsamples = ("00" + noOfsamples).slice(-3);
+              noOfsamples = "002";
+              var upperLimit = tempLimitObj.PartSize.T1Pos;
+              var lowerLimit = tempLimitObj.PartSize.T1Neg;
+
+              var fetchpowerbackup = await clspowerbackup.fetchPowerBackupData(IdsNo);
+              if (fetchpowerbackup.status && fetchpowerbackup.result.length > 0) {
+                var WeighmentType = fetchpowerbackup.result[0].WeighmentType;
+                var tblname = fetchpowerbackup.result[0].ProductType == 1 ? 'tbl_tab_master17_incomplete' : 'tbl_cap_master17_incomplete';
+                if (WeighmentType == "F") {
+                  const checkData = {
+                    str_tableName: tblname,
+                    data: '*',
+                    condition: [
+                      { str_colName: 'RepSerNo', value: fetchpowerbackup.result[0].Incomp_RepSerNo, comp: 'eq' },
+                    ]
+                  }
+                  var chkResult = await database.select(checkData);
+                  console.log(chkResult);
+
+                  var PerFineType = chkResult[0][0].RepoLabel20 == '1' ? "PerFineComp" : "PerFineLUB";
+
+                  if (globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IdsNo) == undefined) {
+                    globalData.arrPerFineTypeSelectedMenu.push({ idsNo: IdsNo, selectedPerFine: PerFineType })
+                  } else {
+                    var PerFineSelected = globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IdsNo);
+                    PerFineSelected.selectedPerFine = PerFineType;
+                  }
+
+                  if (globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo) == undefined) {
+                    globalData.arrPerFineCurrentTest.push({ idsNo: IdsNo, PerFineComp: [], PerFineLUB: [] });
+                    var currentTest = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo);
+                    currentTest[PerFineType].push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 8, SI: 1 });
+                    currentTest[PerFineType].push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 8, SI: 2 });
+                  } else {
+                    var currentTest = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo);
+                    currentTest.PerFineComp = [];
+                    currentTest.PerFineLUB = [];
+                    currentTest[PerFineType].push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 8, SI: 1 });
+                    currentTest[PerFineType].push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 8, SI: 2 });
+                  }
+
+                  strReturnProtocol = `MSH${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,N,`;
+                  return strReturnProtocol
+                }
+              } else {
+                globalData.arrpercentFineData.push({ idsNo: IdsNo, actualSampleValue: 1, sampleNo: 0, message: "" });
+                noOfsamples = ("00" + noOfsamples).slice(-3);
+                await this.updatePerFineParameters(IdsNo, MenuType);
+
+
+                let TempArrayLimitsObj = globalData.arrPerFineCurrentTest.find(
+                  (k) => k.idsNo == IdsNo
+                );
+                strReturnProtocol = `LDQ01`;
+
+                if (TempArrayLimitsObj["PerFineComp"].length != 0) {
+                  strReturnProtocol += `Compaction Granules,`;
+                }
+                if (TempArrayLimitsObj["PerFineLUB"].length != 0) {
+                  strReturnProtocol += `Lubricated Granules,`;
+                }
+
+                strReturnProtocol = strReturnProtocol + ";";
+                await this.activityLogEntryForMs("% Fine", IdsNo);
+                return strReturnProtocol;
+              }
               // last 0/1 for Edit sample 0- editable 1- Not editable
               //***************commented and adde by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
               //strReturnProtocol = `MSF${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,0`;
-             // strReturnProtocol = `MSF${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
-              strReturnProtocol = `MSH${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
+              // strReturnProtocol = `MSF${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
+              // strReturnProtocol = `MSH${menuObj.InstruId}N%FINE,${upperLimit},${lowerLimit},${noOfsamples},0000,1,${tempLimitObj.PerFine.unit},`;
               //************************************************************************* *****************************************************/
-              await this.activityLogEntryForMs("% Fine", IdsNo);
-              return strReturnProtocol;
               break;
             case "Y":
               // CASE FOR SEALED CARTRIAGE
@@ -1843,16 +1906,16 @@ class MenuSelect {
                 thicknessNom: 0,
                 thicknesneg: 0,
                 thicknespos: 0,
-                mgcnt:0,
-                mmcnt:0,
-                ncnt:0,
-                linecnt:[],
-                rhcnt:0,
-                dataValues:[],
-                isFirstSampleSaved:false,
-                moveToComplete:false,
-                dataFlowStatus:false,
-                idsIPAddress:''
+                mgcnt: 0,
+                mmcnt: 0,
+                ncnt: 0,
+                linecnt: [],
+                rhcnt: 0,
+                dataValues: [],
+                isFirstSampleSaved: false,
+                moveToComplete: false,
+                dataFlowStatus: false,
+                idsIPAddress: ''
               };
               globalData.arrHardness425.push(obj);
             } else {
@@ -1871,16 +1934,16 @@ class MenuSelect {
                 (objHardness.thicknessNom = 0),
                 (objHardness.thicknesneg = 0),
                 (objHardness.thicknespos = 0);
-                objHardness.mgcnt = 0;
-                objHardness.mmcnt = 0;
-                objHardness.ncnt = 0;
-                objHardness.linecnt = [];
-                objHardness.rhcnt = 0;
-                objHardness.dataValues = [];
-                objHardness.isFirstSampleSaved = false;
-                objHardness.moveToComplete = true;
-                objHardness.dataFlowStatus = false;
-                objHardness.idsIPAddress = '';
+              objHardness.mgcnt = 0;
+              objHardness.mmcnt = 0;
+              objHardness.ncnt = 0;
+              objHardness.linecnt = [];
+              objHardness.rhcnt = 0;
+              objHardness.dataValues = [];
+              objHardness.isFirstSampleSaved = false;
+              objHardness.moveToComplete = true;
+              objHardness.dataFlowStatus = false;
+              objHardness.idsIPAddress = '';
             }
 
             if (objHardness1050 == undefined) {
@@ -2384,7 +2447,7 @@ class MenuSelect {
     var tempparticleData = globalData.arrPaticleData.find(k => k.idsNo == IdsNo);
     if (tempparticleData == undefined) {
       globalData.arrPaticleData.push({ idsNo: IdsNo, actualSampleValue: 1 });
-  } else {
+    } else {
       tempparticleData.datecount = false;
       tempparticleData.timecount = false;
       tempparticleData.dataValues = undefined;
@@ -2392,12 +2455,12 @@ class MenuSelect {
       tempparticleData.unit = undefined;
       tempparticleData.side = undefined;
 
-  }
+    }
 
     var temppercentFineData = globalData.arrpercentFineData.find(k => k.idsNo == IdsNo);
     if (temppercentFineData == undefined) {
       globalData.arrpercentFineData.push({ idsNo: IdsNo, actualSampleValue: 1 });
-  } else {
+    } else {
       temppercentFineData.datecount = false;
       temppercentFineData.timecount = false;
       temppercentFineData.dataValues = undefined;
@@ -2405,7 +2468,7 @@ class MenuSelect {
       temppercentFineData.unit = undefined;
       temppercentFineData.side = undefined;
 
-  }
+    }
     return "+";
   }
   async CheckDTModel(idsNo) {
@@ -2654,6 +2717,177 @@ class MenuSelect {
       var protocolToBeSend = `ESD${MenuType}A01Select Jar A Or Jar B,,,,`;
     }
     return protocolToBeSend;
+  }
+
+
+  async updateParticleSeizingParameters(IdsNo, MenuType) {
+
+    var currentParticleSeizingMeshArr = globalData.arrparticleSizingCurrentTest.find(k => k.idsNo == IdsNo);
+    var tempObjProdType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo);
+    if (currentParticleSeizingMeshArr === undefined) {
+      globalData.arrparticleSizingCurrentTest.push({ idsNo: IdsNo, particleSeizing: [] });
+      currentParticleSeizingMeshArr = globalData.arrparticleSizingCurrentTest.find(k => k.idsNo == IdsNo);
+    } else {
+      currentParticleSeizingMeshArr.particleSeizing = [];
+    }
+
+    var tempIPQCobj = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+    let selectedIds;
+    if (tempIPQCobj != undefined) { // IPQC Cubicles
+      selectedIds = tempIPQCobj.selectedIds;
+    } else {
+      selectedIds = IdsNo;
+    }
+    var currentCubicleObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
+
+    let startIndex;
+    let endIndex;
+
+    if (tempObjProdType.productType == 1) {
+      if (MenuType === 'P') {
+        startIndex = 9;
+        endIndex = 18;
+      }
+    } else {
+      if (MenuType === 'P') {
+        startIndex = 9;
+        endIndex = 18;
+      }
+    }
+
+    var selectObj = {
+      str_tableName: tempObjProdType.productType == 1 ? 'tbl_product_gran' : 'tbl_product_gran_cap',
+      data: '*',
+      condition: [
+        { str_colName: 'ProductName', value: currentCubicleObj.Sys_ProductName },
+        { str_colName: 'ProductId', value: currentCubicleObj.Sys_BFGCode },
+        { str_colName: 'ProductVersion', value: currentCubicleObj.Sys_PVersion },
+        { str_colName: 'Version', value: currentCubicleObj.Sys_Version },
+        // { str_colName: 'BatchNo', value: currentCubicleObj.Sys_Batch }
+      ]
+    }
+
+    let productObj = await database.select(selectObj);
+
+
+
+    var CubicleObj = globalData.arr_limits.find(k => k.idsNo == IdsNo)
+
+    if (tempObjProdType.productType == 1 || tempObjProdType.productType == 2) {
+      for (let i = startIndex; i <= endIndex; i++) {
+        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {
+          switch (i) {
+            case 9:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 9, SI: 1 });
+              break;
+            case 12:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 12, SI: 2 });
+              break;
+            case 13:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 20, flag: 'a', paramIndex: 13, SI: 3 });
+              break;
+            case 14:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 40, flag: 'a', paramIndex: 14, SI: 4 });
+              break;
+            case 15:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'a', paramIndex: 15, SI: 5 });
+              break;
+            case 16:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 80, flag: 'a', paramIndex: 16, SI: 6 });
+              break;
+            case 17:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 100, flag: 'a', paramIndex: 17, SI: 7 });
+              break;
+            case 18:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "Tray", flag: 'a', paramIndex: 18, SI: 8 });
+              break;
+          }
+        }
+      }
+    }
+
+    if (currentParticleSeizingMeshArr.particleSeizing.length) {
+      currentParticleSeizingMeshArr.particleSeizing.sort((obj1, obj2) => obj1.SI > obj2.SI);
+    }
+
+
+    console.log(currentParticleSeizingMeshArr);
+  }
+
+  async updatePerFineParameters(IdsNo, MenuType) {
+
+    var currentPerFineMeshArr = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo);
+    var tempObjProdType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo);
+    if (currentPerFineMeshArr === undefined) {
+      globalData.arrPerFineCurrentTest.push({ idsNo: IdsNo, PerFineComp: [], PerFineLUB: [] });
+      currentPerFineMeshArr = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo);
+    } else {
+      currentPerFineMeshArr.PerFineComp = [];
+      currentPerFineMeshArr.PerFineLUB = [];
+    }
+
+    var tempIPQCobj = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+    let selectedIds;
+    if (tempIPQCobj != undefined) { // IPQC Cubicles
+      selectedIds = tempIPQCobj.selectedIds;
+    } else {
+      selectedIds = IdsNo;
+    }
+    var currentCubicleObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
+
+    let startIndex;
+    let endIndex;
+
+    if (tempObjProdType.productType == 1 || tempObjProdType.productType == 2) {
+      if (MenuType === 'F') {
+        startIndex = 8;
+        endIndex = 11;
+      }
+    }
+
+    var selectObj = {
+      str_tableName: tempObjProdType.productType == 1 ? 'tbl_product_gran' : 'tbl_product_gran_cap',
+      data: '*',
+      condition: [
+        { str_colName: 'ProductName', value: currentCubicleObj.Sys_ProductName },
+        { str_colName: 'ProductId', value: currentCubicleObj.Sys_BFGCode },
+        { str_colName: 'ProductVersion', value: currentCubicleObj.Sys_PVersion },
+        { str_colName: 'Version', value: currentCubicleObj.Sys_Version },
+        // { str_colName: 'BatchNo', value: currentCubicleObj.Sys_Batch }
+      ]
+    }
+
+    let productObj = await database.select(selectObj);
+
+
+
+    // var CubicleObj = globalData.arr_limits.find(k => k.idsNo == IdsNo)
+
+    if (tempObjProdType.productType == 1 || tempObjProdType.productType == 2) {
+      for (let i = startIndex; i <= endIndex; i++) {
+        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {
+          switch (i) {
+            case 8:
+              currentPerFineMeshArr.PerFineComp.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 8, SI: 1 });
+              currentPerFineMeshArr.PerFineComp.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 8, SI: 2 });
+              break;
+            case 11:
+              currentPerFineMeshArr.PerFineLUB.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 11, SI: 1 });
+              currentPerFineMeshArr.PerFineLUB.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 11, SI: 2 });
+              break;
+          }
+        }
+      }
+    }
+
+    if (currentPerFineMeshArr.PerFineComp.length) {
+      currentPerFineMeshArr.PerFineComp.sort((obj1, obj2) => obj1.SI > obj2.SI);
+    }
+    if (currentPerFineMeshArr.PerFineLUB.length) {
+      currentPerFineMeshArr.PerFineLUB.sort((obj1, obj2) => obj1.SI > obj2.SI);
+    }
+
+    console.log(currentPerFineMeshArr);
   }
 }
 module.exports = MenuSelect;

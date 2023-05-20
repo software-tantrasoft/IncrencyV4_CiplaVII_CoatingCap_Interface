@@ -682,25 +682,25 @@ class MenuRequestModel {
                         if (productType == 1 && CubicInfo.Sys_HardID != 'None' && instrument == 'Hardness'
                             // && (CubicInfo.Sys_CubType != 'Effervescent Granulation' || CubicInfo.Sys_CubType != 'Granulation')
                         ) {
-                        var temp_arr_limits = globalData.arr_limits.find(k => k.idsNo == strIdsIP);
-                        if(!temp_arr_limits.Hardness){
-                           
-                            Object.assign(globalData.arr_limits[index], {
-                                Hardness: {
-                                    nominal: result[0][0].Param7_Nom,
-                                    T1Neg: result[0][0].Param7_T1Neg,
-                                    T1Pos: result[0][0].Param7_T1Pos,
-                                    LimitOn: result[0][0].Param7_LimitOn,
-                                    dp: result[0][0].Param7_Dp,
-                                    isonstd: result[0][0].Param7_IsOnStd,
-                                    port: portNo,
-                                    noOfSamples: productSamples.Individual,
-                                    side: side,
-                                    unit: result[0][0].Param7_Unit
-                                }
+                            var temp_arr_limits = globalData.arr_limits.find(k => k.idsNo == strIdsIP);
+                            if (!temp_arr_limits.Hardness) {
 
-                            });
-                        }    
+                                Object.assign(globalData.arr_limits[index], {
+                                    Hardness: {
+                                        nominal: result[0][0].Param7_Nom,
+                                        T1Neg: result[0][0].Param7_T1Neg,
+                                        T1Pos: result[0][0].Param7_T1Pos,
+                                        LimitOn: result[0][0].Param7_LimitOn,
+                                        dp: result[0][0].Param7_Dp,
+                                        isonstd: result[0][0].Param7_IsOnStd,
+                                        port: portNo,
+                                        noOfSamples: productSamples.Individual,
+                                        side: side,
+                                        unit: result[0][0].Param7_Unit
+                                    }
+
+                                });
+                            }
                             if (globalData.arr_limits[index].Hardness.dp == undefined) {
                                 globalData.arr_limits[index].Hardness.dp = result[0][0].Param7_Dp;
                             }
@@ -881,49 +881,47 @@ class MenuRequestModel {
                                     });
                                 }
                             }
-                        } else if (key == 'Param8_Upp') { // for % fine and from tab_gran
+                        } else if (key == 'Param8_Upp' || key == 'Param11_Upp') { // for % fine and from tab_gran
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check LOD is set 
-                                if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance'
-                                    // && (CubicInfo.Sys_Area == 'Effervescent Granulation' || CubicInfo.Sys_Area == 'Granulation')
-                                ) {
-                                    Object.assign(globalData.arr_limits[index], {
-                                        PerFine: {
-                                            nominal: result[0][0].Param8_Nom,
-                                            T1Neg: result[0][0].Param8_Low,
-                                            T1Pos: result[0][0].Param8_Upp,
-                                            LimitOn: 1,
-                                            dp: result[0][0].Param8_Dp,
-                                            isonstd: 1,
-                                            port: portNo,
-                                            side: side,
-                                            noOfSamples: 2,
-                                            unit: ''
-                                        }
-                                    });
+                                if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance') {
+                                    // if (key == "Param8_Upp") {
+                                        Object.assign(globalData.arr_limits[index], {
+                                            PerFine: {
+                                                nominal: result[0][0].Param8_Nom,
+                                                T1Neg: result[0][0].Param8_Low,
+                                                T1Pos: result[0][0].Param8_Upp,
+                                                LimitOn: 1,
+                                                dp: result[0][0].Param8_Dp,
+                                                isonstd: 1,
+                                                port: portNo,
+                                                side: side,
+                                                noOfSamples: 2,
+                                                unit: ''
+                                            }
+                                        });
                                 }
                             }
                         }
-                        else if (key == 'Param9_Upp') { // forParticke sizing and from tab_gran
+                        else if (key == 'Param9_Upp' || key == 'Param12_Upp' || key == 'Param13_Upp' || key == 'Param14_Upp' ||
+                            key == 'Param15_Upp' || key == 'Param16_Upp' || key == 'Param17_Upp' || key == 'Param18_Upp') { // forParticke sizing and from tab_gran
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check LOD is set 
-                                if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance'
-                                    //  && (CubicInfo.Sys_Area == 'Effervescent Granulation' || CubicInfo.Sys_Area == 'Granulation')
-                                ) {
-                                    Object.assign(globalData.arr_limits[index], {
-                                        PartSize: {
-                                            nominal: result[0][0].Param9_Nom,
-                                            T1Neg: result[0][0].Param9_Low,
-                                            T1Pos: result[0][0].Param9_Upp,
-                                            LimitOn: 1,
-                                            dp: result[0][0].Param9_Dp,
-                                            isonstd: 1,
-                                            port: portNo,
-                                            noOfSamples: 7,
-                                            side: side,
-                                            unit: ''
-                                        }
-                                    });
+                                if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance') {
+                                        Object.assign(globalData.arr_limits[index], {
+                                            PartSize: {
+                                                nominal: result[0][0].Param9_Nom,
+                                                T1Neg: result[0][0].Param9_Low,
+                                                T1Pos: result[0][0].Param9_Upp,
+                                                LimitOn: 1,
+                                                dp: result[0][0].Param9_Dp,
+                                                isonstd: 1,
+                                                port: portNo,
+                                                noOfSamples: 7,
+                                                side: side,
+                                                unit: ''
+                                            }
+                                        });
                                 }
                             }
                         }
@@ -2235,11 +2233,11 @@ class MenuRequestModel {
             query = `SELECT * FROM tbl_cubical WHERE (Sys_Area = 'Coating-Capsule' || Sys_Area = 'Coating' || Sys_Area = 'Capsule Filling') 
             AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
             AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType != 'IPC'`;
-        }else if(sysArea == 'Coating')  {
-                query = `SELECT * FROM tbl_cubical WHERE Sys_Area = '${sysArea}' 
+        } else if (sysArea == 'Coating') {
+            query = `SELECT * FROM tbl_cubical WHERE Sys_Area = '${sysArea}' 
                 AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
                 AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType != 'IPC'`;
-        }else {
+        } else {
             query = `SELECT * FROM tbl_cubical WHERE Sys_Area LIKE '${sysArea}%' 
             AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
             AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType != 'IPC'`;
@@ -2483,12 +2481,7 @@ class MenuRequestModel {
                     var side = CubicInfo.Sys_RotaryType;
                     str_Protocol = str_Protocol.split(',')[0].substring(3);
                     // here we store which menu is selected based on incoming protocol
-                    if (globalData.arrLODTypeSelectedMenu.find(k => k.idsNo == IdsSrNo) == undefined) {
-                        globalData.arrLODTypeSelectedMenu.push({ idsNo: IdsSrNo, selectedLOD: str_Protocol })
-                    } else {
-                        let tempObj = globalData.arrLODTypeSelectedMenu.find(k => k.idsNo == IdsSrNo);
-                        tempObj.selectedLOD = str_Protocol;
-                    }
+
                     if (side == 'Single' || side == 'NA') {
                         side = 'N';
                     } else if (side == 'Double') {
@@ -2504,52 +2497,105 @@ class MenuRequestModel {
                         ]
                     }
                     var result = await database.select(slectProductSamples);
-                    var LODType;
-                    switch (str_Protocol) {
-                        case 'GRANULES DRY':
-                            LODType = "GRNDRY"; //  COMPDRY
-                            break;
-                        case 'GRANULES LUB':
-                            LODType = "GRNLUB"; //  COMPLUB
-                            break;
-                        case 'LAYER1 DRY':
-                            LODType = "LAY1DRY";
-                            break;
-                        case 'LAYER1 LUB':
-                            LODType = "LAY1LUB";
-                            break;
-                        case 'LAYER2 DRY':
-                            LODType = "LAY2DRY";
-                            break;
-                        case 'LAYER2 LUB':
-                            LODType = "LAY2LUB";
-                            break;
+                    if (CubicInfo.Sys_BalID != 'None') {
+
+                        var PerFineType;
+                        switch (str_Protocol) {
+                            case 'Compaction Granules':
+                                PerFineType = "PerFineComp"; //  COMPDRY
+                                break;
+                            case 'Lubricated Granules':
+                                PerFineType = "PerFineLUB"; //  COMPLUB
+                                break;
+                        }
+                        if (globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IdsSrNo) == undefined) {
+                            globalData.arrPerFineTypeSelectedMenu.push({ idsNo: IdsSrNo, selectedPerFine: PerFineType })
+                        } else {
+                            let tempObj = globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IdsSrNo);
+                            tempObj.selectedPerFine = PerFineType;
+                        }
+                        //clearing and reiniting LOD DATA
+                        // var objLodData = globalData.arrLodData.find(LD => LD.idsNo == IdsSrNo);
+                        // if (objLodData == undefined) {
+                        //     globalData.arrLodData.push({ idsNo: IdsSrNo, arr: [], counter: 0 })
+                        // }
+                        // else {
+                        //     objLodData.arr = [];
+                        // }
+                        // var Obj = globalData.arr_menuList.find(k => k.MenuName == 'LOD');
+                        var objArrLimits =  globalData.arrPerFineCurrentTest.find((k) => k.idsNo == IdsSrNo);
+                       
+                        // var MenuTypeObj = globalData.arrGranulationMenuType.find(k => k.idsNo == IdsSrNo)
+                        var MenuType = "H";
+                        var Limit = objArrLimits[PerFineType];
+                        var noOfsamples = objArrLimits[PerFineType].noOfSamples;
+                        noOfsamples = ("00" + noOfsamples).slice(-3);
+                        var intInstrumentID = 1;
+                        // if (MenuTypeObj.LODMenuType == 'H') {
+                        //     intInstrumentID = 4;
+                        // } else {
+                        //     intInstrumentID = 3;
+                        // }
+                        //***************commented and added by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
+                        //let strReturnProtocol = `MS${MenuTypeObj.LODMenuType}${intInstrumentID}${side}${LODType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1`;
+                        let strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}${PerFineType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1,${objArrLimits[PerFineType].unit},`;
+                        //************************************************************************* *****************************************************/
+                        return strReturnProtocol;
                     }
-                    //clearing and reiniting LOD DATA
-                    var objLodData = globalData.arrLodData.find(LD => LD.idsNo == IdsSrNo);
-                    if (objLodData == undefined) {
-                        globalData.arrLodData.push({ idsNo: IdsSrNo, arr: [], counter: 0 })
+                    if (CubicInfo.Sys_MoistID != 'None') {
+                        if (globalData.arrLODTypeSelectedMenu.find(k => k.idsNo == IdsSrNo) == undefined) {
+                            globalData.arrLODTypeSelectedMenu.push({ idsNo: IdsSrNo, selectedLOD: str_Protocol })
+                        } else {
+                            let tempObj = globalData.arrLODTypeSelectedMenu.find(k => k.idsNo == IdsSrNo);
+                            tempObj.selectedLOD = str_Protocol;
+                        }
+                        var LODType;
+                        switch (str_Protocol) {
+                            case 'GRANULES DRY':
+                                LODType = "GRNDRY"; //  COMPDRY
+                                break;
+                            case 'GRANULES LUB':
+                                LODType = "GRNLUB"; //  COMPLUB
+                                break;
+                            case 'LAYER1 DRY':
+                                LODType = "LAY1DRY";
+                                break;
+                            case 'LAYER1 LUB':
+                                LODType = "LAY1LUB";
+                                break;
+                            case 'LAYER2 DRY':
+                                LODType = "LAY2DRY";
+                                break;
+                            case 'LAYER2 LUB':
+                                LODType = "LAY2LUB";
+                                break;
+                        }
+                        //clearing and reiniting LOD DATA
+                        var objLodData = globalData.arrLodData.find(LD => LD.idsNo == IdsSrNo);
+                        if (objLodData == undefined) {
+                            globalData.arrLodData.push({ idsNo: IdsSrNo, arr: [], counter: 0 })
+                        }
+                        else {
+                            objLodData.arr = [];
+                        }
+                        var Obj = globalData.arr_menuList.find(k => k.MenuName == 'LOD');
+                        var objArrLimits = globalData.arr_limits.find(k => k.idsNo == IdsSrNo);
+                        var MenuTypeObj = globalData.arrGranulationMenuType.find(k => k.idsNo == IdsSrNo)
+                        var Limit = objArrLimits[LODType];
+                        var noOfsamples = objArrLimits[LODType].noOfSamples;
+                        noOfsamples = ("00" + noOfsamples).slice(-3);
+                        var intInstrumentID;
+                        if (MenuTypeObj.LODMenuType == 'H') {
+                            intInstrumentID = 4;
+                        } else {
+                            intInstrumentID = 3;
+                        }
+                        //***************commented and added by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
+                        //let strReturnProtocol = `MS${MenuTypeObj.LODMenuType}${intInstrumentID}${side}${LODType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1`;
+                        let strReturnProtocol = `MS${MenuTypeObj.LODMenuType}${intInstrumentID}${side}${LODType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1,${objArrLimits[LODType].unit},`;
+                        //************************************************************************* *****************************************************/
+                        return strReturnProtocol;
                     }
-                    else {
-                        objLodData.arr = [];
-                    }
-                    var Obj = globalData.arr_menuList.find(k => k.MenuName == 'LOD');
-                    var objArrLimits = globalData.arr_limits.find(k => k.idsNo == IdsSrNo);
-                    var MenuTypeObj = globalData.arrGranulationMenuType.find(k => k.idsNo == IdsSrNo)
-                    var Limit = objArrLimits[LODType];
-                    var noOfsamples = objArrLimits[LODType].noOfSamples;
-                    noOfsamples = ("00" + noOfsamples).slice(-3);
-                    var intInstrumentID;
-                    if (MenuTypeObj.LODMenuType == 'H') {
-                        intInstrumentID = 4;
-                    } else {
-                        intInstrumentID = 3;
-                    }
-                    //***************commented and added by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
-                    //let strReturnProtocol = `MS${MenuTypeObj.LODMenuType}${intInstrumentID}${side}${LODType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1`;
-                    let strReturnProtocol = `MS${MenuTypeObj.LODMenuType}${intInstrumentID}${side}${LODType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1,${objArrLimits[LODType].unit},`;
-                    //************************************************************************* *****************************************************/
-                    return strReturnProtocol;
                 } else { // IF LIST OF IPQC
                     var strSelectedIds = str_Protocol.split(':')[0].substring(3, 6);
                     // check if array hold the object w.r.t to current Ids if not then we push otherwise we can update that

@@ -125,7 +125,9 @@ class MoveGranulationData {
                         { str_colName: 'MstSerNo', value: 0 },
                         { str_colName: 'RecSeqNo', value: i + 1 },
                         { str_colName: 'DataValue', value: v.DataValue },
-                        { str_colName: 'DecimalPoint', value: v.DecimalPoint }
+                        { str_colName: 'DecimalPoint', value: v.DecimalPoint },
+                        { str_colName: 'Limit1', value: v.Limit1 },
+                        { str_colName: 'Limit2', value: v.Limit2 },
                     ]
                 }
 
@@ -392,6 +394,7 @@ class MoveGranulationData {
                     { str_colName: 'RepoLabel11', value: result.incompleteData.RepoLabel11 },
                     { str_colName: 'RepoLabel12', value: result.incompleteData.RepoLabel12 },
                     { str_colName: 'RepoLabel13', value: result.incompleteData.RepoLabel13 },
+                    { str_colName: 'RepoLabel20', value: result.incompleteData.RepoLabel20 },
                     { str_colName: 'PrintNo', value: result.incompleteData.PrintNo },
                     { str_colName: 'IsArchived', value: result.incompleteData.IsArchived },
                     { str_colName: 'GraphType', value: result.incompleteData.GraphType },
@@ -448,7 +451,7 @@ class MoveGranulationData {
             if(data!=undefined){
                 data.datecount = false;
                 data.timecount = false;
-                data.dataValues = [];
+                data.dataValues = undefined;
                 data.actualSampleValue = 1;
                 data.unit = undefined;
                 data.side = undefined

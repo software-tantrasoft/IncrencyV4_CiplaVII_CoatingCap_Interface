@@ -32,7 +32,7 @@
         },
         {
             "Model":"Default",
-            "TareCmd":"Z",
+            "TareCmd":"T",
             "SendCmd":"Y"
         }
 

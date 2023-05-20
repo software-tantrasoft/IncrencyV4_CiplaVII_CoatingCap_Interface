@@ -34,7 +34,9 @@ class ProcessWTModel {
         //var productTypeObj = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo)
         var objProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IDSSrNo)
 
-        var objHardness = globalData.arrHardness425.find(k => k.idsNo == IDSSrNo)
+        var objHardness = globalData.arrHardness425.find(k => k.idsNo == IDSSrNo);
+
+
 
         // console.log(tempLimObj)
         var menuId = str_Protocol.substring(2, 3);
@@ -159,7 +161,7 @@ class ProcessWTModel {
                     if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'H';
-                        objHardness.idsIPAddress = idsIPAddress;
+                        // objHardness.idsIPAddress = idsIPAddress;
                     }
                     if (instrument == "Balance") {
                         if (objLotData.MS.substring(2, 3) == "P") {   // for particle size handle 
@@ -167,15 +169,69 @@ class ProcessWTModel {
                                 return (`DL03${arrPaticleData.message},`);
                             }
                             else {
-                                return ("DL03TESTSAMPLE,");
+                                var currentParticleSeizing = globalData.arrparticleSizingCurrentTest.find((k) => k.idsNo == IDSSrNo);
+                                if (currentParticleSeizing.particleSeizing[0].isCompleted === 'NotCompleted') {
+                                    var testFlag = currentParticleSeizing.particleSeizing[0].flag + currentParticleSeizing.particleSeizing[0].mesh;
+                                    currentParticleSeizing.particleSeizing[0].isCompleted = 'Pending';
+                                }
+                                var message;
+                                switch (testFlag) {
+                                    case "aTestSample":
+                                        message = "TEST SAMPLE";
+                                        break;
+                                    case 'b60':
+                                        message = "BELOW 60 MESH";
+                                        break;
+                                    case 'a20':
+                                        message = "ABOVE 20 MESH";
+                                        break;
+                                    case 'a40':
+                                        message = "ABOVE 40 MESH";
+                                        break;
+                                    case 'a60':
+                                        message = "ABOVE 60 MESH";
+                                        break;
+                                    case 'a80':
+                                        message = "ABOVE 80 MESH";
+                                        break;
+                                    case 'a100':
+                                        message = "ABOVE 100 MESH";
+                                        break;
+                                    case 'aTray':
+                                        message = "FINES ON TRAY";
+                                        break;
+                                    default:
+                                        message = "";
+                                        break;
+                                }
+                                return (`DL03${message},`);
                             }
                         }
                         if (objLotData.MS.substring(2, 3) == "F") {   // for %Fine handle 
                             if (arrpercentFineData.sampleNo > 0 && arrpercentFineData.message != "") {
                                 return (`DL03${arrpercentFineData.message},`);
-                            }
-                            else {
-                                return ("DL03TESTSAMPLE,");
+                            } else {
+                                //%Fine arrays
+                                var PerFineSelected = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IDSSrNo);
+                                var currentPerFine = globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IDSSrNo);
+                                var selectTest = currentPerFine.selectedPerFine;
+                                if (PerFineSelected[selectTest][0].isCompleted === 'NotCompleted') {
+                                    var testFlag = PerFineSelected[selectTest][0].flag + PerFineSelected[selectTest][0].mesh;
+                                    PerFineSelected[selectTest][0].isCompleted = 'Pending';
+                                }
+                                var message;
+                                switch (testFlag) {
+                                    case "aTestSample":
+                                        message = "TEST SAMPLE";
+                                        break;
+                                    case 'b60':
+                                        message = "BELOW 60 MESH";
+                                        break;
+                                    default:
+                                        message = "";
+                                        break;
+                                }
+                                return (`DL03${message},`);
                             }
                         }
                     }

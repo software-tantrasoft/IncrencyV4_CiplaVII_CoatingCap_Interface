@@ -123,8 +123,12 @@ var arrContentCapsule = [] // This array hold the content Number {idsNo:200, con
 var arrLLsampleRemark = []; //[{idsNo:200, remark:LE0/LE1}]
 var arrRotaryTypeDT = [];
 var arrHardnessPowerbackupFlag = [];
-var arrPaticleData = [];  
-var arrpercentFineData = [];   // for particle size handle 
+var arrPaticleData = [];  // for particle size handle 
+var arrparticleSizingCurrentTest = [];
+var arrpercentFineData = [];   // for %Fine Data store
+var arrPerFineCurrentTest = [];
+var arrPerFineTypeSelectedMenu = []; // selected menu is compaction or granulation 
+
 module.exports.arrGroupIPC = arrGroupIPC;
 module.exports.arrHardnessPowerbackupFlag = arrHardnessPowerbackupFlag;
 module.exports.arrHardnessTH1050=arrHardnessTH1050
@@ -225,7 +229,10 @@ module.exports.arrHardnessST50LAN = arrHardnessST50LAN;
 module.exports.arrContentCapsule = arrContentCapsule;
 module.exports.arrLLsampleRemark = arrLLsampleRemark;
 module.exports.arrPaticleData = arrPaticleData;
+module.exports.arrparticleSizingCurrentTest = arrparticleSizingCurrentTest;
 module.exports.arrpercentFineData = arrpercentFineData;
-module.exports.calibrationforhard = calibrationforhard ;
+module.exports.arrPerFineCurrentTest = arrPerFineCurrentTest;
+module.exports.arrPerFineTypeSelectedMenu = arrPerFineTypeSelectedMenu;
+module.exports.calibrationforhard = calibrationforhard;
 
 

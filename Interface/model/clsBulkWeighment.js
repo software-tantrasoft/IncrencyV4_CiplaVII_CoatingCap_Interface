@@ -9968,7 +9968,10 @@ class BulkWeighment {
                     if (receivedProtocol.includes('mm')) {
                         objHardness.mmcnt = objHardness.mmcnt + 1;
                     }
-                    if (receivedProtocol.includes('N')) {
+                    if ((receivedProtocol.includes("n") || receivedProtocol.includes("N") ||
+                        receivedProtocol.includes("Kp") || receivedProtocol.includes("kp") || receivedProtocol.includes("KP") ||
+                        receivedProtocol.includes("kP") || receivedProtocol.includes("Sc") || receivedProtocol.includes("sc") ||
+                        receivedProtocol.includes("SC") || receivedProtocol.includes("sC"))) {
                         objHardness.ncnt = objHardness.ncnt + 1;
                     }
 
@@ -10004,23 +10007,65 @@ class BulkWeighment {
 
                         }
                     } else if (
-                        (receivedProtocol.includes("N")) &&
+                        (receivedProtocol.includes("n") || receivedProtocol.includes("N") ||
+                            receivedProtocol.includes("Kp") || receivedProtocol.includes("kp") || receivedProtocol.includes("KP") ||
+                            receivedProtocol.includes("kP") || receivedProtocol.includes("Sc") || receivedProtocol.includes("sc") ||
+                            receivedProtocol.includes("SC") || receivedProtocol.includes("sC")) &&
                         objHardness.dimensionParam == 2
                     ) {
-
+                        var includeNorKp
                         objHardness.dimensionParam = 0;
 
-                        // objHardness.dimensionParam = 3;
-
-                        var includeNorKp = protocolValueData.includes("N");
-                        //var hardnessVal = 0;
+                        if (receivedProtocol.includes("n") || receivedProtocol.includes("N") ||
+                            receivedProtocol.includes("Kp") || receivedProtocol.includes("kp") || receivedProtocol.includes("KP") ||
+                            receivedProtocol.includes("kP") || receivedProtocol.includes("Sc") || receivedProtocol.includes("sc") ||
+                            receivedProtocol.includes("SC") || receivedProtocol.includes("sC")) {
+                            includeNorKp = true
+                        }
+                        else {
+                            includeNorKp = false
+                        }
                         if (includeNorKp == true) {
 
-                            if (objHardness.dataValues.length) objHardness.dataValues[objHardness.dataValues.length - 1].n = protocolValueData.split("N")[0].trim().length == 0 ? 0 : protocolValueData.split("N")[0].trim()
+                            var HardnessVal = 0;
+                            var HardnessUnit;
+                            //var strRecivedProtocol = app.protocolToString(Buffer.from(protocolValueData,'utf8'));
+                            var includeUnit = protocolValueData.substring(0, protocolValueData.length - 2).trim();//for non-printable chrecters test
+                            if (includeUnit.includes("n") || includeUnit.includes("N")) {
+                                HardnessVal = includeUnit.substring(0, includeUnit.length - 1).trim();
+                                HardnessUnit = includeUnit.substring(includeUnit.length,HardnessVal.length).trim()
+                                
+                            }
+                            else {
+                                HardnessVal = includeUnit.substring(0, includeUnit.length - 2).trim();
+                                HardnessUnit = includeUnit.substring(includeUnit.length,HardnessVal.length).trim()
+                            }
 
-                            objHardness.hardnessDecimal = includeNorKp == true ? 0 : 2; // hardnessVal.split('.').replace(/\D/g, '').length;//count number in given string
-                            //console.log("Hardness",objHardness);
-                            var HardnessUnit = "N";
+                            objHardness.hardnessVal = HardnessVal
+                            objHardness.HardnessUnit = HardnessUnit
+
+                            var decimalValue = objHardness.hardnessVal.match(/^\d+$/) ?  0 : objHardness.hardnessVal.split(".")[1].length
+                            objHardness.hardnessDecimal = decimalValue
+
+                           
+
+                            if (objHardness.hardnessVal == "") {
+                                objHardness.hardnessVal = "NA";
+                            }
+                           
+                            var isHardnessValid = parseFloat(objHardness.hardnessVal);
+                            var isHardnessValid = isHardnessValid.toString();
+                            const objBulkInvalid = new bulkInvalid();
+                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+
+                            if (objHardness.dataValues.length) {
+                                if(objHardness.hardnessVal == "NA"){
+                                    objHardness.dataValues[objHardness.dataValues.length - 1].n  = 0;
+                                }else{
+                                    objHardness.dataValues[objHardness.dataValues.length - 1].n = objHardness.hardnessVal;
+                                }
+                            }
+                           
 
                         }
                         else {
@@ -10152,7 +10197,7 @@ class BulkWeighment {
 
                                 await clspowerbackup.insertPowerBackupData(productObj, protocolIncomingType, tempUserObject, IdsNo, "htd", "Erweka TBH-425", "Hardness");
                                 var ProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo)
-                                var HardnessUnit = "N";
+                                // var HardnessUnit = "N";
                                 var masterIncopleteData = {
                                     str_tableName: "tbl_tab_masterhtd_incomplete",
                                     data: [
@@ -10172,7 +10217,7 @@ class BulkWeighment {
                                         { str_colName: "PrTime", value: date.format(now, "HH:mm:ss") },
                                         { str_colName: "Side", value: side },
                                         { str_colName: "Qty", value: productlimits.Hardness.noOfSamples },
-                                        { str_colName: "Unit", value: HardnessUnit },
+                                        { str_colName: "Unit", value: objHardness.HardnessUnit },
                                         { str_colName: "CubicleType", value: productObj.Sys_CubType },
                                         { str_colName: "ReportType", value: productObj.Sys_RptType },
                                         { str_colName: "MachineCode", value: productObj.Sys_MachineCode },
@@ -10200,6 +10245,7 @@ class BulkWeighment {
                                         { str_colName: "Lot", value: objLotData.LotNo },
                                         { str_colName: "Stage", value: productObj.Sys_Stage },
                                         { str_colName: "Area", value: productObj.Sys_Area },
+                                        { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
                                     ],
                                 };
 
@@ -10562,6 +10608,7 @@ class BulkWeighment {
                                             { str_colName: "WgmtModeNo", value: 7 },
                                             { str_colName: "Lot", value: objLotData.LotNo },
                                             { str_colName: "Stage", value: productObj.Sys_Stage },
+                                            { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
                                         ],
                                     };
 
@@ -16658,6 +16705,8 @@ class BulkWeighment {
             var tempLimObj = globalData.arr_limits.find(k => k.idsNo == IdsNo);
             var typeValue = "P";
             var actualSampleValue = data.actualSampleValue;
+
+
             if (tdValue != "HD000" && tdValue != "TD000") {
                 var tempTDHD = globalData.arrTHHDrepet.find(k => k.idsNo == IdsNo);
                 if (tempTDHD == undefined) { globalData.arrTHHDrepet.push({ idsNo: IdsNo, flag: false, oc: 0 }) }
@@ -16722,38 +16771,79 @@ class BulkWeighment {
                         }
                         return `${protocolIncomingType}R40Invalid String,,,,`;
                     }
+
+                    var particleSeizingMeshObj = {}  // initializing mesh obj for particle test
+                    var currentParticleSeizing = globalData.arrparticleSizingCurrentTest.find((k) => k.idsNo == IdsNo);
+
+                    if (typeValue == 'P') {
+                        intNos = currentParticleSeizing.particleSeizing.length + 1
+                    }
+                    let testFlag
+
+
                     intNos = tempLimObj.PartSize.noOfSamples;
-                    maxLimit = tempLimObj.PartSize.T1Pos;
-                    minLimit = tempLimObj.PartSize.T1Neg;
+                    // maxLimit = tempLimObj.PartSize.T1Pos;
+                    // minLimit = tempLimObj.PartSize.T1Neg;
                     // actualSampleValue = data.actualSampleValue;
                     if (actualSampleValue <= intNos) {
+                        let currentParticleSeizingTest;
+
+                        currentParticleSeizingTest = currentParticleSeizing.particleSeizing;
+
                         if (actualSampleValue != 1) {
+
+                            for (let i = 0; i < currentParticleSeizingTest.length; i++) {
+                                if (currentParticleSeizingTest[i].isCompleted === 'Pending') {
+                                    currentParticleSeizingTest[i].isCompleted = 'Completed';
+
+                                    particleSeizingMeshObj['Pparam'] = `Param${currentParticleSeizingTest[i].paramIndex}_Upp`;
+                                    particleSeizingMeshObj['Nparam'] = `Param${currentParticleSeizingTest[i].paramIndex}_Low`;
+
+                                    if (currentParticleSeizingTest[i].flag === 'a') {   // a for above
+                                        particleSeizingMeshObj['testFlag'] = `Above ${currentParticleSeizingTest[i].mesh} Mesh`;
+                                    } else if (currentParticleSeizingTest[i].flag === 'b') {    // b for below
+                                        particleSeizingMeshObj['testFlag'] = `Below ${currentParticleSeizingTest[i].mesh} Mesh`;
+
+                                    }
+                                    // continue;
+                                } else if (currentParticleSeizingTest[i].isCompleted === 'NotCompleted') {
+                                    testFlag = currentParticleSeizingTest[i].flag + currentParticleSeizingTest[i].mesh;
+                                    currentParticleSeizingTest[i].isCompleted = 'Pending';
+                                    break;
+                                }
+                            }
+
+
                             // await objIncompleteGran.saveIncompleteData(cubicalObj, data, intNos, typeValue, tempUserObject, IdsNo);
                             await objIncompleteGran.saveIncompleteData(cubicalObj, data, actualSampleValue, intNos, typeValue, tempUserObject, IdsNo);
                             objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                            var particleMenu = globalData.arr_limits.find(k => k.idsNo == IdsNo);
                             data.actualSampleValue = actualSampleValue + 1;
                             let count = actualSampleValue + 1;
                             let message;
-                            switch (count) {
-                                case 2:
+                            switch (testFlag) {
+                                case 'b60':
+                                    message = "BELOW 60 MESH";
+                                    break;
+                                case 'a20':
                                     message = "ABOVE 20 MESH";
                                     break;
-                                case 3:
+                                case 'a40':
                                     message = "ABOVE 40 MESH";
                                     break;
-                                case 4:
+                                case 'a60':
                                     message = "ABOVE 60 MESH";
                                     break;
-                                case 5:
+                                case 'a80':
                                     message = "ABOVE 80 MESH";
                                     break;
-                                case 6:
+                                case 'a100':
                                     message = "ABOVE 100 MESH";
                                     break;
-                                case 7:
+                                case 'aTray':
                                     message = "FINES ON TRAY";
                                     break;
-                                case 8:
+                                default:
                                     message = "";
                                     break;
                             }
@@ -16772,35 +16862,51 @@ class BulkWeighment {
                         }
                         else {
                             await objIncompleteGran.saveIncompleteData(cubicalObj, data, actualSampleValue, intNos, typeValue, tempUserObject, IdsNo);
-
                             data.actualSampleValue = actualSampleValue + 1;
                             let count = actualSampleValue + 1;
+                            let testFlag;
                             let message;
+
+                            for (let i = 0; i < currentParticleSeizingTest.length; i++) {
+                                if (currentParticleSeizingTest[i].isCompleted === 'NotCompleted') {
+                                    testFlag = currentParticleSeizingTest[i].flag + currentParticleSeizingTest[i].mesh;
+                                    currentParticleSeizingTest[i].isCompleted = 'Pending';
+                                    break;
+                                }
+                            }
+
                             objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
-                            switch (count) {
-                                case 2:
+                            switch (testFlag) {
+                                case "aTestSample":
+                                    message = "TEST SAMPLE";
+                                    break;
+                                case 'b60':
+                                    message = "BELOW 60 MESH";
+                                    break;
+                                case 'a20':
                                     message = "ABOVE 20 MESH";
                                     break;
-                                case 3:
+                                case 'a40':
                                     message = "ABOVE 40 MESH";
                                     break;
-                                case 4:
+                                case 'a60':
                                     message = "ABOVE 60 MESH";
                                     break;
-                                case 5:
+                                case 'a80':
                                     message = "ABOVE 80 MESH";
                                     break;
-                                case 6:
+                                case 'a100':
                                     message = "ABOVE 100 MESH";
                                     break;
-                                case 7:
+                                case 'aTray':
                                     message = "FINES ON TRAY";
                                     break;
-                                case 8:
+                                default:
                                     message = "";
                                     break;
                             }
-                          
+                            //let sendProtocol = `WPP00${count}${message},`;
+                            let sendProtocol = `DL03${message},`;
                             if (actualSampleValue != 8) {
                                 let sendProtocol = `DL03${message},`;
                                 tempParticledata.datecount = false;
@@ -16809,7 +16915,7 @@ class BulkWeighment {
                                 tempParticledata.unit = undefined;
                                 tempParticledata.sampleNo = 0;
                                 tempParticledata.message = ""
-                                
+
                                 return sendProtocol;
                             }
 
@@ -16830,12 +16936,12 @@ class BulkWeighment {
         } catch (err) {
             var tempParticledata = globalData.arrPaticleData.find(k => k.idsNo == IdsNo);
             if (tempParticledata == undefined) {
-                globalData.arrPaticleData.push({ idsNo: IdsNo, actualSampleValue: 0 });
+                globalData.arrPaticleData.push({ idsNo: IdsNo, actualSampleValue: 1 });
             } else {
                 tempParticledata.datecount = false;
                 tempParticledata.timecount = false;
                 tempParticledata.dataValues = undefined;
-                tempParticledata.actualSampleValue = 0;
+                tempParticledata.actualSampleValue = 1;
                 tempParticledata.unit = undefined;
                 tempParticledata.side = undefined
                 tempParticledata.sampleNo = 0;
@@ -16934,23 +17040,54 @@ class BulkWeighment {
                         }
                         return `${protocolIncomingType}R40Invalid String,,,,`;
                     }
+
+
+                    var perFineMeshObj = {}  // initializing mesh obj for particle test
+                    var PerFineSelected = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo);
+                    var currentPerFine = globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IdsNo);
+
+
+
+                    let testFlag
                     intNos = tempLimObj.PerFine.noOfSamples;
-                    maxLimit = tempLimObj.PerFine.T1Pos;
-                    minLimit = tempLimObj.PerFine.T1Neg;
-                    // actualSampleValue = data.actualSampleValue;
                     if (actualSampleValue <= intNos) {
+                        let currentPerFineTest;
+                        var selectTest = currentPerFine.selectedPerFine
+                        currentPerFineTest = PerFineSelected[selectTest];
+
                         if (actualSampleValue != 1) {
+                            for (let i = 0; i < currentPerFineTest.length; i++) {
+                                if (currentPerFineTest[i].isCompleted === 'Pending') {
+                                    currentPerFineTest[i].isCompleted = 'Completed';
+
+                                    perFineMeshObj['Pparam'] = `Param${currentPerFineTest[i].paramIndex}_Upp`;
+                                    perFineMeshObj['Nparam'] = `Param${currentPerFineTest[i].paramIndex}_Low`;
+
+                                    if (currentPerFineTest[i].flag === 'a') {   // a for above
+                                        perFineMeshObj['testFlag'] = `Above ${currentPerFineTest[i].mesh} Mesh`;
+                                    } else if (currentPerFineTest[i].flag === 'b') {    // b for below
+                                        perFineMeshObj['testFlag'] = `Below ${currentPerFineTest[i].mesh} Mesh`;
+
+                                    }
+                                    // continue;
+                                } else if (currentPerFineTest[i].isCompleted === 'NotCompleted') {
+                                    testFlag = currentPerFineTest[i].flag + currentPerFineTest[i].mesh;
+                                    currentPerFineTest[i].isCompleted = 'Pending';
+                                    break;
+                                }
+                            }
+
                             // await objIncompleteGran.saveIncompleteData(cubicalObj, data, intNos, typeValue, tempUserObject, IdsNo);
                             await objIncompleteGran.saveIncompleteData(cubicalObj, data, actualSampleValue, intNos, typeValue, tempUserObject, IdsNo);
                             objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                             data.actualSampleValue = actualSampleValue + 1;
                             let count = actualSampleValue + 1;
                             let message;
-                            switch (count) {
-                                case 2:
+                            switch (testFlag) {
+                                case 'b60':
                                     message = "BELOW 60 MESH";
                                     break;
-                                case 3:
+                                default:
                                     message = "";
                                     break;
                             }
@@ -16970,15 +17107,27 @@ class BulkWeighment {
                         }
                         else {
                             await objIncompleteGran.saveIncompleteData(cubicalObj, data, actualSampleValue, intNos, typeValue, tempUserObject, IdsNo);
+
                             data.actualSampleValue = actualSampleValue + 1;
                             let count = actualSampleValue + 1;
                             let message;
+
+                            for (let i = 0; i < currentPerFineTest.length; i++) {
+                                if (currentPerFineTest[i].isCompleted === 'NotCompleted') {
+                                    testFlag = currentPerFineTest[i].flag + currentPerFineTest[i].mesh;
+                                    currentPerFineTest[i].isCompleted = 'Pending';
+                                    break;
+                                }
+                            }
                             objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
-                            switch (count) {
-                                case 2:
+                            switch (testFlag) {
+                                case "aTestSample":
+                                    message = "TEST SAMPLE";
+                                    break;
+                                case 'b60':
                                     message = "BELOW 60 MESH";
                                     break;
-                                case 3:
+                                default:
                                     message = "";
                                     break;
                             }
@@ -17015,7 +17164,7 @@ class BulkWeighment {
                 tempFinedata.datecount = false;
                 tempFinedata.timecount = false;
                 tempFinedata.dataValues = undefined;
-                tempFinedata.actualSampleValue = 0;
+                tempFinedata.actualSampleValue = 1;
                 tempFinedata.unit = undefined;
                 tempFinedata.side = undefined
 

@@ -894,6 +894,30 @@ class LoginModal {
             globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
                 .filter(k => k.idsNo != strIdsNo);
         }
+        //%Fine Array
+        if (globalData.arrpercentFineData != undefined) {
+            globalData.arrpercentFineData = globalData.arrpercentFineData
+                .filter(k => k.idsNo != strIdsNo);
+        }
+
+        if (globalData.arrPerFineCurrentTest != undefined) {
+            globalData.arrPerFineCurrentTest = globalData.arrPerFineCurrentTest
+                .filter(k => k.idsNo != strIdsNo);
+        }
+
+        if (globalData.arrPerFineTypeSelectedMenu != undefined) {
+            globalData.arrPerFineTypeSelectedMenu = globalData.arrPerFineTypeSelectedMenu
+                .filter(k => k.idsNo != strIdsNo);
+        }
+          //Particle Size Array
+          if (globalData.arrPaticleData != undefined) {
+            globalData.arrPaticleData = globalData.arrPaticleData
+                .filter(k => k.idsNo != strIdsNo);
+        }
+        if (globalData.arrparticleSizingCurrentTest != undefined) {
+            globalData.arrparticleSizingCurrentTest = globalData.arrparticleSizingCurrentTest
+                .filter(k => k.idsNo != strIdsNo);
+        }
        
     }
 

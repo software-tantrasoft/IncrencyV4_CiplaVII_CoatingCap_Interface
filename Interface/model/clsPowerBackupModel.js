@@ -270,10 +270,10 @@ class PowerBackup {
                 }
             }
             var objUser = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
-            if(objUser.UserId == PowerBackupData[0].Userid){
+            if (objUser.UserId == PowerBackupData[0].Userid) {
                 protocol = `WI${WeighmentType}${Weightment_name},0,8`;
                 return protocol;
-            }else{
+            } else {
                 this.deletePowerBackupData(IdsNo)
                 return protocol = "MR";
             }
@@ -292,14 +292,14 @@ class PowerBackup {
             //let currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == Idsno);
             let protocol;
             // here ids sending 8 for indivisual layer 1 // Dosa dry // softshell
-            if(Weightment_type == "H" && powerbackupdata[0].WeighmentType == "P"){
-                Weightment_type = "P"   
+            if (Weightment_type == "H" && powerbackupdata[0].WeighmentType == "P") {
+                Weightment_type = "P"
             }
 
-            if(Weightment_type == "H" && powerbackupdata[0].WeighmentType == "F"){
-                Weightment_type = "F"   
+            if (Weightment_type == "H" && powerbackupdata[0].WeighmentType == "F") {
+                Weightment_type = "F"
             }
-            
+
             switch (Weightment_type) {
                 case "1":
                     if (ProductType == 5) {//dosa dry
@@ -375,35 +375,52 @@ class PowerBackup {
                 }
 
                 if (Weightment_type == '18') {
-
+                    var testFlag;
                     var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
                     if (objLotData == undefined) {
 
                         globalData.arrLot.push({ idsNo: IdsNo, LotNo: getLot[0][0].Lot, MS: 'MSPNÂ' });
                     }
+
+
+                    let tempParticleCount = parseInt(count);
+                    tempParticleCount = tempParticleCount - 1;  // because not including test sample in mesh list
+                    var currentParticleSeizing = globalData.arrparticleSizingCurrentTest.find((k) => k.idsNo == IdsNo);
+                    var currentParticleSeizingTest = currentParticleSeizing.particleSeizing;
+                    for (let i = 0; i < currentParticleSeizingTest.length; i++) {
+                        if (i <= tempParticleCount) {
+                            currentParticleSeizingTest[i].isCompleted = 'Completed';
+                        } else if (currentParticleSeizingTest[i].isCompleted === 'NotCompleted') {
+                            testFlag = currentParticleSeizingTest[i].flag + currentParticleSeizingTest[i].mesh;
+                            currentParticleSeizingTest[i].isCompleted = 'Pending';
+                            break;
+                        }
+                    }
                     var message = '';
                     let cnt = parseInt(count) + 1;
-                    switch (cnt) {
-
-                        case 2:
+                    switch (testFlag) {
+                        case 'b60':
+                            message = "BELOW 60 MESH";
+                            break;
+                        case 'a20':
                             message = "ABOVE 20 MESH";
                             break;
-                        case 3:
+                        case 'a40':
                             message = "ABOVE 40 MESH";
                             break;
-                        case 4:
+                        case 'a60':
                             message = "ABOVE 60 MESH";
                             break;
-                        case 5:
+                        case 'a80':
                             message = "ABOVE 80 MESH";
                             break;
-                        case 6:
+                        case 'a100':
                             message = "ABOVE 100 MESH";
                             break;
-                        case 7:
+                        case 'aTray':
                             message = "FINES ON TRAY";
                             break;
-                        case 8:
+                        default:
                             message = "";
                             break;
                     }
@@ -412,25 +429,45 @@ class PowerBackup {
 
                     var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
                     let arrPaticleData = globalData.arrPaticleData.find(ht => ht.idsNo == IdsNo);
-                    if(objLotData != undefined){
+                    if (objLotData != undefined) {
                         arrPaticleData.sampleNo = parseInt(cnt);
                         arrPaticleData.message = message;
+                        arrPaticleData.actualSampleValue = cnt;
                     }
-                  
+
                     // protocol = `WP${Weightment_type}00${parseInt(cnt)}${message},`;
                     protocol = `PC0${count}${sidevalue}`;
                 }
                 else if (Weightment_type == '17') {
+                    var testFlag;
                     var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
                     if (objLotData == undefined) {
 
                         globalData.arrLot.push({ idsNo: IdsNo, LotNo: getLot[0][0].Lot, MS: 'MSFNÂ' });
                     }
+
+                    let tempPerFineCount = parseInt(count);
+                    tempPerFineCount = tempPerFineCount - 1;  // because not including test sample in mesh list
+
+                    var PerFineSelected = globalData.arrPerFineCurrentTest.find(k => k.idsNo == IdsNo);
+                    var currentPerFine = globalData.arrPerFineTypeSelectedMenu.find(k => k.idsNo == IdsNo);
+
+                    var selectTest = currentPerFine.selectedPerFine
+                    var  currentPerFineTest = PerFineSelected[selectTest];
+
+                    for (let i = 0; i < currentPerFineTest.length; i++) {
+                        if (i <= tempPerFineCount) {
+                            currentPerFineTest[i].isCompleted = 'Completed';
+                        } else if (currentPerFineTest[i].isCompleted === 'NotCompleted') {
+                            testFlag = currentPerFineTest[i].flag + currentPerFineTest[i].mesh;
+                            currentPerFineTest[i].isCompleted = 'Pending';
+                            break;
+                        }
+                    }
                     var message = '';
                     let cnt = parseInt(count) + 1;
-                    switch (cnt) {
-
-                        case 2:
+                    switch (testFlag) {
+                        case 'b60':
                             message = "BELOW 60 MESH";
                             break;
                     }
@@ -442,9 +479,15 @@ class PowerBackup {
 
                     var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
                     let arrpercentFineData = globalData.arrpercentFineData.find(ht => ht.idsNo == IdsNo);
-                    if(objLotData != undefined){
-                        arrpercentFineData.sampleNo = parseInt(cnt);
-                        arrpercentFineData.message = message;
+                    if (objLotData != undefined) {
+                        if(arrpercentFineData == undefined){
+                            globalData.arrpercentFineData.push({idsNo: IdsNo, actualSampleValue: 2,sampleNo : parseInt(cnt), message: message  })
+                        }
+                        else{
+                            arrpercentFineData.sampleNo = parseInt(cnt);
+                            arrpercentFineData.message = message;
+                        }
+                       
                     }
                     protocol = `PC0${count}${sidevalue}`;
                 }
