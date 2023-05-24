@@ -172,6 +172,7 @@ class CommanFunction {
                 var int_curentCalibrationIndex = sortedArray.indexOf(CalibrationType);
                 // calculating first caalibration
                 var str_first_calibration = sortedArray[0];
+                let now = new Date();
                 this.getFrepSrNo(str_first_calibration).then(fRerSrNo => {
                     // fRerSrNo is failed repSrNo which will insert in all failed tables
                     var arr_CalibArray = []; // array holds calibration which done and one which failed
@@ -194,7 +195,8 @@ class CommanFunction {
                                             const updateObj = {
                                                 str_tableName: 'tbl_calibration_periodic_master_failed',
                                                 data: [
-                                                    { str_colName: 'Periodic_RepNo', value: fRerSrNo }
+                                                    { str_colName: 'Periodic_RepNo', value: fRerSrNo },
+                                                    { str_colName: 'Periodic_DueDate', value: date.format(now, 'YYYY-MM-DD') },
                                                 ],
                                                 condition: [
                                                     { str_colName: 'srNo', value: lastInsertedId }
@@ -655,7 +657,7 @@ class CommanFunction {
     // Below function copies data from incomplete tables to complete tables after successfull calibration 
     // of all types
     //****************************************************************************************************** */
-    async incompleteToComplete(CalibrationType, strBalId, IDSSrNo,grancalib =false) {
+    async incompleteToComplete(CalibrationType, strBalId, IDSSrNo, grancalib = false) {
         try {
             // CalibrationType - OnGoing caaibration type i-e P, R, L .....
             var res = await obj_getRepSrNo.getRepSrNoWRTBalance(strBalId, IDSSrNo);
@@ -665,13 +667,13 @@ class CommanFunction {
             // we are finding length of sorted array that we have 
             let length = arr_sortedCalibArray.length;
             // here we finding last calibration
-            let lastCalibration ;
-            if(grancalib){
-                 lastCalibration = "P";
-            }else{
-                 lastCalibration = arr_sortedCalibArray[length - 1];
+            let lastCalibration;
+            if (grancalib) {
+                lastCalibration = "P";
+            } else {
+                lastCalibration = arr_sortedCalibArray[length - 1];
             }
-           
+
             // If current calibration is last calibration then we can proceed for copying
             //data from incomplete to complete tabled
             if (CalibrationType == lastCalibration) {
@@ -868,7 +870,7 @@ class CommanFunction {
                     console.log(logQ);
                     //logFromPC.addtoProtocolLog(logQ)
                     return 'ok';
-                } else if (isNewBal == 1 && moment(res1[0][0].Bal_CalbDueDt).format('YYYY-MM-DD') > moment().format('YYYY-MM-DD')) {
+                } else if (isNewBal == 1 && moment(res1[0][0].Bal_CalbDueDt).format('YYYY-MM-DD') > moment().format('YYYY-MM-DD') && res1[0][0].Bal_CalbStoreType.readUIntLE() == 1) {
                     var updateisNewBal = {
                         str_tableName: "tbl_balance",
                         data: [{ str_colName: "IsNewBalance", value: 0 }],
@@ -879,6 +881,127 @@ class CommanFunction {
                     console.log(logQ);
                     //logFromPC.addtoProtocolLog(logQ)
                     return 'ok';
+                } else if (isNewBal == 1 && res1[0][0].Bal_CalbStoreType.readUIntLE() == 0) {
+                    var today = new Date();
+                    var month = today.getMonth() + 1;
+                    month = ("0" + month).slice(-2);
+                    var year = today.getFullYear();
+                    var arr = res1[0][0].Bal_CalbDates.split(',');
+                    var arr_calibdates = []
+                    for (let d of arr) {
+                        var day = ("0" + d).slice(-2)
+                        var dates = '';
+                        dates = year + '-' + month + '-' + day;
+                        arr_calibdates.push(dates);
+                    }
+                    var normalDate = "";
+                    let now = new Date();
+                    let todayDate = moment(now).format('YYYY-MM-DD');
+                    for (let index = 0; index < arr_calibdates.length; index++) {
+                        if (todayDate < arr_calibdates[index]) {
+                            normalDate = arr_calibdates[index];
+                            break;
+                        } else if (todayDate == arr_calibdates[index]) {
+                            if (arr_calibdates.length - 1 < index + 1) {
+                                normalDate = "";
+                            } else {
+                                normalDate = arr_calibdates[index + 1];
+                            }
+                            break;
+                        }
+                    }
+                    if (normalDate == "") {
+                        var day = ("0" + arr[0]).slice(-2)
+                        var date = '';
+                        var todaysmonth = today.getMonth() + 1;
+                        var month = today.getMonth() + 2;
+                        month = ("0" + month).slice(-2);
+                        if (todaysmonth == 12) {
+                            month = "01";
+                            year = year + 1;
+                        }
+                        date = year + '-' + month + '-' + day;
+                        normalDate = date;
+                    }
+                    var updateisNewBal = {
+                        str_tableName: "tbl_balance",
+                        data: [{ str_colName: "IsNewBalance", value: 0 }],
+                        condition: [{ str_colName: "Bal_ID", value: strBalId }],
+                    };
+                    await database.update(updateisNewBal);
+                    var logQ = `Calibration Was new balance calibration and calibdate is greater than todaydate, no calib date shifted`;
+                    console.log(logQ);
+                    logFromPC.addtoProtocolLog(logQ)
+
+                    console.log('normalDate', normalDate);
+                    //checking for 31st 
+                    var finalarrfordate = normalDate.split('-');
+                    var daysinmonth = await this.daysInMonth(finalarrfordate[1], finalarrfordate[0]);
+
+
+                    if (Number(finalarrfordate[2]) > daysinmonth) {
+                        let days = "01";
+                        let month;
+                        let year;
+                        if (finalarrfordate[1] == "12") {
+                            month = "01";
+                            year = Number(finalarrfordate[0]) + 1;
+                        } else {
+                            month = (Number(finalarrfordate[1]) + 1);
+                            month = ("0" + month).slice(-2);
+                            year = finalarrfordate[0];
+                        }
+                        normalDate = year + '-' + month + '-' + days;
+                    }
+                    //
+                    var updateBalDueDates = {
+                        str_tableName: 'tbl_balance',
+                        data: [
+                            { str_colName: 'Bal_CalbDueDt', value: normalDate },
+                            { str_colName: 'Bal_CalbDueDtL', value: normalDate },
+                            { str_colName: 'Bal_CalbDueDtU', value: normalDate },
+                            { str_colName: 'Bal_CalbDueDtR', value: normalDate },
+                            { str_colName: 'Bal_CalbDueDtE', value: normalDate },
+                        ],
+                        condition: [
+                            { str_colName: 'Bal_ID', value: strBalId },
+                        ]
+
+                    }
+
+                    await database.update(updateBalDueDates);
+
+                    var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == IDSSrNo);
+                    var calibtable = 'tbl_calibration_status';
+                    if (objOwner.owner == 'analytical') {
+                        calibtable = 'tbl_calibration_status';
+                    } else {
+                        calibtable = 'tbl_calibration_status_bin';
+                    }
+                    let selectObj = {
+                        str_tableName: calibtable,
+                        data: '*',
+                        condition: [
+                            { str_colName: 'BalID', value: strBalId }
+                        ]
+                    }
+                    let result = await database.select(selectObj);
+                    if (result[0].length != 0) {
+                        let repNo = result[0][0].RepNo;
+                        let updateObj = {
+                            str_tableName: 'tbl_calibration_periodic_master',
+                            data: [
+                                { str_colName: 'Periodic_DueDate', value: normalDate }
+                            ],
+                            condition: [
+                                { str_colName: 'Periodic_RepNo', value: repNo }
+                            ]
+                        }
+                        await database.update(updateObj);
+                    }
+                    return 'ok';
+
+
                 } else {
                     var normalDate;
                     var todays_Date = new Date();
@@ -906,9 +1029,6 @@ class CommanFunction {
                         }
                         normalDate = await normaDate.convertDate(dateInUTC);
                     }
-
-
-
                     else {
                         var arr = res1[0][0].Bal_CalbDates.split(',');
                         var today = new Date();
@@ -917,58 +1037,66 @@ class CommanFunction {
                         month = ("0" + month).slice(-2);
                         var year = today.getFullYear();
                         var arr_calibdates = []
-                        // for (let d of arr) {
-                        //     var day = ("0" + d).slice(-2)
-                        //     var date = '';
-                        //     date = year + '-' + month + '-' + day;
-                        //     arr_calibdates.push(date);
-                        // }
                         for (let d of arr) {
                             var day = ("0" + d).slice(-2)
                             var date = '';
-                            if(parseFloat(month) >= 12){
-                                year++;
-                                month = '01';
-                                date = year + '-' + month + '-' + day;
-                            }else {
-                                date = year + '-' + month + '-' + day;
-                            }
+                            date = year + '-' + month + '-' + day;
                             arr_calibdates.push(date);
                         }
                         var lastCalibDate = await this.checkIfLatestEntryResBal(strBalId);
                         lastCalibDate = moment(lastCalibDate).format('YYYY-MM-DD')
                         console.log(arr_calibdates);
                         normalDate = "";
-                        for (const [i, ddmmyy] of arr_calibdates.entries()) {
-                            if (lastCalibDate < ddmmyy) {
-                                normalDate = arr_calibdates[i];
+                        for (let index = 0; index < arr_calibdates.length; index++) {
+                            if (lastCalibDate < arr_calibdates[index]) {
+                                normalDate = arr_calibdates[index];
+                                break;
+                            } else if (lastCalibDate == arr_calibdates[index]) {
+                                if (arr_calibdates.length - 1 < index + 1) {
+                                    normalDate = "";
+                                } else {
+                                    normalDate = arr_calibdates[index + 1];
+                                }
                                 break;
                             }
+
                         }
-                        // if (normalDate == "") {
-                        //     var day = ("0" + arr[0]).slice(-2)
-                        //     var date = '';
-                        //     var month = today.getMonth() + 2;
-                        //     month = ("0" + month).slice(-2);
-                        //     date = year + '-' + month + '-' + day;
-                        //     normalDate = date;
-                        // }
                         if (normalDate == "") {
                             var day = ("0" + arr[0]).slice(-2)
                             var date = '';
+                            var todaysmonth = today.getMonth() + 1;
                             var month = today.getMonth() + 2;
+
                             month = ("0" + month).slice(-2);
-                            if(parseFloat(month) >= 12){
-                               year++;
-                               month = '02';
-                               date = year + '-' + month + '-' + day;
-                           }else {
-                               date = year + '-' + month + '-' + day;
-                           }
+                            if (todaysmonth == 12) {
+                                month = "01";
+                                year = year + 1;
+                            }
+                            date = year + '-' + month + '-' + day;
                             normalDate = date;
                         }
                     }
                     console.log('normalDate', normalDate)
+                    //checking for 31st 
+                    var finalarrfordate = normalDate.split('-');
+                    var daysinmonth = await this.daysInMonth(finalarrfordate[1], finalarrfordate[0]);
+
+
+                    if (Number(finalarrfordate[2]) > daysinmonth) {
+                        let days = "01";
+                        let month;
+                        let year;
+                        if (finalarrfordate[1] == "12") {
+                            month = "01";
+                            year = Number(finalarrfordate[0]) + 1;
+                        } else {
+                            month = Number(finalarrfordate[1]) + 1;
+                            month = ("0" + month).slice(-2);
+                            year = finalarrfordate[0];
+                        }
+                        normalDate = year + '-' + month + '-' + days;
+                    }
+                    //
                     var updateBalDueDates = {
                         str_tableName: 'tbl_balance',
                         data: [
@@ -1027,7 +1155,7 @@ class CommanFunction {
                     } else {
                         var logQ = `Normal calibration and calibdate is less than or equals todaydate, calib date shifted to ${normalDate}`;
                         console.log(logQ);
-                       // logFromPC.addtoProtocolLog(logQ)
+                        // logFromPC.addtoProtocolLog(logQ)
                     }
 
                     // -----end-----
@@ -1039,6 +1167,9 @@ class CommanFunction {
         } catch (err) {
             throw new Error(err);
         }
+    }
+    async daysInMonth(month, year) {
+        return new Date(year, month, 0).getDate();
     }
     async checkIfLatestEntryResBal(BalId) {
         // `SELECT * FROM `tbl_calibration_periodic_master` WHERE Periodic_RepNo = (SELECT MAX(Periodic_RepNo) AS Periodic_RepNo WHERE Periodic_BalID = 'TantraTest');`
@@ -1595,7 +1726,7 @@ class CommanFunction {
     }
 
 
-    async updateactivitylogfortesttermination(idsNo,weightment_type) {
+    async updateactivitylogfortesttermination(idsNo, weightment_type) {
         return new Promise(async (resolve, reject) => {
             const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == idsNo);
             var selectedIds;
@@ -1611,7 +1742,7 @@ class CommanFunction {
 
             let typeValue = weightment_type;
             if (typeValue != undefined) {
-               
+
                 let TEST = '';
                 switch (typeValue) {
                     case '1':
@@ -1711,18 +1842,136 @@ class CommanFunction {
                     { strUserName: tempUserObject.UserName },
                     { activity: `${TEST} test is Terminated on` + " " + 'IDS :' + " " + idsNo });
                 objActivityLog.ActivityLogEntry(objActivity).then(() => { resolve("ok") }).catch(error => { console.log(error); });
-            }else{
+            } else {
                 resolve("ok");
             }
 
 
-           
+
         })
 
 
     }
+    async calibrationVerificationafterfailed(idsNo) {
+        try {
+            var tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
+            var DailyRes = false;
+            var PeriodicRes = false;
+            if (tempCubicInfo.Sys_Port1 == 'Balance' || tempCubicInfo.Sys_Port2 == 'Balance') {
+                let strBalId = tempCubicInfo.Sys_BalID;
+                // let check for latest entry in dailyCalibrationTable
+                let selectDaily = {
+                    str_tableName: 'tbl_calibration_daily_master_incomplete',
+                    data: '*',
+                    condition: [
+                        { str_colName: 'Daily_BalID', value: strBalId, comp: 'eq' }
+                    ],
+                    order: [
+                        {
+                            str_colName: 'Daily_RepNo', value: 'DESC LIMIT 0,1'
+                        }
+                    ]
+                }
+                let dResu = await database.select(selectDaily);
+                if (dResu[0].length > 0) {
+                    if (dResu[0][0].Daily_VerifyID == 'NULL') {
+                        DailyRes = true;
+                    } else {
+                        DailyRes = false;
+                    }
+                } else {
+                    DailyRes = false;
+                }
+                if (!DailyRes) {
+                    // let check for latest entry in Periodic Table
+                    let selectPeriodic = {
+                        str_tableName: 'tbl_calibration_periodic_master_failed',
+                        data: '*',
+                        condition: [
+                            { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' }
+                        ],
+                        order: [
+                            {
+                                str_colName: 'Periodic_RepNo', value: 'DESC LIMIT 0,1'
+                            }
+                        ]
+                    }
+                    let PResu = await database.select(selectPeriodic);
+                    if (PResu[0].length > 0) {
+                        if (PResu[0][0].Periodic_VerifyID == 'NULL') {
+                            PeriodicRes = true;
+                        } else {
+                            PeriodicRes = false;
+                        }
+                    } else {
+                        PeriodicRes = false;
+                    }
+                }
+                if (DailyRes || PeriodicRes) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+    async checkbalanceduefornew(CalibrationType, strBalId, IDSSrNo) {
+        var selectBalsetDays = {
+            str_tableName: 'tbl_balance',
+            data: '*',
+            condition: [
+                { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
+            ]
+        }
+        var res1 = await database.select(selectBalsetDays);
+        let days = res1[0][0].Bal_CalbDuration;
+        let isNewBal = res1[0][0].IsNewBalance.readUIntLE();
+
+        if (isNewBal == 1 && res1[0][0].Bal_CalbStoreType.readUIntLE() == 0) {
+            var today = new Date();
+            var month = today.getMonth() + 1;
+            month = ("0" + month).slice(-2);
+            var year = today.getFullYear();
+            var arr = res1[0][0].Bal_CalbDates.split(',');
+            var arr_calibdates = []
+            for (let d of arr) {
+                var day = ("0" + d).slice(-2)
+                var dates = '';
+                dates = year + '-' + month + '-' + day;
+                arr_calibdates.push(dates);
+            }
+            var normalDate = "";
+            let now = new Date();
+            let todayDate = moment(now).format('YYYY-MM-DD');
+
+            normalDate = todayDate;
+
+            var updateBalDueDates = {
+                str_tableName: 'tbl_balance',
+                data: [
+                    { str_colName: 'Bal_CalbDueDt', value: normalDate },
+                    { str_colName: 'Bal_CalbDueDtL', value: normalDate },
+                    { str_colName: 'Bal_CalbDueDtU', value: normalDate },
+                    { str_colName: 'Bal_CalbDueDtR', value: normalDate },
+                    { str_colName: 'Bal_CalbDueDtE', value: normalDate },
+                ],
+                condition: [
+                    { str_colName: 'Bal_ID', value: strBalId },
+                ]
+
+            }
+            await database.update(updateBalDueDates);
+            return 'ok';
 
 
+        }
+    }
 
     //****************************************************************************************************** */
     /*

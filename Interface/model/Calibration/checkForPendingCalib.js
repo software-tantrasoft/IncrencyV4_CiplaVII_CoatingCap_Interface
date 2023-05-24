@@ -37,49 +37,49 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
      * perform calibration from start i-e periodic, so we are clearing flags in calibration_status which set to 1 previous date
      * depends updon the date, As discused with Rahul, Pushkar, Sheetal;  
      */
-        var exists = Object.keys(tempCaibStatus.status).some(function(k) {
-            return tempCaibStatus.status[k] == 1 ;
-        });
-        if(exists){
+    var exists = Object.keys(tempCaibStatus.status).some(function (k) {
+        return tempCaibStatus.status[k] == 1;
+    });
+    if (exists) {
         // check for the date in table
         var objSelectCalibStatus = {
             str_tableName: calibTable,
             data: "*",
             condition: [
-                {str_colName:'BalID', value:strBalId}
+                { str_colName: 'BalID', value: strBalId }
             ]
         }
         var arrResult = await database.select(objSelectCalibStatus);
-         var dtCalibStatusDate = arrResult[0][0].date;
-            if(moment(dtCalibStatusDate).format('YYYY-MM-DD')!=moment().format('YYYY-MM-DD')){
-                 // Updating Our golbal array that all calibration is completed with complete status
-                 for (var i in globalData.calibrationStatus) {
-                    if (globalData.calibrationStatus[i].BalId == strBalId) {
-                        globalData.calibrationStatus[i].status['P'] = 0;
-                        globalData.calibrationStatus[i].status['E'] = 0;
-                        globalData.calibrationStatus[i].status['R'] = 0;
-                        globalData.calibrationStatus[i].status['U'] = 0;
-                        globalData.calibrationStatus[i].status['L'] = 0;
-                        break; //Stop this loop, we found it!
-                    }
+        var dtCalibStatusDate = arrResult[0][0].date;
+        if (moment(dtCalibStatusDate).format('YYYY-MM-DD') != moment().format('YYYY-MM-DD')) {
+            // Updating Our golbal array that all calibration is completed with complete status
+            for (var i in globalData.calibrationStatus) {
+                if (globalData.calibrationStatus[i].BalId == strBalId) {
+                    globalData.calibrationStatus[i].status['P'] = 0;
+                    globalData.calibrationStatus[i].status['E'] = 0;
+                    globalData.calibrationStatus[i].status['R'] = 0;
+                    globalData.calibrationStatus[i].status['U'] = 0;
+                    globalData.calibrationStatus[i].status['L'] = 0;
+                    break; //Stop this loop, we found it!
                 }
-
-                const updateCalibstatusObj = {
-                    str_tableName: calibTable,
-                    data: [
-                        { str_colName: 'P', value: 0 },
-                        { str_colName: 'E', value: 0 },
-                        { str_colName: 'R', value: 0 },
-                        { str_colName: 'U', value: 0 },
-                        { str_colName: 'L', value: 0 }
-                    ],
-                    condition: [
-                        { str_colName: 'BalID', value: strBalId }
-                    ]
-                }
-                await database.update(updateCalibstatusObj);
             }
+
+            const updateCalibstatusObj = {
+                str_tableName: calibTable,
+                data: [
+                    { str_colName: 'P', value: 0 },
+                    { str_colName: 'E', value: 0 },
+                    { str_colName: 'R', value: 0 },
+                    { str_colName: 'U', value: 0 },
+                    { str_colName: 'L', value: 0 }
+                ],
+                condition: [
+                    { str_colName: 'BalID', value: strBalId }
+                ]
+            }
+            await database.update(updateCalibstatusObj);
         }
+    }
     // If calibration due today then get calibration status for required balance in calibrationStatus 
     // or it blank so
     // no for loop execution and it sends CR0
@@ -428,35 +428,30 @@ exports.checkIfTodayIsPeriodicCalib = async (IDSSrNo) => {
                 var month = today.getMonth() + 1;
                 month = ("0" + month).slice(-2);
                 var year = today.getFullYear();
-                var arr_calibdates = []
-                for (let d of arr) {
-                    var day = ("0" + d).slice(-2)
-                    var date = '';
-                    date = year + '-' + month + '-' + day;
-                    let checkres = await checkPeriodicEntry(date, strBalId);
-                    if ((todayDate == date) && (checkres.length == 0)) {
-                        //logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Todays)')
-                        console.log('today match', date)
-                        return true; // calibration Pending   
-                    } else if (date <= todayDate && checkres.length == 0) {
-                        let lastCalibDate = await checkIfLatestEntryResBal(strBalId);
-                        lastCalibDate = moment(lastCalibDate).format('YYYY-MM-DD')
-                        console.log('yesterday', date)
-                        if (lastCalibDate != 'no data') {
-                            if (date > lastCalibDate) {
-                                //logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Previous)')
-                                return true;
-                            } else {
-                                continue;
-                            }
-                        } else {
-                            return false;
+                var arr_calibdates = [];
+                let calibDate = res[0][0].Bal_CalbDueDt;
+                calibDate = date1.format(calibDate, 'YYYY-MM-DD');
+                let checkres = await checkPeriodicEntry(calibDate, strBalId);
+                if ((todayDate == calibDate) && (checkres.length == 0)) {
+                    logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Todays)')
+                    console.log('today match', calibDate)
+                    return true; // calibration Pending   
+                } else if (calibDate <= todayDate && checkres.length == 0) {
+                    let lastCalibDate = await checkIfLatestEntryResBal(strBalId);
+                    lastCalibDate = moment(lastCalibDate).format('YYYY-MM-DD')
+                    console.log('yesterday', calibDate)
+                    if (lastCalibDate != 'no data') {
+                        if (calibDate > lastCalibDate) {
+                            logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Previous)')
+                            return true;
                         }
-
                     } else {
-                        console.log('false codition', date)
                         return false;
                     }
+
+                } else {
+                    console.log('false codition', calibDate)
+                    return false;
                 }
             }
         }
@@ -486,7 +481,7 @@ exports.checkIfTodayIsPeriodicCalibVernier = async (IDSSrNo) => {
         var year = today.getFullYear();
         // cheeck if new balance
         if (blnVerIsNew == 1) {
-           // logFromPC.addtoProtocolLog('Vernier Calibration Cause:New Vernier')
+            // logFromPC.addtoProtocolLog('Vernier Calibration Cause:New Vernier')
             return true;//everytime return true if new balance
         } else {
 
@@ -498,10 +493,10 @@ exports.checkIfTodayIsPeriodicCalibVernier = async (IDSSrNo) => {
                 // here we have to check if calibration is pending or done for this date
                 let checkres = await checkPeriodicEntryVernier(calibDate, tempVernier);
                 if (calibDate == todayDate) {
-                   // logFromPC.addtoProtocolLog('Vernier Calibration Cause:Normal Routine')
+                    // logFromPC.addtoProtocolLog('Vernier Calibration Cause:Normal Routine')
                     return true;
                 } if (calibDate <= todayDate && checkres.length == 0) {
-                   // logFromPC.addtoProtocolLog('Vernier Calibration Cause:Normal Routine')
+                    // logFromPC.addtoProtocolLog('Vernier Calibration Cause:Normal Routine')
                     return true;
                 } else {
                     return false;
@@ -525,7 +520,7 @@ exports.checkIfTodayIsPeriodicCalibVernier = async (IDSSrNo) => {
                         return true; // calibration Pending   
                     } else if (date <= todayDate && checkres.length == 0) {
                         let lastCalibDate = await checkIfLatestEntryResVernier(tempVernier);
-                       
+
                         console.log('yesterday', date)
                         if (lastCalibDate != 'no data') {
                             lastCalibDate = moment(lastCalibDate).format('YYYY-MM-DD')
