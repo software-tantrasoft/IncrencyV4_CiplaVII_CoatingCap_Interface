@@ -2660,7 +2660,7 @@ class BulkWeighment {
 
                         if (tempTDObj == undefined) {
                             globalData.arrDTData.push({
-                                idsNo: idsNo, arr_heading: [], arr_reading: [], arr_info: [],
+                                idsNo: IdsNo, arr_heading: [], arr_reading: [], arr_info: [],
                                 rotaryType: undefined,
                                 mode: undefined,
                                 Bath_Temp: undefined,
@@ -4580,7 +4580,7 @@ class BulkWeighment {
                                             { str_colName: 'RepSerNo', value: lastInsertedID },
                                             { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
                                             { str_colName: 'RecSeqNo', value: i + 1 },
-                                            { str_colName: 'DT_Side', value: jarType == "NA" },
+                                            { str_colName: 'DT_Side', value: "NA" },
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
                                             { str_colName: 'DT_StartTm', value: startTime },

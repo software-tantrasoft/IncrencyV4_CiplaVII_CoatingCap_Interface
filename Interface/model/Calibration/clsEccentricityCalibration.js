@@ -570,9 +570,6 @@ class Eccentricity {
                         { activity: 'Eccentricity Calibration Started on IDS' + IDSSrNo });
                     await objActivityLog.ActivityLogEntry(objActivity)
 
-                    /*
-                       */
-
                     //powerbackup insertion
                     var data = await CalibPowerBackup.insertCalibPowerBackupData(
                         RepNo,

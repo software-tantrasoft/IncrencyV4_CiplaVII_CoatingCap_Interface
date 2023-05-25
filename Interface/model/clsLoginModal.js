@@ -939,7 +939,7 @@ class LoginModal {
             }
             this.updateWeighmentStatus(obj.IdsNo, 0);
             objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
-           // objIncompleteUpdation.updateReportRemarkaftercommunicationoff(activeUser);
+            objIncompleteUpdation.updateReportRemarkaftercommunicationoff(activeUser);
 
             if (strUserObj != undefined) {
                 var userID = strUserObj.UserId;

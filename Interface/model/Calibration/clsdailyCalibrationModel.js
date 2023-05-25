@@ -952,7 +952,6 @@ class CalibrationModel {
           }
           // inserting data in incomplete daily table
           var res = await database.save(insertDetailObj)
-
           //powerbackup insertion
           var data = await CalibPowerBackup.insertCalibPowerBackupData(
             intDaily_RepNo,

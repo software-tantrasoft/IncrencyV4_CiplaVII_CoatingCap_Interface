@@ -73,12 +73,9 @@ async function calibDecider(str_Protocol, IDSSrNo) {
         switch (calibType) {
             case 'daily':
                 var result = await dailyCalibrationModel.verifyWeights(str_Protocol, IDSSrNo);
-              
                 return result;
             case 'periodic':
                 var result = await periodiccalibrationModel.verifyWeights(str_Protocol, IDSSrNo); 
-         
-            
                 return result;
             case 'vernierPeriodic':
                 var result = await  periodicCalibrationVernierModel.verifyWeights(str_Protocol, IDSSrNo)
