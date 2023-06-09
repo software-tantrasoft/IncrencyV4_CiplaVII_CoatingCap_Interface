@@ -1874,7 +1874,7 @@ class CommanFunction {
                 }
                 let dResu = await database.select(selectDaily);
                 if (dResu[0].length > 0) {
-                    if (dResu[0][0].Daily_VerifyID == 'NULL') {
+                    if (dResu[0][0].CalibrationStatus == 'NULL') {
                         DailyRes = true;
                     } else {
                         DailyRes = false;

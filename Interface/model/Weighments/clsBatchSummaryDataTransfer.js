@@ -1645,7 +1645,7 @@ class BatchDataTransfer {
         var MaxDLB = Math.max(...arrDLBDetail);
         var MinDLB = Math.min(...arrDLBDetail);
         var AvgDLB = (sumDLB / count);
-        if (((cubicalObj.Sys_RptType == 0) && (currentCubicle.Sys_Validation == 0) && (cubicalObj.Sys_CubType == 'Compression') || (cubicalObj.Sys_CubType == 'Coating'))) {
+        if (((cubicalObj.Sys_RptType == 0) && (currentCubicle.Sys_Validation == 0) && ((cubicalObj.Sys_CubType == 'Compression') || (cubicalObj.Sys_CubType == 'Coating')))) {
             // let res = await proObj.productData(cubicalObj);
             // var paramNom = `Param7_Nom`;
             // var limitNo = `Param7_LimitOn`;

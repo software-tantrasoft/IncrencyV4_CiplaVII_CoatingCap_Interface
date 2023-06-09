@@ -324,7 +324,8 @@ class ProtocolHandler {
 
 
                             var SIRCommand = await objSendSIR.prepareCommand(idsNo);
-                            this.sendProtocol(SIRCommand, str_IpAddress);
+                            // this.sendProtocol(SIRCommand, str_IpAddress);
+                            await this.sendProtocol(`SP10SIR,`, str_IpAddress);
 
                             /* Here We need to check If balance connected or not If balance is not connected then
                                calibration should not be asked, So we need to check in Cubicle object , as well as 
@@ -651,6 +652,7 @@ class ProtocolHandler {
                                 await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
                             } else {
                                 objMonitor.monit({ case: 'CP', idsNo: idsNo });
+                                await this.sendProtocol("SP10SIR,", str_IpAddress);
                                 let objFlagCalibWeigh = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
                                 if (objFlagCalibWeigh != undefined) {
                                     objFlagCalibWeigh.alertFlag = true;
@@ -1269,10 +1271,27 @@ class ProtocolHandler {
                             //     selectedIds = idsNo; // for compression and coating
                             // };
 
+                            var fetchpowerbackup = await clspowerbackup.fetchPowerBackupData(idsNo);
+                            var tempObjforremark = globalData.arrIncompleteRemark.find(k => k.IdsNo == idsNo);
+                            if (tempObjforremark == undefined) {
+                                globalData.arrIncompleteRemark.push({
+                                    weighment: true,
+                                    RepoSr: fetchpowerbackup.result[0].Incomp_RepSerNo,
+                                    Type: fetchpowerbackup.result[0].WeighmentType,
+                                    IdsNo: fetchpowerbackup.result[0].Idsno
+                                })
+                            } else {
+                                tempObjforremark.weighment = true;
+                                tempObjforremark.RepoSr = fetchpowerbackup.result[0].Incomp_RepSerNo;
+                                tempObjforremark.Type = fetchpowerbackup.result[0].WeighmentType;
+                                // tempObjforremark.IdsNo = fetchpowerbackup.result[0].Idsno ;
+                            }
+
                             var weightment_type = str_Protocol.substring(2, 3);
                             if (weightment_type == '0') {//handling powerbackup discard condition 
                                 await menuSelectModel.handleCLProtocol(idsNo);
                                 await objIncompleteRemark.updateReportRemark(idsNo);
+                                await objCommanFun.updateactivitylogfortesttermination(idsNo, weightment_type);
                                 console.log('powerbakup discard');
                                 // TO-DO // We can direct call MR from here
                                 await clspowerbackup.deletePowerBackupData(idsNo);
@@ -1280,7 +1299,7 @@ class ProtocolHandler {
                             }
                             else {
 
-                                var fetchpowerbackup = await clspowerbackup.fetchPowerBackupData(idsNo);
+
                                 let objhandelpcprotocol;
 
                                 // if (fetchpowerbackup.result[0].Sys_CubType == "IPQC") {
@@ -1322,7 +1341,7 @@ class ProtocolHandler {
                             var ObjCheckPoweBackUp = await clspowerbackup.fetchPowerBackupData(idsNo);
                             if (ObjCheckPoweBackUp.status && ObjCheckPoweBackUp.result.length > 0) {
                                 objMonitor.monit({ case: 'WS', idsNo: idsNo });
-                                var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol);
+                                var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol, str_IpAddress);
                                 this.sendProtocol(returnProtocol, str_IpAddress);
                             }
                             else {
@@ -1434,7 +1453,7 @@ class ProtocolHandler {
 
                                 } else {
                                     objMonitor.monit({ case: 'WS', idsNo: idsNo });
-                                    var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol);
+                                    var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol, str_IpAddress);
                                     this.sendProtocol(returnProtocol, str_IpAddress);
                                 }
                             }
@@ -1512,6 +1531,13 @@ class ProtocolHandler {
                                 let objFlagCalibWeigh1 = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
                                 if (objFlagCalibWeigh1 != undefined) {
                                     objFlagCalibWeigh1.alertFlag = false;
+                                }
+                                var remarkObj = globalData.arrLLsampleRemark.find(k => k.idsNo == idsNo);
+                                if (remarkObj != undefined) {
+                                    if (globalData.arrLLsampleRemark != undefined) {
+                                        globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
+                                            .filter(k => k.idsNo != idsNo);
+                                    }
                                 }
                                 var returnProtocol1 = await menuRequest.getProductDetail(str_IpAddress.split('.')[3]);
                                 if (returnProtocol1 == 'Area setting mismatched') {
@@ -1852,6 +1878,21 @@ class ProtocolHandler {
                                 for (let key in tempArrLimits) {
                                     if (key !== "idsNo") {
                                         tempArrLimits[key].side = side
+                                        if (key == "Hardness") {
+                                            var remarkObj = globalData.arrLLsampleRemark.find(k => k.idsNo == idsNo);
+                                            if (remarkObj != undefined) {
+                                                if (globalData.arrLLsampleRemark != undefined) {
+                                                    globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
+                                                        .filter(k => k.idsNo != idsNo);
+                                                }
+                                            }
+                                            var objHardness = globalData.arrHardness425.find(
+                                                (ht) => ht.idsNo == idsNo
+                                            );
+                                            objHardness.dataFlowStatus = true;
+                                            this.sendProtocol('HS', str_IpAddress);
+                                            break;
+                                        }
                                     }
                                 }
                                 this.sendProtocol('+', str_IpAddress);
@@ -2066,6 +2107,23 @@ class ProtocolHandler {
                             if (globalData.arrLLsampleRemark != undefined) {//added by Pradip 15/12/2020
                                 globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
                                     .filter(k => k.idsNo != idsNo);
+                            }
+                            break;
+                        case "HS":
+                            var remarkObj = globalData.arrLLsampleRemark.find(k => k.idsNo == idsNo);
+                            if (remarkObj == undefined) {
+                                this.sendProtocol("+", str_IpAddress);
+                            } else {
+                                if (remarkObj.remark == 'HR3,,,,,' || remarkObj.remark == 'TR3,,,,,') {
+                                    this.sendProtocol(remarkObj.remark, str_IpAddress);
+                                } else {
+                                    this.sendProtocol('HS', str_IpAddress);
+                                }
+                                // this.sendProtocol(remarkObj.remark, str_IpAddress);
+                                // if (globalData.arrLLsampleRemark != undefined) {
+                                //     globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
+                                //         .filter(k => k.idsNo != idsNo);
+                                // }
                             }
                             break;
                         default:

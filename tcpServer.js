@@ -42,25 +42,6 @@ tcpServer.on('error',() => {
 
 })
 
-tcpServer.listen({host:'192.168.1.178',port:9000}, function() {  
+tcpServer.listen({host:'192.168.1.173',port:9000}, function() {  
     console.log('TCP SERVER LISTENING TO', tcpServer.address().address + ":9000");  
 });
-  
-
-
-// function strCount(data) {
-//     let result = {};
-//     let lines = data.split('X');
-
-//     for (let i = 0; i < lines.length; i++) {
-//          let str = lines[i];
-      
-//     }
-
-//     return;
-// }
-
-
-// function hardness425parsing(str) {
-  
-// }

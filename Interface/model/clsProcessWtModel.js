@@ -23,7 +23,7 @@ class ProcessWTModel {
     //**************************************************************************************************** */
     // Below function use for WS protocol when comes for Balance and Vernier,
     //*************************************************************************************************** */
-    async processWS(IDSSrNo, str_Protocol) {
+    async processWS(IDSSrNo, str_Protocol,str_IpAddress) {
 
         var tempLimObj = globalData.arr_limits.find(k => k.idsNo == IDSSrNo);
         let arrPaticleData = globalData.arrPaticleData.find(ht => ht.idsNo == IDSSrNo);
@@ -161,7 +161,7 @@ class ProcessWTModel {
                     if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'H';
-                        // objHardness.idsIPAddress = idsIPAddress;
+                        objHardness.idsIPAddress = str_IpAddress;
                     }
                     if (instrument == "Balance") {
                         if (objLotData.MS.substring(2, 3) == "P") {   // for particle size handle 
@@ -240,10 +240,10 @@ class ProcessWTModel {
                     if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'H';
-                        objHardness.idsIPAddress = idsIPAddress;
+                        objHardness.idsIPAddress = str_IpAddress;
                     }
                 }
-                sendProtocol = '+';
+                sendProtocol = 'HS';
                 return (sendProtocol);
                 break;
             case 'T':
@@ -253,14 +253,14 @@ class ProcessWTModel {
                     if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'T';
-                        objHardness.idsIPAddress = idsIPAddress;
+                        objHardness.idsIPAddress = str_IpAddress;
                     }
                 } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
                     var instrument = cubicalObj.Sys_Port3;
                     if (instrument == 'Hardness') {
                         objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'T';
-                        objHardness.idsIPAddress = idsIPAddress;
+                        objHardness.idsIPAddress = str_IpAddress;
                     }
                 }
                 sendProtocol = '+';

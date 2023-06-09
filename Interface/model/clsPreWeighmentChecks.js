@@ -832,8 +832,7 @@ class PreWeighmentChecks {
             if (serverConfig.ProjectName == 'SunPharmaVP') {
                 var PrecalibrationStatus = 'Valid PreCalibration,';
             } else {
-                // var PrecalibrationStatus = await this.verifyPreCalibration(intIdsNo);
-                var PrecalibrationStatus = 'Valid PreCalibration,';
+                var PrecalibrationStatus = await this.verifyPreCalibration(intIdsNo);
 
             }
         } else {

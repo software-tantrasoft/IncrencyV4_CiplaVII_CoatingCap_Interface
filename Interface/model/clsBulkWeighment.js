@@ -7729,1343 +7729,6 @@ class BulkWeighment {
             throw new Error(err);
         }
     }
-    insertBulkWeighmentHardness_425_old(IdsNo, protocol) {
-        return new Promise((resolve, reject) => {
-
-            // Check when there isIPQC
-            var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
-            var selectedIds;
-            var objLotData = globalData.arrLot.find(k => k.idsNo == IdsNo);
-            if (IPQCObject != undefined) {
-                selectedIds = IPQCObject.selectedIds;
-            } else {
-                selectedIds = IdsNo;
-            }
-            var currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
-            var actualProtocol = protocol;
-            let now = new Date();
-            var protocolValue = protocol.substring(0, 5);// starting 5 character
-            var protocolValueData = protocol.substring(6);// starting 5 character
-            var protocolIncomingType = protocolValue.substring(0, 1);//Check incoming Protocol is from "T" or "H"
-            var ProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo)
-            //var hardnessReading = protocol.substring(0, 7);
-            const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
-            var objHardness = globalData.arrHardness425.find(ht => ht.idsNo == IdsNo);
-            var productlimits = globalData.arr_limits.find(al => al.idsNo == IdsNo);
-            var objInvalid = globalData.arrBulkInvalid.find(k => k.idsNo == IdsNo);
-            var nonPrintableChrPattern = /[^\x20-\x7E]/g; //for non-printable chrecters test
-            var tempprotocolValueData = protocolValueData.substring(0, protocolValueData.length - 2).trim();//for non-printable chrecters test
-
-            if (protocolValue != "TD000" && protocolValue != "HD000" && protocolValue != "ED000") {
-                /**
-                 * @description We are here setting TD000 and HD000 to false
-                 */
-                var tempTDHD = globalData.arrTHHDrepet.find(k => k.idsNo == IdsNo);
-                if (tempTDHD == undefined) { globalData.arrTHHDrepet.push({ idsNo: IdsNo, flag: false, oc: 0 }) }
-                else { tempTDHD.flag = false; tempTDHD.oc = 0 }
-                /************************************************************* */
-                var IncludeX = actualProtocol.includes("X");
-                //console.log("IncludeX", IncludeX);
-                if (IncludeX == true) {
-                    var receivedProtocol = actualProtocol.replace("X", "").trim();
-                    const objBulkInvalid = new bulkInvalid();
-                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                    objBulkInvalid.invalidObj.HD425.invalid = false;
-                    objBulkInvalid.invalidObj.HD425.invalidMsg = "";
-                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                }
-                else { IncludeX = false; }
-                // To check whether user send 125 string or other
-                if (actualProtocol.includes(";") || actualProtocol.includes('#')) {
-                    const objBulkInvalid = new bulkInvalid();
-                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                    objBulkInvalid.invalidObj.HD425.invalid = true;
-                    objBulkInvalid.invalidObj.HD425.invalidMsg = "125 string";
-                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                }
-                if (IncludeX == true) {
-
-                    //console.log("IncludeX", IncludeX);
-                    if (receivedProtocol.includes("mm") && objHardness.dimensionParam == 0) {
-                        var includeMM = protocolValueData.includes("mm")
-                        //var tempprotocolValueData = protocolValueData.substring(0,protocolValueData.length -2).trim();
-                        if (nonPrintableChrPattern.test(tempprotocolValueData)) {
-                            var msg = "Invalid String,,,,"
-                            //var msg = "INVALID DATA,RECEIVED,RETRANSMIT DATA,,"
-                            includeMM = false
-                            resolve(`${protocolIncomingType}R40${msg}`);
-                        }
-
-                        if (includeMM == true) {
-                            // As we are inserting all values like --, NA, 0 so we here db Datatype must be a varchar
-                            // var thicknessVal = protocolValueData.replace("mm", "").trim(); 
-                            // if (protocolValueData.split('m')[0].trim() == "--") {
-                            //     objHardness.thicknessVal = 0;
-                            // } else {
-                            objHardness.thicknessVal = protocolValueData.split('mm')[0].trim();
-                            // }
-                            objHardness.thicknessDecimal = 2;//thicknessVal.split('.').replace(/\D/g, '').length;//count number in given string
-                            //Repeat is handled at the start So No need to check again
-                            //if (receivedProtocol.includes("R") != true) {
-                            objHardness.sampleNo = objHardness.sampleNo + 1;
-                            //}
-
-                            objHardness.dimensionParam = 1;
-                            var isThickValid = parseFloat(objHardness.thicknessVal);
-                            var isThickValid = isThickValid.toString();
-                            // if(isThickValid == 'NaN') {
-                            //     const objBulkInvalid = new bulkInvalid();
-                            //     objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            //     objBulkInvalid.invalidObj.HD425.invalid = true;
-                            //     objBulkInvalid.invalidObj.HD425.invalidMsg = "INVALID WGT PLS,REPEAT SAMPLES,,";
-                            //     Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                            // }
-                            //console.log("First",objHardness);
-                        }
-
-                    }
-                    else if (receivedProtocol.includes("mm") && objHardness.dimensionParam == 1) {
-
-                        var includeMM = protocolValueData.includes("mm");
-                        //var tempprotocolValueData = protocolValueData.substring(0,protocolValueData.length -2).trim();
-                        if (nonPrintableChrPattern.test(tempprotocolValueData)) {
-                            var msg = "Invalid String,,,,"
-                            //var msg = "INVALID DATA,RECEIVED,RETRANSMIT DATA,,"
-                            includeMM = false
-                            resolve(`${protocolIncomingType}R40${msg}`);
-                        }
-
-                        if (includeMM == true) {
-
-                            // if (protocolValueData.split('m')[0].trim() == "--") {
-                            //     objHardness.dimensionVal = 0;
-                            // } else {
-                            objHardness.dimensionVal = protocolValueData.split('m')[0].trim();
-                            // }
-                            objHardness.dimensionDecimal = 2;// dimensionVal.split('.').replace(/\D/g, '').length;//count number in given string
-                            objHardness.dimensionParam = 2;
-                            var isDimensionsValid = parseFloat(objHardness.dimensionVal);
-                            var isDimensionsValid = isDimensionsValid.toString();
-                            // if(isDimensionsValid == 'NaN') {
-                            //     const objBulkInvalid = new bulkInvalid();
-                            //     objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            //     objBulkInvalid.invalidObj.HD425.invalid = true;
-                            //     objBulkInvalid.invalidObj.HD425.invalidMsg = "INVALID WGT PLS,REPEAT SAMPLES,,";
-                            //     Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                            // }
-                            //console.log("SEcond",objHardness);
-                        }
-
-                    }
-                    else if (receivedProtocol.includes("N") && objHardness.dimensionParam == 2) {//|| receivedProtocol.includes("KP") ) {
-                        // if (receivedProtocol.includes("--") != true) {
-                        var includeNorKp
-                        objHardness.dimensionParam = 0;
-                        var tempProtocolValueData = protocolValueData.substring(0, protocolValueData.length - 2).trim();//for non-printable chrecters test
-                        if (tempProtocolValueData.includes("n") || tempProtocolValueData.includes("N") ||
-                            tempProtocolValueData.includes("Kp") || tempProtocolValueData.includes("kp") || tempProtocolValueData.includes("KP") ||
-                            tempProtocolValueData.includes("kP") || tempProtocolValueData.includes("Sc") || tempProtocolValueData.includes("sc") ||
-                            tempProtocolValueData.includes("SC") || tempProtocolValueData.includes("sC")) {
-                            includeNorKp = true
-                        }
-                        else {
-                            includeNorKp = false
-                        }
-
-                        //var includeNorKp = protocolValueData.includes("N")
-
-                        //var hardnessVal = 0;
-                        if (nonPrintableChrPattern.test(tempprotocolValueData)) {
-                            var msg = "Invalid String,,,,"
-                            //var msg = "INVALID DATA,RECEIVED,RETRANSMIT DATA,,"
-                            includeNorKp = false
-                            resolve(`${protocolIncomingType}R40${msg}`);
-                            objHardness.sampleNo = objHardness.sampleNo - 1;
-                        }
-
-                        if (includeNorKp == true) {
-                            var HardnessVal = 0;
-                            //var strRecivedProtocol = app.protocolToString(Buffer.from(protocolValueData,'utf8'));
-                            var includeUnit = protocolValueData.substring(0, protocolValueData.length - 2).trim();//for non-printable chrecters test
-                            if (includeUnit.includes("n") || includeUnit.includes("N")) {
-                                HardnessVal = includeUnit.substring(0, includeUnit.length - 1).trim();
-                            }
-                            else {
-                                HardnessVal = includeUnit.substring(0, includeUnit.length - 2).trim();
-                            }
-
-                            //objHardness.hardnessVal = protocolValueData.split('N')[0].trim();
-                            objHardness.hardnessVal = HardnessVal
-
-                            if (objHardness.hardnessVal == "") {
-                                objHardness.hardnessVal = "NA";
-                            }
-                            // else if(objHardness.hardnessVal == '--'){
-                            //     objHardness.hardnessVal = 0;
-                            // }
-                            var isHardnessValid = parseFloat(objHardness.hardnessVal);
-                            var isHardnessValid = isHardnessValid.toString();
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            if (isHardnessValid == 'NaN' && objHardness.sampleNo == 1) {
-                                objBulkInvalid.invalidObj.HD425.invalid = true;
-                                objBulkInvalid.invalidObj.HD425.invalidMsg = "INVALID WGT PLS,REPEAT SAMPLES,,";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                            }
-                            // objBulkInvalid.invalidObj.HD425.invalid = false;
-                            if (objBulkInvalid.invalidObj.HD425.invalid && objHardness.sampleNo == 1) {
-                                //commented by vivek on 14-05-2020************************
-                                //var msg = "Invalid String,FORMAT PLS REPEAT,SAME SAMPLE,,"
-                                //resolve(`DM000${msg}`);
-                                //********************************************************/
-                                var msg = "Invalid String,,,,"
-                                //var msg = "INVALID DATA,RECEIVED,RETRANSMIT DATA,,"
-                                resolve(`${protocolIncomingType}R40${msg}`);
-
-                                objHardness.sampleNo = objHardness.sampleNo - 1;
-                            } else {
-                                objHardness.hardnessDecimal = includeNorKp == true ? 0 : 2;// hardnessVal.split('.').replace(/\D/g, '').length;//count number in given string
-                                //console.log("Hardness",objHardness);
-                                var HardnessUnit = productlimits.Hardness.unit;
-                                var doMasterEntry = (objHardness.sampleNo == 1) ? true : false;
-                                //added by vivek on 11-11-2019***************************/
-                                var tempLimObj = globalData.arr_limits.find(k => k.idsNo == IdsNo);
-                                var intNos = tempLimObj.Hardness.noOfSamples;
-                                /***************************************************** */
-
-                                if (objHardness.sampleNo <= intNos) {
-
-                                    if (doMasterEntry == true) {
-                                        let objActivity = {};
-                                        Object.assign(objActivity,
-                                            { strUserId: tempUserObject.UserId },
-                                            { strUserName: tempUserObject.UserName },
-                                            { activity: 'Hardness Weighment Started on IDS' + IdsNo });
-                                        objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
-                                        var productObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
-
-                                        const checkMasterData = {
-                                            str_tableName: 'tbl_tab_masterhtd_incomplete',
-                                            data: 'MAX(MstSerNo) AS SeqNo',
-                                            condition: [
-                                                { str_colName: 'BFGCode', value: productObj.Sys_BFGCode, comp: 'eq' },
-                                                { str_colName: 'ProductName', value: productObj.Sys_ProductName, comp: 'eq' },
-                                                { str_colName: 'PVersion', value: productObj.Sys_PVersion, comp: 'eq' },
-                                                { str_colName: 'Version', value: productObj.Sys_Version, comp: 'eq' },
-                                                { str_colName: 'BatchNo', value: productObj.Sys_Batch, comp: 'eq' },
-                                                { str_colName: 'Idsno', value: IdsNo, comp: 'eq' },
-                                            ]
-                                        }
-                                        // console.log("tbl_tab_masterhtd_incomplete  1 :" + checkMasterData);
-                                        database.select(checkMasterData).then((result) => {
-                                            var objIncompIdHardness = globalData.hardnessIncompleteId.find(sr => sr.idsNo == IdsNo);
-                                            var intMstSerNo;
-                                            if (result[0][0].SeqNo == null) {
-                                                intMstSerNo = 1;
-                                                objIncompIdHardness.incompRepSerNo = intMstSerNo;
-                                            } else {
-                                                var newMstSerNo = result[0][0].SeqNo + 1;
-                                                intMstSerNo = newMstSerNo;
-                                                objIncompIdHardness.incompRepSerNo = intMstSerNo;
-                                            }
-
-
-                                            /***  AS PER shraddhanands and vinod powade: bredth will always perform on Vernier so we are not checking it in
-                                            Multiparameter hardness **/
-                                            // if (productlimits.Breadth != undefined) {
-                                            //     objHardness.colName = "Breadth";
-                                            //     objHardness.opNominal = productlimits.Breadth.nominal;
-                                            //     objHardness.opNegTol = productlimits.Breadth.T2Neg;
-                                            //     objHardness.opPosTol = productlimits.Breadth.T2Pos;
-                                            // }
-                                            // else
-                                            if (productlimits.Length != undefined) {
-                                                objHardness.colName = "Length";
-                                                objHardness.opNominal = productlimits.Length.nominal;
-                                                objHardness.opNegTol = productlimits.Length.T2Neg;
-                                                objHardness.opPosTol = productlimits.Length.T2Pos;
-                                            }
-                                            else if (productlimits.Diameter != undefined) {
-                                                objHardness.colName = "Diameter";
-                                                objHardness.opNominal = productlimits.Diameter.nominal;
-                                                objHardness.opNegTol = productlimits.Diameter.T2Neg;
-                                                objHardness.opPosTol = productlimits.Diameter.T2Pos;
-                                            }
-
-                                            else {
-                                                objHardness.colName = "NA";
-                                                objHardness.opNominal = 0;
-                                                objHardness.opNegTol = 0;
-                                                objHardness.opPosTol = 0;
-                                            }
-
-                                            if (productlimits.Thickness == undefined) {
-                                                objHardness.thicknessNom = 0;
-                                                objHardness.thicknesneg = 0;
-                                                objHardness.thicknespos = 0;
-                                            }
-                                            else {
-                                                objHardness.thicknessNom = productlimits.Thickness.nominal;
-                                                objHardness.thicknesneg = productlimits.Thickness.T2Neg;
-                                                objHardness.thicknespos = productlimits.Thickness.T2Pos;
-                                            }
-
-                                            var side = "NA";
-                                            if (productObj.Sys_RotaryType == "Single") {
-                                                side = "NA";
-                                            }
-                                            else {
-                                                side = productlimits.Hardness.side == "L" ? "LHS" : "RHS";
-                                            }
-                                            var masterIncopleteData = {
-                                                str_tableName: 'tbl_tab_masterhtd_incomplete',
-                                                data: [
-                                                    { str_colName: 'MstSerNo', value: objIncompIdHardness.incompRepSerNo },
-                                                    { str_colName: 'InstruId', value: 1 },
-                                                    { str_colName: 'BFGCode', value: productObj.Sys_BFGCode },
-                                                    { str_colName: 'ProductName', value: productObj.Sys_ProductName },
-                                                    { str_colName: 'ProductType', value: ProductType.productType },
-                                                    { str_colName: 'Idsno', value: IdsNo },
-                                                    { str_colName: 'CubicalNo', value: productObj.Sys_CubicNo },
-                                                    { str_colName: 'BalanceId', value: productObj.Sys_BalID },
-                                                    { str_colName: 'VernierId', value: productObj.Sys_VernierID },
-                                                    { str_colName: 'BatchNo', value: productObj.Sys_Batch },
-                                                    { str_colName: 'UserId', value: tempUserObject.UserId },
-                                                    { str_colName: 'UserName', value: tempUserObject.UserName },
-                                                    { str_colName: 'PrDate', value: date.format(now, 'YYYY-MM-DD') },
-                                                    { str_colName: 'PrTime', value: date.format(now, 'HH:mm:ss') },
-                                                    { str_colName: 'Side', value: side },
-                                                    { str_colName: 'Qty', value: productlimits.Hardness.noOfSamples },
-                                                    { str_colName: 'Unit', value: HardnessUnit },
-                                                    { str_colName: 'DecimalPoint', value: objHardness.hardnessDecimal },
-                                                    { str_colName: 'CubicleType', value: productObj.Sys_CubType },
-                                                    { str_colName: 'ReportType', value: productObj.Sys_RptType },
-                                                    { str_colName: 'MachineCode', value: productObj.Sys_MachineCode },
-                                                    { str_colName: 'MFGCode', value: productObj.Sys_MfgCode },
-                                                    { str_colName: 'BatchSize', value: `${productObj.Sys_BatchSize} ${productObj.Sys_BatchSizeUnit}` },
-                                                    { str_colName: 'HardnessID', value: currentCubicle.Sys_HardID },
-                                                    { str_colName: 'CubicleName', value: productObj.Sys_dept },
-                                                    { str_colName: 'CubicleLocation', value: productObj.Sys_dept },
-                                                    { str_colName: 'IsArchived', value: 0 },
-                                                    { str_colName: 'PVersion', value: productObj.Sys_PVersion },
-                                                    { str_colName: 'Version', value: productObj.Sys_Version },
-                                                    { str_colName: 'ColHeadDOLOBO', value: objHardness.colName },
-                                                    { str_colName: 'NomThick', value: objHardness.thicknessNom },
-                                                    { str_colName: 'PosTolThick', value: objHardness.thicknespos },
-                                                    { str_colName: 'NegTolThick', value: objHardness.thicknesneg },
-                                                    { str_colName: 'NomHard', value: productlimits.Hardness.nominal },
-                                                    { str_colName: 'PosTolHard', value: productlimits.Hardness.T1Pos },
-                                                    { str_colName: 'NegTolHard', value: productlimits.Hardness.T1Neg },
-                                                    { str_colName: 'NomDOLOBO', value: objHardness.opNominal },
-                                                    { str_colName: 'PosTolDOLOBO', value: objHardness.opPosTol },
-                                                    { str_colName: 'NegTolDOLOBO', value: objHardness.opNegTol },
-                                                    { str_colName: 'GraphType', value: productlimits.Hardness.isonstd[0] },
-                                                    { str_colName: 'RepoLabel11', value: currentCubicle.Sys_Validation },
-                                                    { str_colName: 'Lot', value: objLotData.LotNo },
-                                                    { str_colName: 'Area', value: productObj.Sys_Area },
-                                                    { str_colName: 'Stage', value: productObj.Sys_Stage },
-                                                    { str_colName: 'AppearanceDesc', value: productObj.Sys_Appearance },
-                                                    { str_colName: 'MachineSpeed_Min', value: productObj.Sys_MachineSpeed_Min },
-                                                    { str_colName: 'MachineSpeed_Max', value: productObj.Sys_MachineSpeed_Max },
-                                                    { str_colName: 'GenericName', value: productObj.Sys_GenericName },
-                                                    { str_colName: 'BMRNo', value: productObj.Sys_BMRNo },
-                                                ]
-                                            }
-                                            //console.log("tbl_tab_masterhtd_incomplete  2 :" + masterIncopleteData);
-                                            database.save(masterIncopleteData).then((masterSrno) => {
-                                                var objIncompIdHardness = globalData.hardnessIncompleteId.find(sr => sr.idsNo == IdsNo);
-                                                var objHardness = globalData.arrHardness425.find(ht => ht.idsNo == IdsNo);
-                                                objInstrumentUsage.InstrumentUsage('Hardness', IdsNo, 'tbl_instrumentlog_hardness', 'Hardness', 'started');
-                                                objIncompIdHardness.incompRepSerNo = masterSrno[0].insertId;
-                                                //console.log("Third",objHardness);
-                                                const insertDetailObj = {
-                                                    str_tableName: 'tbl_tab_detailhtd_incomplete',
-                                                    data: [
-                                                        { str_colName: 'RepSerNo', value: objIncompIdHardness.incompRepSerNo },
-                                                        { str_colName: 'MstSerNo', value: 0 },
-                                                        { str_colName: 'RecSeqNo', value: objHardness.sampleNo },
-                                                        { str_colName: 'DataValueThick', value: objHardness.thicknessNom == 0 ? 0 : objHardness.thicknessVal },
-                                                        { str_colName: 'DataValueDOLOBO', value: objHardness.opNominal == 0 ? 0 : objHardness.dimensionVal },
-                                                        { str_colName: 'DataValueHard', value: objHardness.hardnessVal },
-                                                        { str_colName: 'DecimalPointThick', value: objHardness.thicknessNom == 0 ? 0 : objHardness.thicknessDecimal },
-                                                        { str_colName: 'DecimalPointDOLOBO', value: objHardness.opNominal == 0 ? 0 : objHardness.dimensionDecimal },
-                                                        { str_colName: 'DecimalPointHard', value: objHardness.hardnessDecimal },
-                                                        { str_colName: 'idsNo', value: parseInt(objHardness.idsNo) }
-
-                                                    ]
-                                                }
-                                                // console.log("tbl_tab_detailhtd_incomplete 2" + insertDetailObj); 
-                                                database.save(insertDetailObj).catch(err => console.log(err));
-                                                var tempObj = globalData.arrIncompleteRemark.find(k => k.IdsNo == IdsNo);
-                                                if (tempObj == undefined) {
-                                                    globalData.arrIncompleteRemark.push({ weighment: true, RepoSr: masterSrno[0].insertId, Type: 7, IdsNo: IdsNo });
-                                                }
-                                                else {
-                                                    tempObj.weighment = true;
-                                                    tempObj.RepoSr = masterSrno[0].insertId;
-                                                    tempObj.Type = 7;
-                                                    //globalData.arrIncompleteRemark.IdsNo = IdsNo;
-                                                }
-                                            }).catch(err => console.log(err))
-                                        }).catch(err => console.log(err));
-                                    } else {
-                                        if (objHardness.sampleNo > 0) {
-                                            var objHardness = globalData.arrHardness425.find(ht => ht.idsNo == IdsNo);
-                                            var objIncompIdHardness = globalData.hardnessIncompleteId.find(sr => sr.idsNo == IdsNo);
-                                            const insertDetailObj = {
-                                                str_tableName: 'tbl_tab_detailhtd_incomplete',
-                                                data: [
-                                                    { str_colName: 'RepSerNo', value: objIncompIdHardness.incompRepSerNo },
-                                                    { str_colName: 'MstSerNo', value: 0 },
-                                                    { str_colName: 'RecSeqNo', value: objHardness.sampleNo },
-                                                    { str_colName: 'DataValueThick', value: objHardness.thicknessNom == 0 ? 0 : objHardness.thicknessVal },
-                                                    { str_colName: 'DataValueDOLOBO', value: objHardness.opNominal == 0 ? 0 : objHardness.dimensionVal },
-                                                    { str_colName: 'DataValueHard', value: objHardness.hardnessVal },
-                                                    { str_colName: 'DecimalPointThick', value: objHardness.thicknessNom == 0 ? 0 : objHardness.thicknessDecimal },
-                                                    { str_colName: 'DecimalPointDOLOBO', value: objHardness.opNominal == 0 ? 0 : objHardness.dimensionDecimal },
-                                                    { str_colName: 'DecimalPointHard', value: objHardness.hardnessDecimal },
-                                                    { str_colName: 'idsNo', value: parseInt(objHardness.idsNo) }
-
-                                                ]
-                                            }
-                                            database.save(insertDetailObj).catch(err => console.log(err));
-                                            // globalData.sampleNo++;  
-                                        }
-
-                                    }
-
-                                }
-
-                            }
-                        }
-                        // }
-                    }
-                    resolve(protocolValue);
-                }
-                else {
-                    resolve(protocolValue);
-                }
-            }
-            else {
-
-                var objInvalid = globalData.arrBulkInvalid.find(k => k.idsNo == IdsNo);
-
-                if (objInvalid != undefined && objInvalid.HD425.invalid == true) {
-                    //commented by vivek omm 14/05/2020*************
-                    //resolve('DM000INVALID FORMAT,PLS REPEAT SAMPLE,,,');
-                    //******************************************** */
-                    var msg = "Invalid String,,,,"
-                    //var msg = "INVALID DATA,RECEIVED,RETRANSMIT DATA,,"
-                    resolve(`${protocolIncomingType}R40${msg}`);
-                } else {
-                    /**
-                    * @description We are here setting TD000 and HD000 to true
-                    */
-                    var tempTDHD = globalData.arrTHHDrepet.find(k => k.idsNo == IdsNo);
-                    tempTDHD.flag = true;
-                    tempTDHD.oc = tempTDHD.oc + 1;
-                    /************************************************************* */
-                    // console.log(tempTDHD)
-                    if (tempTDHD.flag == true && tempTDHD.oc == 1) {
-                        var tempLimObj = globalData.arr_limits.find(k => k.idsNo == IdsNo);
-                        var intNos = tempLimObj.Hardness.noOfSamples;
-                        var objIncompIdHardness = globalData.hardnessIncompleteId.find(sr => sr.idsNo == IdsNo);
-                        var objHardness = globalData.arrHardness425.find(ht => ht.idsNo == IdsNo);
-                        var productObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
-                        if (objHardness.sampleNo >= intNos) {
-                            //console.log(globalData.hardnessIncompleteId);
-                            hardnessData.saveHardnessData(objIncompIdHardness.incompRepSerNo, IdsNo).then((res) => {
-                                // Clear flag for Incomplete remark on weighment complete like (test aborted, balance off, Auto logout);
-                                if (globalData.arrIncompleteRemark != undefined) {
-                                    globalData.arrIncompleteRemark = globalData.arrIncompleteRemark.filter(k => k.IdsNo != IdsNo);
-                                }
-                                var objUpdateValidation = {
-                                    str_tableName: "tbl_cubical",
-                                    data: [
-                                        { str_colName: 'Sys_Validation', value: 0 },
-                                    ],
-                                    condition: [
-                                        { str_colName: 'Sys_IDSNo', value: IdsNo },
-                                    ]
-                                }
-
-                                database.update(objUpdateValidation).catch(err => console.log(err));
-                                let objActivity = {};
-                                Object.assign(objActivity,
-                                    { strUserId: tempUserObject.UserId },
-                                    { strUserName: tempUserObject.UserName },
-                                    { activity: 'Hardness Weighment Completed on IDS' + IdsNo });
-                                objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
-                                objHardness.sampleNo = 0;
-                                var response = `${protocolIncomingType}R3,,,,,`;
-                                objInstrumentUsage.InstrumentUsage('Hardness', IdsNo, 'tbl_instrumentlog_hardness', '', 'completed');
-                                objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
-                                resolve(response);
-                            }).catch(err => {
-
-                            })
-
-                        } else {
-                            // var response = `${protocolIncomingType}R3,,,,,`;
-                            // resolve(response);
-                            //HR0<>,<>,<>,<>,<>,
-                            objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
-                            var HRDProtocol = `${protocolIncomingType}R0` + objHardness.sampleNo + " Samples Recived.,,,,,";
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.HD425.invalid = false;
-                            objBulkInvalid.invalidObj.HD425.invalidMsg = "";
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            resolve(HRDProtocol);
-                        }
-                    } else {
-                        console.log('REPEAT_COUNT FOR TDHD000');
-                        resolve('+')
-                    }
-                }
-            }
-
-        })
-
-    }
-
-    // async insertBulkWeighmentHardness_425(IdsNo, protocol) {
-    //     try {
-    //         // Check when there isIPQC
-    //         var IPQCObject = globalData.arr_IPQCRelIds.find((k) => k.idsNo == IdsNo);
-    //         var selectedIds;
-    //         var objLotData = globalData.arrLot.find((k) => k.idsNo == IdsNo);
-
-    //         if (IPQCObject != undefined) {
-    //             selectedIds = IPQCObject.selectedIds;
-    //         } else {
-    //             selectedIds = IdsNo;
-    //         }
-    //         var currentCubicle = globalData.arrIdsInfo.find(
-    //             (k) => k.Sys_IDSNo == selectedIds
-    //         );
-    //         var actualProtocol = protocol;
-    //         let now = new Date();
-    //         var protocolValue = protocol.substring(0, 5); // starting 5 character
-    //         var protocolValueData = protocol.substring(6); // starting 5 character
-    //         var protocolIncomingType = protocolValue.substring(0, 1); //Check incoming Protocol is from "T" or "H"
-    //         //var hardnessReading = protocol.substring(0, 7);
-    //         const tempUserObject = globalData.arrUsers.find((k) => k.IdsNo == IdsNo);
-    //         var objHardness = globalData.arrHardness425.find(
-    //             (ht) => ht.idsNo == IdsNo
-    //         );
-    //         var productlimits = globalData.arr_limits.find((al) => al.idsNo == IdsNo);
-    //         var objInvalid = globalData.arrBulkInvalid.find((k) => k.idsNo == IdsNo);
-
-    //         if (protocolValue != "TD000" && protocolValue != "HD000") {
-    //             /**
-    //              * @description We are here setting TD000 and HD000 to false
-    //              */
-    //             var tempTDHD = globalData.arrTHHDrepet.find((k) => k.idsNo == IdsNo);
-    //             if (tempTDHD == undefined) {
-    //                 globalData.arrTHHDrepet.push({ idsNo: IdsNo, flag: false, oc: 0 });
-    //             } else {
-    //                 tempTDHD.flag = false;
-    //                 tempTDHD.oc = 0;
-    //             }
-    //             /************************************************************* */
-    //             var IncludeX = actualProtocol.includes("X");
-    //             //console.log("IncludeX", IncludeX);
-    //             if (IncludeX == true) {
-    //                 var receivedProtocol = actualProtocol.replace("X", "").trim();
-    //                 const objBulkInvalid = new bulkInvalid();
-    //                 objBulkInvalid.invalidObj.idsNo = IdsNo;
-    //                 objBulkInvalid.invalidObj.HD425.invalid = false;
-    //                 objBulkInvalid.invalidObj.HD425.invalidMsg = "";
-    //                 Object.assign(objInvalid, objBulkInvalid.invalidObj);
-    //             } else {
-    //                 IncludeX = false;
-    //             }
-    //             if (IncludeX == true) {
-    //                 //console.log("IncludeX", IncludeX);
-    //                 if (
-    //                     receivedProtocol.includes("mm") &&
-    //                     objHardness.dimensionParam == 0
-    //                 ) {
-    //                     var includeMM = protocolValueData.includes("mm");
-    //                     //console.log("includeMM", includeMM);
-    //                     if (includeMM == true) {
-    //                         // var thicknessVal = protocolValueData.replace("mm", "").trim();
-    //                         // if (protocolValueData.split('m')[0].trim() == "--") {
-    //                         //     objHardness.thicknessVal = 0;
-    //                         // } else {
-    //                         objHardness.thicknessVal = protocolValueData.split("mm")[0].trim();
-    //                         // }
-    //                         objHardness.thicknessDecimal = 2; //thicknessVal.split('.').replace(/\D/g, '').length;//count number in given string
-    //                         //Repeat is handled at the start So No need to check again
-    //                         //if (receivedProtocol.includes("R") != true) {
-    //                         objHardness.sampleNo = objHardness.sampleNo + 1;
-    //                         //}
-
-    //                         objHardness.dimensionParam = 1;
-    //                         var isThickValid = parseFloat(objHardness.thicknessVal);
-    //                         var isThickValid = isThickValid.toString();
-    //                         // if(isThickValid == 'NaN') {
-    //                         //     const objBulkInvalid = new bulkInvalid();
-    //                         //     objBulkInvalid.invalidObj.idsNo = IdsNo;
-    //                         //     objBulkInvalid.invalidObj.HD425.invalid = true;
-    //                         //     objBulkInvalid.invalidObj.HD425.invalidMsg = "INVALID WGT PLS,REPEAT SAMPLES,,";
-    //                         //     Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-    //                         // }
-    //                         //console.log("First",objHardness);
-    //                     }
-    //                 } else if (
-    //                     receivedProtocol.includes("mm") &&
-    //                     objHardness.dimensionParam == 1
-    //                 ) {
-    //                     var includeMM = protocolValueData.includes("mm");
-    //                     if (includeMM == true) {
-    //                         // if (protocolValueData.split('m')[0].trim() == "--") {
-    //                         //     objHardness.dimensionVal = 0;
-    //                         // } else {
-    //                         objHardness.dimensionVal = protocolValueData.split("mm")[0].trim();
-    //                         // }
-    //                         objHardness.dimensionDecimal = 2; // dimensionVal.split('.').replace(/\D/g, '').length;//count number in given string
-    //                         objHardness.dimensionParam = 2;
-    //                         //var isDimensionsValid = parseFloat(objHardness.dimensionVal);
-    //                         //var isDimensionsValid = isDimensionsValid.toString();
-    //                         // if(isDimensionsValid == 'NaN') {
-    //                         //     const objBulkInvalid = new bulkInvalid();
-    //                         //     objBulkInvalid.invalidObj.idsNo = IdsNo;
-    //                         //     objBulkInvalid.invalidObj.HD425.invalid = true;
-    //                         //     objBulkInvalid.invalidObj.HD425.invalidMsg = "INVALID WGT PLS,REPEAT SAMPLES,,";
-    //                         //     Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-    //                         // }
-    //                         //console.log("SEcond",objHardness);
-    //                     }
-    //                 } else if (
-    //                     receivedProtocol.includes("N") &&
-    //                     objHardness.dimensionParam == 2
-    //                 ) {
-    //                     //|| receivedProtocol.includes("KP") ) {
-    //                     // if (receivedProtocol.includes("--") != true) {
-
-    //                     //objHardness.dimensionParam = 0;
-
-    //                     objHardness.dimensionParam = 3;
-
-    //                     var includeNorKp = protocolValueData.includes("N");
-    //                     //var hardnessVal = 0;
-    //                     if (includeNorKp == true) {
-    //                         //var strRecivedProtocol = app.protocolToString(Buffer.from(protocolValueData,'utf8'));
-
-    //                         objHardness.hardnessVal = protocolValueData.split("N")[0].trim().length == 0 ? 0 : protocolValueData.split("N")[0].trim()
-    //                         // if (objHardness.hardnessVal == "") {
-    //                         //     objHardness.hardnessVal = "NA";
-    //                         // }
-    //                         // else if(objHardness.hardnessVal == '--'){
-    //                         //     objHardness.hardnessVal = 0;
-    //                         // }
-    //                         // var isHardnessValid = parseFloat(objHardness.hardnessVal);
-    //                         // var isHardnessValid = isHardnessValid.toString();
-    //                         // const objBulkInvalid = new bulkInvalid();
-    //                         // objBulkInvalid.invalidObj.idsNo = IdsNo;
-    //                         // if (isHardnessValid == "NaN" && !isHardnessValid == "NA") {
-    //                         //     objBulkInvalid.invalidObj.HD425.invalid = true;
-    //                         //     objBulkInvalid.invalidObj.HD425.invalidMsg =
-    //                         //         "INVALID WGT PLS,REPEAT SAMPLES,,";
-    //                         //     Object.assign(objInvalid, objBulkInvalid.invalidObj);
-    //                         // }
-    //                         // objBulkInvalid.invalidObj.HD425.invalid = false;
-    //                         // if (
-    //                         //     objBulkInvalid.invalidObj.HD425.invalid &&
-    //                         //     objHardness.sampleNo == 1
-    //                         // ) {
-    //                         //     //var msg = "Invalid String,FORMAT PLS REPEAT,SAME SAMPLE,,"
-    //                         //     var msg = `${protocolIncomingType}R40Invalid String,,,,`;
-    //                         //     objHardness.sampleNo = objHardness.sampleNo - 1;
-    //                         //     return msg;
-    //                         // } else {
-    //                         objHardness.hardnessDecimal = includeNorKp == true ? 0 : 2; // hardnessVal.split('.').replace(/\D/g, '').length;//count number in given string
-    //                         //console.log("Hardness",objHardness);
-    //                         var HardnessUnit = "N";
-    //                         var doMasterEntry = objHardness.sampleNo == 1 ? true : false;
-    //                         //added by vivek on 11-11-2019***************************/
-    //                         var tempLimObj = globalData.arr_limits.find(
-    //                             (k) => k.idsNo == IdsNo
-    //                         );
-    //                         var intNos = tempLimObj.Hardness.noOfSamples;
-    //                         /***************************************************** */
-
-    //                         if (objHardness.sampleNo <= intNos) {
-    //                             if (doMasterEntry == true) {
-    //                                 let objActivity = {};
-    //                                 Object.assign(
-    //                                     objActivity,
-    //                                     { strUserId: tempUserObject.UserId },
-    //                                     { strUserName: tempUserObject.UserName },
-    //                                     { activity: "Hardness Weighment Started on IDS" + IdsNo }
-    //                                 );
-    //                                 await objActivityLog
-    //                                     .ActivityLogEntry(objActivity)
-    //                                     .catch((error) => {
-    //                                         logFromPC.addtoProtocolLog(error, "error");
-    //                                         console.log(error);
-    //                                     });
-    //                                 var productObj = globalData.arrIdsInfo.find(
-    //                                     (k) => k.Sys_IDSNo == selectedIds
-    //                                 );
-
-    //                                 const checkMasterData = {
-    //                                     str_tableName: "tbl_tab_masterhtd_incomplete",
-    //                                     data: "MAX(MstSerNo) AS SeqNo",
-    //                                     condition: [
-    //                                         {
-    //                                             str_colName: "BFGCode",
-    //                                             value: productObj.Sys_BFGCode,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "ProductName",
-    //                                             value: productObj.Sys_ProductName,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PVersion",
-    //                                             value: productObj.Sys_PVersion,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "Version",
-    //                                             value: productObj.Sys_Version,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "BatchNo",
-    //                                             value: productObj.Sys_Batch,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         { str_colName: "Idsno", value: IdsNo, comp: "eq" },
-    //                                     ],
-    //                                 };
-    //                                 // console.log("tbl_tab_masterhtd_incomplete  1 :" + checkMasterData);
-    //                                 var result = await database.select(checkMasterData);
-    //                                 var objIncompIdHardness = globalData.hardnessIncompleteId.find(
-    //                                     (sr) => sr.idsNo == IdsNo
-    //                                 );
-    //                                 var intMstSerNo;
-    //                                 if (result[0][0].SeqNo == null) {
-    //                                     intMstSerNo = 1;
-    //                                     objIncompIdHardness.incompRepSerNo = intMstSerNo;
-    //                                 } else {
-    //                                     var newMstSerNo = result[0][0].SeqNo + 1;
-    //                                     intMstSerNo = newMstSerNo;
-    //                                     objIncompIdHardness.incompRepSerNo = intMstSerNo;
-    //                                 }
-
-    //                                 /***  AS PER shraddhanands and vinod powade: bredth will always perform on Vernier so we are not checking it in
-    //                                                     Multiparameter hardness **/
-    //                                 // if (productlimits.Breadth != undefined) {
-    //                                 //     objHardness.colName = "Breadth";
-    //                                 //     objHardness.opNominal = productlimits.Breadth.nominal;
-    //                                 //     objHardness.opNegTol = productlimits.Breadth.T2Neg;
-    //                                 //     objHardness.opPosTol = productlimits.Breadth.T2Pos;
-    //                                 // }
-    //                                 // else
-    //                                 if (productlimits.Length != undefined) {
-    //                                     objHardness.colName = "Length";
-    //                                     objHardness.opNominal = productlimits.Length.nominal;
-    //                                     objHardness.opNegTol = productlimits.Length.T2Neg;
-    //                                     objHardness.opPosTol = productlimits.Length.T2Pos;
-    //                                 } else if (productlimits.Diameter != undefined) {
-    //                                     objHardness.colName = "Diameter";
-    //                                     objHardness.opNominal = productlimits.Diameter.nominal;
-    //                                     objHardness.opNegTol = productlimits.Diameter.T2Neg;
-    //                                     objHardness.opPosTol = productlimits.Diameter.T2Pos;
-    //                                 } else {
-    //                                     objHardness.colName = "NA";
-    //                                     objHardness.opNominal = 0;
-    //                                     objHardness.opNegTol = 0;
-    //                                     objHardness.opPosTol = 0;
-    //                                 }
-
-    //                                 if (productlimits.Thickness == undefined) {
-    //                                     objHardness.thicknessNom = 0;
-    //                                     objHardness.thicknesneg = 0;
-    //                                     objHardness.thicknespos = 0;
-    //                                 } else {
-    //                                     objHardness.thicknessNom =
-    //                                         productlimits.Thickness.nominal;
-    //                                     objHardness.thicknesneg = productlimits.Thickness.T2Neg;
-    //                                     objHardness.thicknespos = productlimits.Thickness.T2Pos;
-    //                                 }
-
-    //                                 var side = "NA";
-    //                                 if (productObj.Sys_RotaryType == "Single") {
-    //                                     side = "NA";
-    //                                 } else {
-    //                                     side = productlimits.Hardness.side == "L" ? "LHS" : "RHS";
-    //                                 }
-
-    //                                 await clspowerbackup.insertPowerBackupData(
-    //                                     currentCubicle,
-    //                                     protocolIncomingType,
-    //                                     tempUserObject,
-    //                                     IdsNo,
-    //                                     "htd",
-    //                                     "Erweka TBH-425",
-    //                                     "Hardness"
-    //                                 );
-    //                                 var ProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo)
-    //                                 var masterIncopleteData = {
-    //                                     str_tableName: "tbl_tab_masterhtd_incomplete",
-    //                                     data: [
-    //                                         {
-    //                                             str_colName: "MstSerNo",
-    //                                             value: objIncompIdHardness.incompRepSerNo,
-    //                                         },
-    //                                         { str_colName: "InstruId", value: 1 },
-    //                                         {
-    //                                             str_colName: "BFGCode",
-    //                                             value: productObj.Sys_BFGCode,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "ProductName",
-    //                                             value: productObj.Sys_ProductName,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "ProductType",
-    //                                             value: ProductType.productType,
-    //                                         },
-
-    //                                         { str_colName: "Idsno", value: IdsNo },
-    //                                         {
-    //                                             str_colName: "CubicalNo",
-    //                                             value: productObj.Sys_CubicNo,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "BalanceId",
-    //                                             value: productObj.Sys_BalID,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "VernierId",
-    //                                             value: productObj.Sys_VernierID,
-    //                                         },
-    //                                         { str_colName: "BatchNo", value: productObj.Sys_Batch },
-    //                                         { str_colName: "UserId", value: tempUserObject.UserId },
-    //                                         {
-    //                                             str_colName: "UserName",
-    //                                             value: tempUserObject.UserName,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PrDate",
-    //                                             value: date.format(now, "YYYY-MM-DD"),
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PrTime",
-    //                                             value: date.format(now, "HH:mm:ss"),
-    //                                         },
-    //                                         { str_colName: "Side", value: side },
-    //                                         {
-    //                                             str_colName: "Qty",
-    //                                             value: productlimits.Hardness.noOfSamples,
-    //                                         },
-    //                                         { str_colName: "Unit", value: HardnessUnit },
-    //                                         {
-    //                                             str_colName: "CubicleType",
-    //                                             value: productObj.Sys_CubType,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "ReportType",
-    //                                             value: productObj.Sys_RptType,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "MachineCode",
-    //                                             value: productObj.Sys_MachineCode,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "MFGCode",
-    //                                             value: productObj.Sys_MfgCode,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "BatchSize",
-    //                                             value: productObj.Sys_BatchSize,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "HardnessID",
-    //                                             value: currentCubicle.Sys_HardID,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "CubicleName",
-    //                                             value: productObj.Sys_dept,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "CubicleLocation",
-    //                                             value: productObj.Sys_dept,
-    //                                         },
-    //                                         { str_colName: "IsArchived", value: 0 },
-    //                                         {
-    //                                             str_colName: "PVersion",
-    //                                             value: productObj.Sys_PVersion,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "Version",
-    //                                             value: productObj.Sys_Version,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "ColHeadDOLOBO",
-    //                                             value: objHardness.colName,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "NomThick",
-    //                                             value: objHardness.thicknessNom,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PosTolThick",
-    //                                             value: objHardness.thicknespos,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "NegTolThick",
-    //                                             value: objHardness.thicknesneg,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "NomHard",
-    //                                             value: productlimits.Hardness.nominal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PosTolHard",
-    //                                             value: productlimits.Hardness.T1Pos,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "NegTolHard",
-    //                                             value: productlimits.Hardness.T1Neg,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "NomDOLOBO",
-    //                                             value: objHardness.opNominal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PosTolDOLOBO",
-    //                                             value: objHardness.opPosTol,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "NegTolDOLOBO",
-    //                                             value: objHardness.opNegTol,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "GraphType",
-    //                                             value: productlimits.Hardness.LimitOn[0],
-    //                                         },
-    //                                         {
-    //                                             str_colName: "RepoLabel11",
-    //                                             value: currentCubicle.Sys_Validation,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "WgmtModeNo",
-    //                                             value: 7,
-    //                                         },
-    //                                         { str_colName: "Lot", value: objLotData.LotNo },
-    //                                         { str_colName: "Stage", value: productObj.Sys_Stage },
-    //                                     ],
-    //                                 };
-
-    //                                 var masterSrno = await database.save(masterIncopleteData);
-
-    //                                 var objIncompIdHardness = globalData.hardnessIncompleteId.find(
-    //                                     (sr) => sr.idsNo == IdsNo
-    //                                 );
-    //                                 var objHardness = globalData.arrHardness425.find(
-    //                                     (ht) => ht.idsNo == IdsNo
-    //                                 );
-    //                                 objInstrumentUsage.InstrumentUsage(
-    //                                     "Hardness",
-    //                                     IdsNo,
-    //                                     "tbl_instrumentlog_hardness",
-    //                                     "Hardness",
-    //                                     "started"
-    //                                 );
-    //                                 objIncompIdHardness.incompRepSerNo = masterSrno[0].insertId;
-    //                                 //console.log("Third",objHardness);
-
-    //                                 const getRepsrNo = {
-    //                                     str_tableName: "tbl_tab_masterhtd_incomplete",
-    //                                     data: "MAX(RepSerNo) AS RepSerNo",
-    //                                     condition: [
-    //                                         {
-    //                                             str_colName: "BFGCode",
-    //                                             value: productObj.Sys_BFGCode,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "ProductName",
-    //                                             value: productObj.Sys_ProductName,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "PVersion",
-    //                                             value: productObj.Sys_PVersion,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "Version",
-    //                                             value: productObj.Sys_Version,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         {
-    //                                             str_colName: "BatchNo",
-    //                                             value: productObj.Sys_Batch,
-    //                                             comp: "eq",
-    //                                         },
-    //                                         { str_colName: "Idsno", value: IdsNo, comp: "eq" },
-    //                                     ],
-    //                                 };
-
-
-    //                                 var res = await database.select(getRepsrNo);
-    //                                 let objUpdatepowerbackup = {
-    //                                     str_tableName: "tbl_powerbackup",
-    //                                     data: [
-    //                                         {
-    //                                             str_colName: "Incomp_RepSerNo",
-    //                                             value: res[0][0].RepSerNo,
-    //                                         },
-    //                                     ],
-    //                                     condition: [
-    //                                         { str_colName: "Idsno", value: IdsNo },
-    //                                         {
-    //                                             str_colName: "Sys_BFGCode",
-    //                                             value: productObj.Sys_BFGCode,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "Sys_Batch",
-    //                                             value: productObj.Sys_Batch,
-    //                                         },
-    //                                     ],
-    //                                 };
-    //                                 await database.update(objUpdatepowerbackup);
-
-    //                                 const insertDetailObj = {
-    //                                     str_tableName: "tbl_tab_detailhtd_incomplete",
-    //                                     data: [
-    //                                         {
-    //                                             str_colName: "RepSerNo",
-    //                                             value: objIncompIdHardness.incompRepSerNo,
-    //                                         },
-    //                                         { str_colName: "MstSerNo", value: 0 },
-    //                                         {
-    //                                             str_colName: "RecSeqNo",
-    //                                             value: objHardness.sampleNo,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "DataValueThick",
-    //                                             value:
-    //                                                 objHardness.thicknessNom == 0
-    //                                                     ? 0
-    //                                                     : objHardness.thicknessVal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "DataValueDOLOBO",
-    //                                             value:
-    //                                                 objHardness.opNominal == 0
-    //                                                     ? 0
-    //                                                     : objHardness.dimensionVal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "DataValueHard",
-    //                                             value: objHardness.hardnessVal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "DecimalPointThick",
-    //                                             value:
-    //                                                 objHardness.thicknessNom == 0
-    //                                                     ? 0
-    //                                                     : objHardness.thicknessDecimal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "DecimalPointDOLOBO",
-    //                                             value:
-    //                                                 objHardness.opNominal == 0
-    //                                                     ? 0
-    //                                                     : objHardness.dimensionDecimal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "DecimalPointHard",
-    //                                             value: objHardness.hardnessDecimal,
-    //                                         },
-    //                                         {
-    //                                             str_colName: "idsNo",
-    //                                             value: parseInt(objHardness.idsNo),
-    //                                         },
-    //                                     ],
-    //                                 };
-    //                                 const DetailsEntries = {
-    //                                     str_tableName: "tbl_tab_detailhtd_incomplete",
-    //                                     data: 'MAX(RecSeqNo) AS SeqNo',
-    //                                     condition: [
-    //                                         { str_colName: 'RepSerNo', value: objIncompIdHardness.incompRepSerNo, comp: 'eq' }
-    //                                     ]
-    //                                 }
-    //                                 var tabDetails = await database.select(DetailsEntries)
-    //                                 if (tabDetails[0][0].SeqNo == null) {
-    //                                     var entries = 1
-    //                                 } else {
-    //                                     var entries = tabDetails[0][0].SeqNo + 1
-    //                                 }
-
-    //                                 if (entries == objHardness.sampleNo) {
-
-    //                                     await database.save(insertDetailObj);
-    //                                 }
-    //                                 else {
-    //                                     console.log("repeat sample recieved at sampleno ", entries)
-    //                                     objHardness.sampleNo = entries - 1
-    //                                 }
-
-    //                                 var tempObj = globalData.arrIncompleteRemark.find(
-    //                                     (k) => k.IdsNo == IdsNo
-    //                                 );
-    //                                 if (tempObj == undefined) {
-    //                                     globalData.arrIncompleteRemark.push({
-    //                                         weighment: true,
-    //                                         RepoSr: masterSrno[0].insertId,
-    //                                         Type: 7,
-    //                                         IdsNo: IdsNo,
-    //                                     });
-    //                                 } else {
-    //                                     tempObj.weighment = true;
-    //                                     tempObj.RepoSr = masterSrno[0].insertId;
-    //                                     tempObj.Type = 7;
-    //                                     //globalData.arrIncompleteRemark.IdsNo = IdsNo;
-    //                                 }
-    //                             } else {
-    //                                 if (objHardness.sampleNo > 0) {
-    //                                     var objHardness = globalData.arrHardness425.find(
-    //                                         (ht) => ht.idsNo == IdsNo
-    //                                     );
-    //                                     var objIncompIdHardness = globalData.hardnessIncompleteId.find(
-    //                                         (sr) => sr.idsNo == IdsNo
-    //                                     );
-    //                                     const insertDetailObj = {
-    //                                         str_tableName: "tbl_tab_detailhtd_incomplete",
-    //                                         data: [
-    //                                             {
-    //                                                 str_colName: "RepSerNo",
-    //                                                 value: objIncompIdHardness.incompRepSerNo,
-    //                                             },
-    //                                             { str_colName: "MstSerNo", value: 0 },
-    //                                             {
-    //                                                 str_colName: "RecSeqNo",
-    //                                                 value: objHardness.sampleNo,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "DataValueThick",
-    //                                                 value:
-    //                                                     objHardness.thicknessNom == 0
-    //                                                         ? 0
-    //                                                         : objHardness.thicknessVal,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "DataValueDOLOBO",
-    //                                                 value:
-    //                                                     objHardness.opNominal == 0
-    //                                                         ? 0
-    //                                                         : objHardness.dimensionVal,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "DataValueHard",
-    //                                                 value: objHardness.hardnessVal,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "DecimalPointThick",
-    //                                                 value:
-    //                                                     objHardness.thicknessNom == 0
-    //                                                         ? 0
-    //                                                         : objHardness.thicknessDecimal,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "DecimalPointDOLOBO",
-    //                                                 value:
-    //                                                     objHardness.opNominal == 0
-    //                                                         ? 0
-    //                                                         : objHardness.dimensionDecimal,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "DecimalPointHard",
-    //                                                 value: objHardness.hardnessDecimal,
-    //                                             },
-    //                                             {
-    //                                                 str_colName: "idsNo",
-    //                                                 value: parseInt(objHardness.idsNo),
-    //                                             },
-    //                                         ],
-    //                                     };
-    //                                     const DetailsEntries = {
-    //                                         str_tableName: "tbl_tab_detailhtd_incomplete",
-    //                                         data: 'MAX(RecSeqNo) AS SeqNo',
-    //                                         condition: [
-    //                                             { str_colName: 'RepSerNo', value: objIncompIdHardness.incompRepSerNo, comp: 'eq' }
-    //                                         ]
-    //                                     }
-    //                                     var tabDetails = await database.select(DetailsEntries)
-    //                                     if (tabDetails[0][0].SeqNo == null) {
-    //                                         var entries = 1
-    //                                     } else {
-    //                                         var entries = tabDetails[0][0].SeqNo + 1
-    //                                     }
-
-    //                                     if (entries == objHardness.sampleNo) {
-
-    //                                         await database.save(insertDetailObj);
-    //                                     }
-    //                                     else {
-    //                                         console.log("repeat sample recieved at sampleno ", entries)
-    //                                         objHardness.sampleNo = entries - 1
-    //                                     }
-    //                                     // globalData.sampleNo++;
-    //                                 }
-    //                             }
-    //                         }
-
-    //                     }
-    //                     else {
-    //                         return `${protocolIncomingType}R40Invalid String,,,,`;
-    //                     }
-    //                     // }
-    //                 }
-    //                 return protocolValue;
-    //             } else {
-    //                 return protocolValue;
-    //             }
-    //         } else {
-    //             /**
-    //              * @description We are here setting TD000 and HD000 to true
-    //             */
-
-
-    //             if (objHardness.dimensionParam == 2 || objHardness.dimensionParam == 1 || objHardness.dimensionParam == 0) {
-    //                 let objHardness = globalData.arrHardness425.find(
-    //                     (ht) => ht.idsNo == IdsNo
-    //                 );
-
-
-    //                 objHardness.sampleNo = objHardness.dimensionParam == 0 ?
-    //                     objHardness.sampleNo : objHardness.sampleNo - 1
-    //                 objHardness.dimensionParam = 0;
-    //                 var msg = "Invalid String,,,,"
-    //                 return `${protocolIncomingType}R40${msg}`;
-
-    //             }
-    //             else {
-    //                 objHardness.dimensionParam = 0;
-    //             }
-
-    //             var objInvalid = globalData.arrBulkInvalid.find(k => k.idsNo == IdsNo);
-
-    //             if (objInvalid != undefined && objInvalid.HD425.invalid == true) {
-    //                 //commented by vivek omm 14/05/2020*************
-    //                 //resolve('DM000INVALID FORMAT,PLS REPEAT SAMPLE,,,');
-    //                 //******************************************** */
-    //                 var msg = "Invalid String,,,,"
-    //                 //var msg = "INVALID DATA,RECEIVED,RETRANSMIT DATA,,"
-    //                 return `${protocolIncomingType}R40${msg}`;
-    //             }
-    //             else {
-
-    //                 var tempTDHD = globalData.arrTHHDrepet.find((k) => k.idsNo == IdsNo);
-    //                 tempTDHD.flag = true;
-    //                 tempTDHD.oc = tempTDHD.oc + 1;
-    //                 /************************************************************* */
-    //                 console.log(tempTDHD);
-
-
-    //                 if (tempTDHD.flag == true && tempTDHD.oc == 1) {
-    //                     var tempLimObj = globalData.arr_limits.find((k) => k.idsNo == IdsNo);
-    //                     var intNos = tempLimObj.Hardness.noOfSamples;
-    //                     var objIncompIdHardness = globalData.hardnessIncompleteId.find(
-    //                         (sr) => sr.idsNo == IdsNo
-    //                     );
-    //                     var objHardness = globalData.arrHardness425.find(
-    //                         (ht) => ht.idsNo == IdsNo
-    //                     );
-    //                     var productObj = globalData.arrIdsInfo.find(
-    //                         (k) => k.Sys_IDSNo == selectedIds
-    //                     );
-    //                     if (objHardness.sampleNo >= intNos) {
-    //                         //console.log(globalData.hardnessIncompleteId);
-    //                         await hardnessData.saveHardnessData(
-    //                             objIncompIdHardness.incompRepSerNo,
-    //                             IdsNo
-    //                         );
-    //                         // Clear flag for Incomplete remark on weighment complete like (test aborted, balance off, Auto logout);
-    //                         if (globalData.arrIncompleteRemark != undefined) {
-    //                             globalData.arrIncompleteRemark = globalData.arrIncompleteRemark.filter(
-    //                                 (k) => k.IdsNo != IdsNo
-    //                             );
-    //                         }
-    //                         var selectedIds;
-    //                         var IPQCObject = globalData.arr_IPQCRelIds.find(
-    //                             (k) => k.idsNo == IdsNo
-    //                         );
-    //                         if (IPQCObject != undefined) {
-    //                             selectedIds = IPQCObject.selectedIds;
-    //                         } else {
-    //                             selectedIds = IdsNo;
-    //                         }
-    //                         var objUpdateValidation = {
-    //                             str_tableName: "tbl_cubical",
-    //                             data: [{ str_colName: "Sys_Validation", value: 0 }],
-    //                             condition: [{ str_colName: "Sys_IDSNo", value: selectedIds }],
-    //                         };
-
-    //                         await database.update(objUpdateValidation);
-    //                         let objActivity = {};
-    //                         Object.assign(
-    //                             objActivity,
-    //                             { strUserId: tempUserObject.UserId },
-    //                             { strUserName: tempUserObject.UserName },
-    //                             { activity: "Hardness Weighment Completed on IDS" + IdsNo }
-    //                         );
-    //                         await objActivityLog.ActivityLogEntry(objActivity);
-    //                         objHardness.sampleNo = 0;
-    //                         var response = `${protocolIncomingType}R3,,,,,`;
-    //                         objInstrumentUsage.InstrumentUsage(
-    //                             "Hardness",
-    //                             IdsNo,
-    //                             "tbl_instrumentlog_hardness",
-    //                             "",
-    //                             "completed"
-    //                         );
-    //                         objMonitor.monit({
-    //                             case: "BL",
-    //                             idsNo: IdsNo,
-    //                             data: { test: "HARDNESS", flag: "COMPLETED" },
-    //                         });
-    //                         return response;
-    //                     } else {
-    //                         // var response = `${protocolIncomingType}R3,,,,,`;
-    //                         // resolve(response);
-    //                         //HR0<>,<>,<>,<>,<>,
-    //                         objMonitor.monit({
-    //                             case: "HDT",
-    //                             idsNo: IdsNo,
-    //                             data: { sample: objHardness.sampleNo, flag: "start" },
-    //                         });
-    //                         var HRDProtocol =
-    //                             `${protocolIncomingType}R0` +
-    //                             objHardness.sampleNo +
-    //                             " Samples Received,,,,,";
-    //                         return HRDProtocol;
-    //                     }
-    //                 } else {
-    //                     console.log("REPEAT_COUNT FOR TDHD000");
-    //                     return "+";
-    //                 }
-    //             }
-    //         }
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // }
 
     // single sample handling method
     async insertBulkWeighmentHardness_425_old_07_09_2022(IdsNo, protocol) {
@@ -10033,39 +8696,39 @@ class BulkWeighment {
                             var includeUnit = protocolValueData.substring(0, protocolValueData.length - 2).trim();//for non-printable chrecters test
                             if (includeUnit.includes("n") || includeUnit.includes("N")) {
                                 HardnessVal = includeUnit.substring(0, includeUnit.length - 1).trim();
-                                HardnessUnit = includeUnit.substring(includeUnit.length,HardnessVal.length).trim()
-                                
+                                HardnessUnit = includeUnit.substring(includeUnit.length, HardnessVal.length).trim()
+
                             }
                             else {
                                 HardnessVal = includeUnit.substring(0, includeUnit.length - 2).trim();
-                                HardnessUnit = includeUnit.substring(includeUnit.length,HardnessVal.length).trim()
+                                HardnessUnit = includeUnit.substring(includeUnit.length, HardnessVal.length).trim()
                             }
 
                             objHardness.hardnessVal = HardnessVal
                             objHardness.HardnessUnit = HardnessUnit
 
-                            var decimalValue = objHardness.hardnessVal.match(/^\d+$/) ?  0 : objHardness.hardnessVal.split(".")[1].length
+                            var decimalValue = objHardness.hardnessVal.match(/^\d+$/) ? 0 : objHardness.hardnessVal.split(".")[1].length
                             objHardness.hardnessDecimal = decimalValue
 
-                           
+
 
                             if (objHardness.hardnessVal == "") {
                                 objHardness.hardnessVal = "NA";
                             }
-                           
+
                             var isHardnessValid = parseFloat(objHardness.hardnessVal);
                             var isHardnessValid = isHardnessValid.toString();
                             const objBulkInvalid = new bulkInvalid();
                             objBulkInvalid.invalidObj.idsNo = IdsNo;
 
                             if (objHardness.dataValues.length) {
-                                if(objHardness.hardnessVal == "NA"){
-                                    objHardness.dataValues[objHardness.dataValues.length - 1].n  = 0;
-                                }else{
+                                if (objHardness.hardnessVal == "NA") {
+                                    objHardness.dataValues[objHardness.dataValues.length - 1].n = 0;
+                                } else {
                                     objHardness.dataValues[objHardness.dataValues.length - 1].n = objHardness.hardnessVal;
                                 }
                             }
-                           
+
 
                         }
                         else {
@@ -11214,6 +9877,7 @@ class BulkWeighment {
         console.log(dataValues);
 
     }
+
     async insertBulkWeighmentHardness_425Lan(data, IdsNo) {
         // Check when there isIPQC
         var IPQCObject = globalData.arr_IPQCRelIds.find((k) => k.idsNo == IdsNo);
@@ -11286,13 +9950,20 @@ class BulkWeighment {
                     let hardness = dataValueObj.hardness;
                     let thickness = dataValueObj.thickness;
                     let dimension = dataValueObj.dimension;
-                    if ((hardness != 'NA') && (hardness != '--') && (isNaN(Number(hardness)))) {
+
+                    if (productlimits.Hardness == undefined && hardness != '--' ||
+                        productlimits.Thickness == undefined && thickness != '--' ||
+                        (productlimits.Length == undefined && productlimits.Diameter == undefined) && dimension != '--') {
+                        return `${objHardness.protocolIncomingType}R40Invalid String,,,,`;
+                    }
+                    
+                    // if ((hardness != 'NA') && (hardness != '--') && (isNaN(Number(hardness)))) {
+                    //     isInvalisString = true;
+                    // }
+                    if ((thickness != '--') && (isNaN(Number(thickness)))) {
                         isInvalisString = true;
                     }
-                    if ((thickness != 'NA') && (thickness != '--') && (isNaN(Number(thickness)))) {
-                        isInvalisString = true;
-                    }
-                    if ((dimension != 'NA') && (dimension != '--') && (isNaN(Number(dimension)))) {
+                    if ((dimension != '--') && (isNaN(Number(dimension)))) {
                         isInvalisString = true;
                     }
 
@@ -11428,6 +10099,8 @@ class BulkWeighment {
                                     { str_colName: "WgmtModeNo", value: 7 },
                                     { str_colName: "Lot", value: objLotData.LotNo },
                                     { str_colName: "Stage", value: productObj.Sys_Stage },
+                                    { str_colName: "Area", value: productObj.Sys_Area },
+                                    { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
                                 ],
                             };
 
@@ -11586,7 +10259,7 @@ class BulkWeighment {
                                         objHardness.dataFlowStatus = false;
                                     } else {
                                         if (productlimits.Hardness.side == "L") {
-                                            objHardness.dataFlowStatus = true;
+                                            objHardness.dataFlowStatus = false;
                                         } else {
                                             objHardness.dataFlowStatus = false;
                                         }
@@ -11598,6 +10271,12 @@ class BulkWeighment {
 
                                     // objHardness.idsIPAddress = '';
                                     var response = `${objHardness.protocolIncomingType}R3,,,,,`;
+                                    var objRemark = globalData.arrLLsampleRemark.find(k => k.idsNo == IdsNo);
+                                    if (objRemark == undefined) {
+                                        globalData.arrLLsampleRemark.push({ idsNo: IdsNo, remark: response })
+                                    } else {
+                                        objRemark.remark = response;
+                                    }
                                     console.log(objHardness)
                                     objInstrumentUsage.InstrumentUsage(
                                         "Hardness",
@@ -11640,6 +10319,12 @@ class BulkWeighment {
                     var HRDProtocol = `${objHardness.protocolIncomingType}R0` +
                         objHardness.sampleNo +
                         " Samples Received,,,,,";
+                    var objRemark = globalData.arrLLsampleRemark.find(k => k.idsNo == IdsNo);
+                    if (objRemark == undefined) {
+                        globalData.arrLLsampleRemark.push({ idsNo: IdsNo, remark: HRDProtocol })
+                    } else {
+                        objRemark.remark = HRDProtocol;
+                    }
                     return HRDProtocol;
 
                 } else {
@@ -13036,18 +11721,12 @@ class BulkWeighment {
                                         tempObj.Type = 7;
                                         //globalData.arrIncompleteRemark.IdsNo = IdsNo;
                                     }
-
-
-
-                                    // globalData.sampleNo++;  
                                 }
 
                             }
                         }
-                        // }
                     }
                     return protocolValue;
-                    //}
                 }
                 else {
                     // resolve('DM000INVALID FORMAT,PLS REPEAT SAMPLE,,,');
@@ -13156,8 +11835,6 @@ class BulkWeighment {
         }
 
     }
-
-
 
     async insertHardnessPharmatron(IdsNo, protocol) {
         try {
@@ -16721,7 +15398,7 @@ class BulkWeighment {
                     data.timecount = true
                 }
                 if (data.datecount == true && data.timecount == true) {
-                    if (protocol.includes("gm") || protocol.includes("Gm") || protocol.includes("GM") || protocol.includes("kg") || protocol.includes("Kg") || protocol.includes("KG")) {
+                    if (protocol.includes("gm") || protocol.includes("Gm") || protocol.includes("GM") || protocol.includes("kg") || protocol.includes("Kg") || protocol.includes("KG")|| protocol.includes("g") || protocol.includes("G")) {
                         var actualWt = protocol.replace(/[\sNRrn]+/g, "|")
                         actualWt = actualWt.split("|");
                         if (actualWt.length != 0 && !isNaN(Number(actualWt[1]))) {
@@ -16990,7 +15667,7 @@ class BulkWeighment {
                     data.timecount = true
                 }
                 if (data.datecount == true && data.timecount == true) {
-                    if (protocol.includes("gm") || protocol.includes("Gm") || protocol.includes("GM") || protocol.includes("kg") || protocol.includes("Kg") || protocol.includes("KG")) {
+                    if (protocol.includes("gm") || protocol.includes("Gm") || protocol.includes("GM") || protocol.includes("kg") || protocol.includes("Kg") || protocol.includes("KG") || protocol.includes("g") || protocol.includes("G")) {
                         var actualWt = protocol.replace(/[\sNRrn]+/g, "|")
                         actualWt = actualWt.split("|");
                         if (actualWt.length != 0 && !isNaN(Number(actualWt[1]))) {
