@@ -11,6 +11,7 @@ class SendSIR {
         try {
             const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IdsNo));
             let strBalId = tempCubicInfo.Sys_BalID;
+            var tempIM = globalData.arrHexInfo.find(k => k.idsNo == IdsNo);
 
             if (strBalId == "None") {
                 return "";
@@ -29,11 +30,11 @@ class SendSIR {
             } else {
                 balSrNo = "";
             }
-            var tempIM = globalData.arrHexInfo.find(k => k.idsNo == IdsNo);
+            
 
             var tareCmd = "";
             var flgSendSIR = false;
-            if (resultBal[0][0].Bal_Make.includes('Mettler')) {
+            if (resultBal[0][0].Bal_Make.includes('Mettler') || resultBal[0][0].Bal_Make.includes('METTLER')) {
                 var objTareCmd = jsonTareCmd.Mettler.find(mod => resultBal[0][0].Bal_Model.includes(mod.Model));
                 if (objTareCmd == undefined) {
                     flgSendSIR = true
@@ -51,6 +52,14 @@ class SendSIR {
                     flgSendSIR == true ? tareCmd = `SP20SIR,` : tareCmd = "";
                 }
             }
+
+            if (resultBal[0][0].Bal_Model == 'IND-570') {
+                return tareCmd = `SP10SIR,`;
+            }
+            else {
+                return tareCmd = tareCmd;
+            }
+
 
             return tareCmd;
 
