@@ -319,7 +319,8 @@ class PrintReportOnline {
           //calculation = false;
           break;
         case 'Hardness':
-          reportName = 'Repo_Tab_Hardness';
+          // reportName = 'Repo_Tab_Hardness';
+           reportName = 'Repo_Tab_Vernier';
           //calculation = true;
           break;
         case 'Particle Size':
