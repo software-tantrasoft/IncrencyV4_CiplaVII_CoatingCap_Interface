@@ -6,6 +6,9 @@ const jsonTareCmd = require('../global/tare.json');
 
 const Database = require('../database/clsQueryProcess');
 const database = new Database();
+
+const Menuselectm = require('../model/Product/clsMenuSelectModel');
+const hardnesss = new Menuselectm();
 class ProcessWTModel {
     //WT10B0002Below Limit,,,Ä 
     //WT1L S001 19.000
@@ -30,6 +33,7 @@ class ProcessWTModel {
         let arrpercentFineData = globalData.arrpercentFineData.find(ht => ht.idsNo == IDSSrNo);
         var cubicalObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IDSSrNo);
         var objLotData = globalData.arrLot.find(k => k.idsNo == IDSSrNo);
+        var hardnessModelObj = await hardnesss.CheckHardnessModel(IDSSrNo);
 
         //var productTypeObj = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo)
         var objProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IDSSrNo)
@@ -243,7 +247,11 @@ class ProcessWTModel {
                         objHardness.idsIPAddress = str_IpAddress;
                     }
                 }
-                sendProtocol = 'HS';
+                if(hardnessModelObj != undefined &&  instrument == 'Hardness'  ){
+                    sendProtocol = "HS";
+                }else{
+                    sendProtocol = "+";
+                }
                 return (sendProtocol);
                 break;
             case 'T':
@@ -263,7 +271,11 @@ class ProcessWTModel {
                         objHardness.idsIPAddress = str_IpAddress;
                     }
                 }
-                sendProtocol = '+';
+                if(hardnessModelObj != undefined &&  instrument == 'Hardness'  ){
+                    sendProtocol = "HS";
+                }else{
+                    sendProtocol = "+";
+                }
                 return (sendProtocol);
                 break;
             default:
