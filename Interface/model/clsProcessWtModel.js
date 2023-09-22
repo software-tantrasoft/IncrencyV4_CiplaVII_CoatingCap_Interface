@@ -118,7 +118,7 @@ class ProcessWTModel {
                 sendProtocol = await this.sendVL(nominal, IDSSrNo);
                 return (sendProtocol);
                 break;
-            case '9':
+            case 'K':
                 var nominal = tempLimObj.Grp_Layer1.nominal;
                 sendProtocol = await this.sendVL(nominal, IDSSrNo);
                 return (sendProtocol);

@@ -293,7 +293,15 @@ class MoveGranulationData {
             Object.assign(responseObj, { status: 'success' });
 
 
-            const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+            const IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+            var selectedIds;
+            if (IPQCObject != undefined) {
+                selectedIds = IPQCObject.selectedIds
+            } else {
+                selectedIds = IdsNo; // for compression and coating
+            };
+
+            const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
             if (objPrinterName.Sys_PrinterName != 'NA' && globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto') {
                 //Online Printing
                 const objIOnlinePrint = new IOnlinePrint();
@@ -462,8 +470,15 @@ class MoveGranulationData {
             await clspowerbackup.deletePowerBackupData(IdsNo);
             Object.assign(responseObj, { status: 'success' });
 
+            const IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+            var selectedIds;
+            if (IPQCObject != undefined) {
+                selectedIds = IPQCObject.selectedIds
+            } else {
+                selectedIds = IdsNo; // for compression and coating
+            };
 
-            const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+            const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
             if (objPrinterName.Sys_PrinterName != 'NA' &&  globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto') {
                 //Online Printing
                 const objIOnlinePrint = new IOnlinePrint();

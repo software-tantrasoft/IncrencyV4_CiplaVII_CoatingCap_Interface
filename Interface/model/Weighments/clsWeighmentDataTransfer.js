@@ -176,6 +176,7 @@ class WeighmentDataTransfer {
                     { str_colName: `MachineSpeed_Max`, value: resultdata.incompleteData.MachineSpeed_Max },
                     { str_colName: `GenericName`, value: resultdata.incompleteData.GenericName },
                     { str_colName: `BMRNo`, value: resultdata.incompleteData.BMRNo },
+                    // { str_colName: 'Sys_MachineCap', value: ProductType.productType == 2 ? resultdata.incompleteData.Sys_MachineCap : '0' },
 
 
                 ]
@@ -245,6 +246,20 @@ class WeighmentDataTransfer {
             }
             var resultCompleteData = await database.save(masterCompleteData)
             var lastInsertedID = resultCompleteData[0].insertId;
+
+            if (ProductType.productType == 2) {
+                var updateIncompleteObj = {
+                    str_tableName: resultdata.completeTableName,
+                    data: [
+                        { str_colName: 'Sys_MachineCap', value: resultdata.incompleteData.Sys_MachineCap },
+                    ],
+                    condition: [
+                        { str_colName: 'RepSerNo', value: lastInsertedID },
+                    ]
+                }
+                await database.update(updateIncompleteObj);
+            }
+
 
             var fetchMasterRecord = {
                 str_tableName: masterCompleteData.str_tableName,
@@ -342,9 +357,16 @@ class WeighmentDataTransfer {
                     break;
             }
             //print online Report for Regular only
-            const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == Idsno);
+            var selectedIds;
+            var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+            if (IPQCObject != undefined) {
+                selectedIds = IPQCObject.selectedIds;
+            } else {
+                selectedIds = IdsNo;
+            }
+            const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
 
-            if ( objPrinterName.Sys_PrinterName != 'NA' &&  globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto') {
+            if (objPrinterName.Sys_PrinterName != 'NA' && globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto') {
                 objIOnlinePrint.testType = "Regular";
                 objIOnlinePrint.userId = resultdata.incompleteData.UserId;
                 objIOnlinePrint.username = resultdata.incompleteData.UserName;

@@ -273,6 +273,7 @@ class IncompleteDataSave {
                             { str_colName: 'MachineSpeed_Max', value: productObj.Sys_MachineSpeed_Max },
                             { str_colName: 'GenericName', value: productObj.Sys_GenericName },
                             { str_colName: 'BMRNo', value: productObj.Sys_BMRNo },
+                            // { str_colName: 'Sys_MachineCap', value: objProductType.productType == 2 ? productObj.Sys_MachineCap : '0' },                            
                             // { str_colName: 'CheckedByID', value: },
                             // { str_colName: 'CheckedByName', value:  },
                             // { str_colName: 'CheckedByDate', value:  },
@@ -280,11 +281,21 @@ class IncompleteDataSave {
                         ]
 
                     }
-
-
-                    //console.log(insertIncompleteObj);
-                    var resultincomplete = await database.save(insertIncompleteObj)
+                    var resultincomplete = await database.save(insertIncompleteObj);
                     var lastInsertedID = resultincomplete[0].insertId;
+                    if(objProductType.productType == 2){
+                        var updateIncompleteObj = {
+                            str_tableName: tblMaster,
+                            data: [
+                                { str_colName: 'Sys_MachineCap', value: productObj.Sys_MachineCap },
+                            ],
+                            condition: [
+                                { str_colName: 'RepSerNo', value: lastInsertedID },
+                            ]
+                        }
+                        await database.update(updateIncompleteObj);
+                    }
+                    
                     const checkTabDetails = {
                         str_tableName: tblDetail,
                         data: '*',

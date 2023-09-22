@@ -347,13 +347,27 @@ class Group {
                         { str_colName: 'MachineSpeed_Min', value: cubicalObj.Sys_MachineSpeed_Min },
                         { str_colName: 'MachineSpeed_Max', value: cubicalObj.Sys_MachineSpeed_Max },
                         { str_colName: 'GenericName', value: cubicalObj.Sys_GenericName },
-                        { str_colName: 'BMRNo', value: cubicalObj.Sys_BMRNo }
+                        { str_colName: 'BMRNo', value: cubicalObj.Sys_BMRNo },
+                        // { str_colName: 'Sys_MachineCap', value: ProductType.productType == 2 ? cubicalObj.Sys_MachineCap : '0' },
 
                     ]
                 }
                 //console.log(masterCompleteData);
                 var resultincomplete = await database.save(masterCompleteData);
                 var lastInsertedID = resultincomplete[0].insertId;
+                if (ProductType.productType == 2) {
+                    var updateIncompleteObj = {
+                        str_tableName: masterTable,
+                        data: [
+                            { str_colName: 'Sys_MachineCap', value: cubicalObj.Sys_MachineCap },
+                        ],
+                        condition: [
+                            { str_colName: 'RepSerNo', value: lastInsertedID },
+                        ]
+                    }
+                    await database.update(updateIncompleteObj);
+                }
+               
                 const checkTabDetails = {
                     str_tableName: detailTable,
                     data: '*',

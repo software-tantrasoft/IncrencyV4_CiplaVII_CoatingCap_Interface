@@ -247,7 +247,15 @@ class Friability {
 
                     Object.assign(responseObj, { status: 'success', RepSerNo: lastInsertedId });
                     
-                    const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+                    var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+                    var selectedIds;
+                    if (IPQCObject != undefined) {
+                        selectedIds = IPQCObject.selectedIds;
+                    } else {
+                        selectedIds = IdsNo;
+                    }
+
+                    const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
                     if (objPrinterName.Sys_PrinterName != 'NA'  && globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto') {
 
 
@@ -262,12 +270,12 @@ class Friability {
                         // const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
 
 
-                        const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == idsNo);
+                        const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
                         const Activity = {};
                         Object.assign(Activity,
                             { strUserId: tempUserObject.UserId },
                             { strUserName: tempUserObject.UserName },
-                            { activity: 'IDS ' + idsNo + 'Auto Print initiated' });
+                            { activity: 'IDS ' + IdsNo + 'Auto Print initiated' });
                         await objActivityLog.ActivityLogEntry(Activity);
 
 

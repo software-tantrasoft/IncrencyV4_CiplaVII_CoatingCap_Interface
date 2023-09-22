@@ -256,7 +256,15 @@ class TDT {
         Object.assign(responseObj, { status: 'success', repSerNO: lastInsertedId });
         // For Tap Density We have sent direct request to generate report
         // Online report for Tap Density
-        const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+        var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+        var selectedIds;
+        if (IPQCObject != undefined) {
+            selectedIds = IPQCObject.selectedIds;
+        } else {
+            selectedIds = IdsNo;
+        }
+
+        const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
         if(objPrinterName.Sys_PrinterName != 'NA' && globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto'){
           var objOnlineReport = {
             // SelectedValue: lastInsertedId,

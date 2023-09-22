@@ -208,11 +208,26 @@ class BatchDataTransfer {
                                 { str_colName: 'BMRNo', value: cubicalObj.Sys_BMRNo },
                                 { str_colName: 'BatchSize', value: `${cubicalObj.Sys_BatchSize} ${cubicalObj.Sys_BatchSizeUnit}` },
                                 { str_colName: 'ReportType', value: resultdata.incompleteData.GraphType },
+                                // { str_colName: 'MachineSpeed', value: objProductType.productType == 2 ? resultdata.incompleteData.Sys_MachineCap : '0' },
+
                             ]
                         }
-                        //date.format(now, 'YYYY-MM-DD')
-                        let masterResult = await database.save(objInsertMasterData);
+                        
+                        let masterResult = await database.save(objInsertMasterData);                        
                         masterSrNo = masterResult[0].insertId;
+                        if (objProductType.productType == 2) {
+                            var updateIncompleteObj = {
+                                str_tableName: masterTable,
+                                data: [
+                                    { str_colName: 'MachineSpeed', value: resultdata.incompleteData.Sys_MachineCap },
+                                ],
+                                condition: [
+                                    { str_colName: 'RepSerNo', value: masterSrNo },
+                                ]
+                            }
+                            await database.update(updateIncompleteObj);
+                        }
+                       
                         const objInsertDetailData = {
                             str_tableName: detailTable,
                             data: [
