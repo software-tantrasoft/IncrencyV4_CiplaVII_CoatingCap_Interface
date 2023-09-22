@@ -540,7 +540,13 @@ class PreWeighmentChecks {
 
                     }
                     else {
-                        DailyMatched = false
+                        if(objOwner.owner == "IPC" && objCubicData.Sys_BinBalID != "None"){   // IPC has only periodic calibration
+                            DailyMatched = true;
+                        }
+                        else{                                             
+                            DailyMatched = false
+                        }
+                       
                     }
 
                 }
