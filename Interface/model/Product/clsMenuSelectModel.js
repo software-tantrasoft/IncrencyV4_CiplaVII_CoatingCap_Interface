@@ -2769,20 +2769,33 @@ class MenuSelect {
 
     let productObj = await database.select(selectObj);
 
+    var selectProdTypeObj = {
+      str_tableName: 'tbl_product_master',
+      data: '*',
+      condition: [
+          { str_colName: 'ProductName', value: currentCubicleObj.Sys_ProductName},
+          { str_colName: 'ProductId', value: currentCubicleObj.Sys_BFGCode },
+          { str_colName: 'ProductVersion', value: currentCubicleObj.Sys_PVersion },
+          { str_colName: 'Version', value: currentCubicleObj.Sys_Version }
+      ]
+  }
+  var result = await database.select(selectProdTypeObj);
 
+    var IsPSDPrd = result[0][0].IsPSDPrd.readUIntLE();
 
     var CubicleObj = globalData.arr_limits.find(k => k.idsNo == IdsNo)
 
     if (tempObjProdType.productType == 1 || tempObjProdType.productType == 2) {
+      if(IsPSDPrd == 1){
       for (let i = startIndex; i <= endIndex; i++) {
-        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {
+        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {  // without parameter particle size also perform
           switch (i) {
             case 9:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 9, SI: 1 });
               break;
-            case 12:
-              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 12, SI: 2 });
-              break;
+            // case 12:
+            //   currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 12, SI: 2 });
+            //   break;
             case 13:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 20, flag: 'a', paramIndex: 13, SI: 3 });
               break;
@@ -2803,8 +2816,38 @@ class MenuSelect {
               break;
           }
         }
+        } 
+      }else{
+        for (let i = startIndex; i <= endIndex; i++) {
+          switch (i) {
+            case 9:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 9, SI: 1 });
+              break;
+            // case 12:
+            //   currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 12, SI: 2 });
+            //   break;
+            case 13:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 20, flag: 'a', paramIndex: 13, SI: 3 });
+              break;
+            case 14:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 40, flag: 'a', paramIndex: 14, SI: 4 });
+              break;
+            case 15:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'a', paramIndex: 15, SI: 5 });
+              break;
+            case 16:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 80, flag: 'a', paramIndex: 16, SI: 6 });
+              break;
+            case 17:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 100, flag: 'a', paramIndex: 17, SI: 7 });
+              break;
+            case 18:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "Tray", flag: 'a', paramIndex: 18, SI: 8 });
+              break;
+          }
+        }
+        }
       }
-    }
 
     if (currentParticleSeizingMeshArr.particleSeizing.length) {
       currentParticleSeizingMeshArr.particleSeizing.sort((obj1, obj2) => obj1.SI > obj2.SI);

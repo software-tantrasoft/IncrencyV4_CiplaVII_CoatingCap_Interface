@@ -15218,7 +15218,7 @@ class BulkWeighment {
                 objIOnlinePrint.RepSerNo = retuRes.sqNo;
 
 
-                const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+                const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
                 if (objPrinterName.Sys_PrinterName != 'NA' && globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto') {
                     objIOnlinePrint.testType = "Regular";
                     objIOnlinePrint.reportOption = "Friabilator";
@@ -15499,9 +15499,9 @@ class BulkWeighment {
                             let count = actualSampleValue + 1;
                             let message;
                             switch (testFlag) {
-                                case 'b60':
-                                    message = "BELOW 60 MESH";
-                                    break;
+                                // case 'b60':
+                                //     message = "BELOW 60 MESH";
+                                //     break;
                                 case 'a20':
                                     message = "ABOVE 20 MESH";
                                     break;
@@ -15557,9 +15557,9 @@ class BulkWeighment {
                                 case "aTestSample":
                                     message = "TEST SAMPLE";
                                     break;
-                                case 'b60':
-                                    message = "BELOW 60 MESH";
-                                    break;
+                                // case 'b60':
+                                //     message = "BELOW 60 MESH";
+                                //     break;
                                 case 'a20':
                                     message = "ABOVE 20 MESH";
                                     break;

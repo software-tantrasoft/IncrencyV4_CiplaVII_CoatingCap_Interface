@@ -186,6 +186,7 @@ class MenuRequestModel {
             var result = await database.select(selectProdTypeObj);
             var productType = result[0][0].ProductType;
             var productMasterData = result[0][0];
+            var IsPSDPrd = result[0][0].IsPSDPrd.readUIntLE();
             //# pushing prodType to global array for further use along with IDS
             var tempObjProdType = globalData.arrProductTypeArray.find(k => k.idsNo == strIdsIP);
             if (tempObjProdType == undefined) {
@@ -476,18 +477,18 @@ class MenuRequestModel {
                     //if (serverConfig.ProjectName == "CIPLA_INDORE") {
                     if (CubicType == "IPQC" && CubicArea == "Capsule Filling" && result.length == 2) {
                         for (const i of result) {
-                            await this.portInstrumentCheck(port1Intrument, [[i]], strIdsIP, productType, IDStype, '1', productSamples, side);
-                            await this.portInstrumentCheck(port2Intrument, [[i]], strIdsIP, productType, IDStype, '2', productSamples, side);
-                            await this.portInstrumentCheck(port3Instrument, [[i]], strIdsIP, productType, IDStype, '3', productSamples, side);
-                            await this.portInstrumentCheck(port4Instrument, [[i]], strIdsIP, productType, IDStype, '4', productSamples, side);
+                            await this.portInstrumentCheck(port1Intrument, [[i]], strIdsIP, productType, IDStype, '1', productSamples, side,IsPSDPrd);
+                            await this.portInstrumentCheck(port2Intrument, [[i]], strIdsIP, productType, IDStype, '2', productSamples, side,IsPSDPrd);
+                            await this.portInstrumentCheck(port3Instrument, [[i]], strIdsIP, productType, IDStype, '3', productSamples, side,IsPSDPrd);
+                            await this.portInstrumentCheck(port4Instrument, [[i]], strIdsIP, productType, IDStype, '4', productSamples, side,IsPSDPrd);
 
                         }
                     }
                     else {
-                        await this.portInstrumentCheck(port1Intrument, result, strIdsIP, productType, IDStype, '1', productSamples, side);
-                        await this.portInstrumentCheck(port2Intrument, result, strIdsIP, productType, IDStype, '2', productSamples, side);
-                        await this.portInstrumentCheck(port3Instrument, result, strIdsIP, productType, IDStype, '3', productSamples, side);
-                        await this.portInstrumentCheck(port4Instrument, result, strIdsIP, productType, IDStype, '4', productSamples, side);
+                        await this.portInstrumentCheck(port1Intrument, result, strIdsIP, productType, IDStype, '1', productSamples, side,IsPSDPrd);
+                        await this.portInstrumentCheck(port2Intrument, result, strIdsIP, productType, IDStype, '2', productSamples, side,IsPSDPrd);
+                        await this.portInstrumentCheck(port3Instrument, result, strIdsIP, productType, IDStype, '3', productSamples, side,IsPSDPrd);
+                        await this.portInstrumentCheck(port4Instrument, result, strIdsIP, productType, IDStype, '4', productSamples, side,IsPSDPrd);
                     }
                     //}
                     // else {
@@ -509,9 +510,9 @@ class MenuRequestModel {
                     // here BV parameter is (Balance & vernier) if we have GLCD we only check for port3 and port4 so
                     // there is chance that balance as well as vernier is connected so we passed 'BV'
                     // 1N2 is port 1AND2
-                    await this.streamDataMenuMaking(result, strIdsIP, productType, 'BV', '1N2', productSamples, side);
-                    await this.portInstrumentCheck(port3Instrument, result, strIdsIP, productType, IDStype, '3', productSamples, side);
-                    await this.portInstrumentCheck(port4Instrument, result, strIdsIP, productType, IDStype, '4', productSamples, side);
+                    await this.streamDataMenuMaking(result, strIdsIP, productType, 'BV', '1N2', productSamples, side,IsPSDPrd);
+                    await this.portInstrumentCheck(port3Instrument, result, strIdsIP, productType, IDStype, '3', productSamples, side,IsPSDPrd);
+                    await this.portInstrumentCheck(port4Instrument, result, strIdsIP, productType, IDStype, '4', productSamples, side,IsPSDPrd);
                     let returnProtocol = await this.PrintMenu(strIdsIP);
                     return returnProtocol;
                 }
@@ -528,13 +529,13 @@ class MenuRequestModel {
                 }
                 if (CubicType == "IPQC" && (CubicArea == "Capsule Filling" || CubicArea == "Coating-Capsule" ) && productType == 2 && productResult) {
                     for (const i of result) {
-                        await this.portInstrumentCheck(port1Instriment, [[i]], strIdsIP, productType, IDStype, '1', productSamples, side);
-                        await this.portInstrumentCheck(port2Instriment, [[i]], strIdsIP, productType, IDStype, '2', productSamples, side);
+                        await this.portInstrumentCheck(port1Instriment, [[i]], strIdsIP, productType, IDStype, '1', productSamples, side,IsPSDPrd);
+                        await this.portInstrumentCheck(port2Instriment, [[i]], strIdsIP, productType, IDStype, '2', productSamples, side,IsPSDPrd);
                     }
                 }
                 else {
-                    await this.portInstrumentCheck(port1Instriment, result, strIdsIP, productType, IDStype, '1', productSamples, side);
-                    await this.portInstrumentCheck(port2Instriment, result, strIdsIP, productType, IDStype, '2', productSamples, side);
+                    await this.portInstrumentCheck(port1Instriment, result, strIdsIP, productType, IDStype, '1', productSamples, side,IsPSDPrd);
+                    await this.portInstrumentCheck(port2Instriment, result, strIdsIP, productType, IDStype, '2', productSamples, side,IsPSDPrd);
                 }
                 // console.log(port1Instriment, port2Instriment);
                 
@@ -547,7 +548,7 @@ class MenuRequestModel {
         }
     }
 
-    async portInstrumentCheck(portInstrument, result, strIdsIP, productType, IDStype, portNo, productSamples, side) {
+    async portInstrumentCheck(portInstrument, result, strIdsIP, productType, IDStype, portNo, productSamples, side,IsPSDPrd) {
         try {
             if (IDStype == 103 || IDStype == 104) {
                 var tempIPQCobj = globalData.arr_IPQCRelIds.find(k => k.idsNo == strIdsIP);
@@ -560,23 +561,23 @@ class MenuRequestModel {
                 let CubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds)
                 switch (portInstrument.toUpperCase()) {
                     case 'DISINTEGRATION TESTER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'VERNIER':
-                        await this.streamDataMenuMaking(result, strIdsIP, productType, 'Vernier', portNo, productSamples, side)
+                        await this.streamDataMenuMaking(result, strIdsIP, productType, 'Vernier', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'TABLET TESTER':
                     case 'HARDNESS':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'FRIABILATOR':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'TAPPED DENSITY':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'MOISTURE ANALYZER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'BALANCE':
                         if (CubicInfo.Sys_Area == 'Effervescent Granulation' ||
@@ -584,9 +585,9 @@ class MenuRequestModel {
                             || CubicInfo.Sys_Area == 'MFG-1 Processing Area' || CubicInfo.Sys_Area == 'MFG-1 Blending Area' || CubicInfo.Sys_Area == 'MFG-3 IPQC'
                             || CubicInfo.Sys_Area == 'MFG-2 Processing Area' || CubicInfo.Sys_Area == 'MFG-2 Blending Area' || CubicInfo.Sys_Area == 'MFG-8 Processing Area' || CubicInfo.Sys_Area == 'MFG-8 IPQC'
                             | CubicInfo.Sys_Area == 'MFG-5 Capsule' || CubicInfo.Sys_Area == 'MFG-6 Capsule' || CubicInfo.Sys_Area == 'Pellet IPQC') {
-                            this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side)
+                            this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         } else {
-                            await this.streamDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side)
+                            await this.streamDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         }
                         break;
                     case 'MOISTURE ANALYZER':
@@ -609,31 +610,31 @@ class MenuRequestModel {
                             || CubicInfo.Sys_Area == 'MFG-1 Processing Area' || CubicInfo.Sys_Area == 'MFG-1 Blending Area' || CubicInfo.Sys_Area == 'MFG-3 IPQC'
                             || CubicInfo.Sys_Area == 'MFG-2 Processing Area' || CubicInfo.Sys_Area == 'MFG-2 Blending Area' || CubicInfo.Sys_Area == 'MFG-8 Processing Area' || CubicInfo.Sys_Area == 'MFG-8 IPQC'
                             | CubicInfo.Sys_Area == 'MFG-5 Capsule' || CubicInfo.Sys_Area == 'MFG-6 Capsule' || CubicInfo.Sys_Area == 'Pellet IPQC') {
-                            this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side)
+                            this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         } else {
-                            await this.streamDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side)
+                            await this.streamDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         }
                         break;
                     case 'VERNIER':
-                        await this.streamDataMenuMaking(result, strIdsIP, productType, 'Vernier', portNo, productSamples, side)
+                        await this.streamDataMenuMaking(result, strIdsIP, productType, 'Vernier', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'DISINTEGRATION TESTER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'HARDNESS':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'FRIABILATOR':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'TAPPED DENSITY':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'MOISTURE ANALYZER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'SIEVE SHAKER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'SS', portNo, productSamples, side)
+                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'SS', portNo, productSamples, side,IsPSDPrd)
                         break;
                 }
                 return 'Done';
@@ -645,7 +646,7 @@ class MenuRequestModel {
     //************************************************************************************************* */
     //
     //************************************************************************************************* */
-    bulkDataMenuMaking(result, strIdsIP, productType, instrument, portNo, productSamples, side) {
+    bulkDataMenuMaking(result, strIdsIP, productType, instrument, portNo, productSamples, side,IsPSDPrd) {
         productSamples = productSamples[0][0]
         // console.log(strIdsIP, productType, instrument)
         // finding index of object holding current idsNo
@@ -679,7 +680,7 @@ class MenuRequestModel {
                 } else if (key == 'Param7_T1Pos' || key == 'Param7_T1Neg') { // for Hardness // for hardness we are checking for upper not nominal
                     if (parseFloat(result[0][0][key]) >= 0 && parseFloat(result[0][0][key]) != 99999) {
                         // check for product type and check hardness is set 
-                        if (productType == 1 && CubicInfo.Sys_HardID != 'None' && instrument == 'Hardness'
+                        if (productType == 1 && CubicInfo.Sys_HardID != 'None' && instrument == 'Hardness' && productSamples.Individual != 0
                             // && (CubicInfo.Sys_CubType != 'Effervescent Granulation' || CubicInfo.Sys_CubType != 'Granulation')
                         ) {
                             var temp_arr_limits = globalData.arr_limits.find(k => k.idsNo == strIdsIP);
@@ -905,25 +906,48 @@ class MenuRequestModel {
                         }
                         else if (key == 'Param9_Upp' || key == 'Param12_Upp' || key == 'Param13_Upp' || key == 'Param14_Upp' ||
                             key == 'Param15_Upp' || key == 'Param16_Upp' || key == 'Param17_Upp' || key == 'Param18_Upp') { // forParticke sizing and from tab_gran
-                            if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
-                                // check for product type and check LOD is set 
-                                if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance') {
-                                        Object.assign(globalData.arr_limits[index], {
-                                            PartSize: {
-                                                nominal: result[0][0].Param9_Nom,
-                                                T1Neg: result[0][0].Param9_Low,
-                                                T1Pos: result[0][0].Param9_Upp,
-                                                LimitOn: 1,
-                                                dp: result[0][0].Param9_Dp,
-                                                isonstd: 1,
-                                                port: portNo,
-                                                noOfSamples: 7,
-                                                side: side,
-                                                unit: ''
-                                            }
-                                        });
+                                if(IsPSDPrd == 1){
+                                    if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {  // without parameter particle size also perform
+                                        // check for product type and check LOD is set 
+                                        if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance') {
+                                                Object.assign(globalData.arr_limits[index], {
+                                                    PartSize: {
+                                                        nominal: result[0][0].Param9_Nom,
+                                                        T1Neg: result[0][0].Param9_Low,
+                                                        T1Pos: result[0][0].Param9_Upp,
+                                                        LimitOn: 1,
+                                                        dp: result[0][0].Param9_Dp,
+                                                        isonstd: 1,
+                                                        port: portNo,
+                                                        noOfSamples: 7,
+                                                        side: side,
+                                                        unit: ''
+                                                    }
+                                                });
+                                        }
+                                     }
                                 }
-                            }
+                                else{
+                                    // if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {  // without parameter particle size also perform
+                                        // check for product type and check LOD is set 
+                                        if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance') {
+                                                Object.assign(globalData.arr_limits[index], {
+                                                    PartSize: {
+                                                        nominal: result[0][0].Param9_Nom,
+                                                        T1Neg: result[0][0].Param9_Low,
+                                                        T1Pos: result[0][0].Param9_Upp,
+                                                        LimitOn: 1,
+                                                        dp: result[0][0].Param9_Dp,
+                                                        isonstd: 1,
+                                                        port: portNo,
+                                                        noOfSamples: 7,
+                                                        side: side,
+                                                        unit: ''
+                                                    }
+                                                });
+                                        }
+                                //      }
+                                }                           
                         }
                         else if (key == 'Param7_Upp') { // for tab density and from tab_gran
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
@@ -1143,7 +1167,7 @@ class MenuRequestModel {
     // below function is responsible for Menu creation only for balance and vernier, it pushes all the visible
     // menus to globalArray - arrLimits
     //*************************************************************************************************** */
-    async streamDataMenuMaking(result, strIdsIP, productType, instrument, portNo, productSamples, side) {
+    async streamDataMenuMaking(result, strIdsIP, productType, instrument, portNo, productSamples, side,IsPSDPrd) {
 
         // finding index of object holding current idsNo
         // Here if Cubicle type is IPQC then we find actual 
@@ -1198,7 +1222,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check balance is set 
                             if (CubicInfo.Sys_BalID != 'None'
-                                && (instrument == 'BV' || instrument == 'Balance')) {
+                                && (instrument == 'BV' || instrument == 'Balance') && productSamples.Individual != 0) {
                                 if ((productType == 1 || productType == 2)) {
                                     Object.assign(globalData.arr_limits[index], {
                                         Individual: {
@@ -1332,7 +1356,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check balance is set 
                             if (productType == 1 && CubicInfo.Sys_VernierID != 'None'
-                                && (instrument == 'BV' || instrument == 'Vernier')) {
+                                && (instrument == 'BV' || instrument == 'Vernier') && productSamples.Individual != 0) {
                                 Object.assign(globalData.arr_limits[index], {
                                     Thickness: {
                                         nominal: result[0][0].Param3_Nom,
@@ -1393,7 +1417,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check vernier is set 
                             if (productType == 1 && CubicInfo.Sys_VernierID != 'None'
-                                && (instrument == 'BV' || instrument == 'Vernier')) { //for bredth, productType1
+                                && (instrument == 'BV' || instrument == 'Vernier') && productSamples.Individual != 0) { //for bredth, productType1
                                 Object.assign(globalData.arr_limits[index], {
                                     Breadth: {
                                         nominal: result[0][0].Param4_Nom,
@@ -1436,7 +1460,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check vernier is set 
                             if ((productType == 1 || productType == 2) && CubicInfo.Sys_VernierID != 'None'
-                                && (instrument == 'BV' || instrument == 'Vernier')) {
+                                && (instrument == 'BV' || instrument == 'Vernier') && productSamples.Individual != 0) {
                                 Object.assign(globalData.arr_limits[index], {
                                     Length: {
                                         nominal: result[0][0].Param5_Nom,
@@ -1460,7 +1484,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check vernier is set 
                             if (productType == 1 && CubicInfo.Sys_VernierID != 'None'
-                                && (instrument == 'BV' || instrument == 'Vernier')) {// for Diameter, productType1
+                                && (instrument == 'BV' || instrument == 'Vernier') && productSamples.Individual != 0) {// for Diameter, productType1
                                 Object.assign(globalData.arr_limits[index], {
                                     Diameter: {
                                         nominal: result[0][0].Param6_Nom,
@@ -1484,7 +1508,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check balance is set 
                             if (productType == 1 && CubicInfo.Sys_BalID != 'None'
-                                && (instrument == 'BV' || instrument == 'Balance')) {
+                                && (instrument == 'BV' || instrument == 'Balance') && productSamples.Individual != 0) {
                                 var paramName = 'Ind_Layer';
                                 if (serverConfig.ProjectName == "RBH") {
                                     paramName = 'Ind_Empty';
@@ -1578,7 +1602,7 @@ class MenuRequestModel {
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check balance is set 
                             if (productType == 1 && CubicInfo.Sys_BalID != 'None'
-                                && (instrument == 'BV' || instrument == 'Balance')) {
+                                && (instrument == 'BV' || instrument == 'Balance') && productSamples.Individual != 0) {
                                 Object.assign(globalData.arr_limits[index], {
                                     Ind_Layer1: {
                                         nominal: result[0][0].Param11_Nom,
