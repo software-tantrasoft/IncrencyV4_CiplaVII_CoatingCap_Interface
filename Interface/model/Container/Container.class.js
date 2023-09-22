@@ -33,11 +33,14 @@ class Container {
                 condition: [
                     { str_colName: 'Bin_BinID', value: strContainerNo, comp: 'eq' },
                     { str_colName: 'Bin_Status', value: 0, comp: 'eq' },
-                    { str_colName: 'Bin_ProductID', value: cuurentCubicle.Sys_BFGCode, comp: 'eq' },
-                    { str_colName: 'Bin_ProductName', value: cuurentCubicle.Sys_ProductName, comp: 'eq' },
-                    { str_colName: 'Bin_ProductVersion', value: cuurentCubicle.Sys_PVersion, comp: 'eq' },
-                    { str_colName: 'Bin_Version', value: cuurentCubicle.Sys_Version, comp: 'eq' },
-                    { str_colName: 'Bin_BatchNo', value: cuurentCubicle.Sys_Batch, comp: 'eq' }
+                    { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
+                    { str_colName: 'Bin_IDSNo', value: objBin.selIds, comp: 'eq' },
+                    { str_colName: 'Bin_BatchNo', value: objBin.selBatch, comp: 'eq' },
+                    { str_colName: 'Bin_ProductID', value: objBin.selProductId, comp: 'eq' },
+                    { str_colName: 'Bin_ProductName', value: objBin.selProductName, comp: 'eq' },
+                    { str_colName: 'Bin_ProductVersion', value: objBin.selProductVersion, comp: 'eq' },
+                    { str_colName: 'Bin_Version', value: objBin.selVersion, comp: 'eq' },
+
                 ]
             }
             
@@ -322,6 +325,8 @@ class Container {
                     { str_colName: 'Bin_Version', value: objBin.selVersion },
                     { str_colName: 'Bin_BatchNo', value: objBin.selBatch },
                     { str_colName: 'Bin_GrossWt', value: 0 },
+                    { str_colName: 'Bin_Status', value: 0, comp: 'eq'  },
+                    { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
                 ]
             }
 

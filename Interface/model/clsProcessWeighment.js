@@ -1561,6 +1561,10 @@ class ProcessWeighment {
                             { str_colName: 'Bin_ProductVersion', value: objBin.selProductVersion, comp: 'eq' },
                             { str_colName: 'Bin_Version', value: objBin.selVersion, comp: 'eq' },
                             { str_colName: 'Bin_BinID', value: objBin.selContainer, comp: 'eq' },
+                            { str_colName: 'Bin_BatchNo', value: objBin.selBatch, comp: 'eq' }, // adding batch for extra condtion
+                            { str_colName: 'Bin_TareWt', value: 0, comp: 'eq'  },
+                            { str_colName: 'Bin_Status', value: 0, comp: 'eq'  },
+                            { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
                         ]
                     }
                     if ((area.toUpperCase() == "COMPRESSION" || area.toUpperCase() == "EFFERVESCENT COMPRESSION"
