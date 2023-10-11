@@ -358,11 +358,11 @@ class WeighmentDataTransfer {
             }
             //print online Report for Regular only
             var selectedIds;
-            var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsNo);
+            var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == Idsno);
             if (IPQCObject != undefined) {
                 selectedIds = IPQCObject.selectedIds;
             } else {
-                selectedIds = IdsNo;
+                selectedIds = Idsno;
             }
             const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
 
@@ -375,12 +375,12 @@ class WeighmentDataTransfer {
 
 
 
-                const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
+                const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == Idsno);
                 const Activity = {};
                 Object.assign(Activity,
                     { strUserId: tempUserObject.UserId },
                     { strUserName: tempUserObject.UserName },
-                    { activity: 'IDS ' + IdsNo + 'Auto Print initiated' });
+                    { activity: 'IDS ' + Idsno + 'Auto Print initiated' });
                 await objActivityLog.ActivityLogEntry(Activity);
 
 
