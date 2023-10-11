@@ -509,104 +509,104 @@ class ProtocolHandler {
                                             await database.update(objUpdateCubicle);
 
                                             strReturnProtocol = strReturnProtocol.substring(0, strReturnProtocol.length - 1)
+                                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            // //sending powerbackup
+                                            // var calibtype = strReturnProtocol.substring(2, 3);
+                                            // switch (calibtype) {
+                                            //     case "1":
+                                            //         calibtype = "Daily";
+                                            //         break;
+                                            //     case "2":
+                                            //         calibtype = "Periodic";
+                                            //         break;
+                                            //     case "E":
+                                            //         calibtype = "Eccentricity";
+                                            //         break;
+                                            //     case "R":
+                                            //         calibtype = "Repeatability";
+                                            //         break;
+                                            //     case "U":
+                                            //         calibtype = "Uncertainty";
+                                            //         break;
+                                            // }
+                                            // let objFetchcalibpowerbackup =
+                                            //     await CalibPowerBackup.fetchCalibPowerBackupData(
+                                            //         idsNo,
+                                            //         calibtype,
+                                            //         tempBalace
+                                            //     );
+                                            // if (
+                                            //     objFetchcalibpowerbackup.status &&
+                                            //     objFetchcalibpowerbackup.result.length > 0
+                                            // ) {
+                                            //     strReturnProtocol =
+                                            //         await CalibPowerBackup.sendCalibPowerBackupData(
+                                            //             strReturnProtocol,
+                                            //             objFetchcalibpowerbackup.result,
+                                            //             idsNo,
+                                            //             str_IpAddress
+                                            //         );
+                                            // } else {
+                                            //     //clearing of different user entry if entry is not present in calibrationpowerbackup table
+                                            //     var tempCalibStatus = globalData.calibrationStatus.find(
+                                            //         (k) => k.BalId == tempBalace
+                                            //     );
+                                            //     const tempUserObject = globalData.arrUsers.find(
+                                            //         (k) => k.IdsNo == idsNo
+                                            //     );
+                                            //     var curruser = tempUserObject.UserId;
+                                            //     var calibrationentrypresent = false;
+                                            //     var differentuserentrypresent = false;
 
-                                            //sending powerbackup
-                                            var calibtype = strReturnProtocol.substring(2, 3);
-                                            switch (calibtype) {
-                                                case "1":
-                                                    calibtype = "Daily";
-                                                    break;
-                                                case "2":
-                                                    calibtype = "Periodic";
-                                                    break;
-                                                case "E":
-                                                    calibtype = "Eccentricity";
-                                                    break;
-                                                case "R":
-                                                    calibtype = "Repeatability";
-                                                    break;
-                                                case "U":
-                                                    calibtype = "Uncertainty";
-                                                    break;
-                                            }
-                                            let objFetchcalibpowerbackup =
-                                                await CalibPowerBackup.fetchCalibPowerBackupData(
-                                                    idsNo,
-                                                    calibtype,
-                                                    tempBalace
-                                                );
-                                            if (
-                                                objFetchcalibpowerbackup.status &&
-                                                objFetchcalibpowerbackup.result.length > 0
-                                            ) {
-                                                strReturnProtocol =
-                                                    await CalibPowerBackup.sendCalibPowerBackupData(
-                                                        strReturnProtocol,
-                                                        objFetchcalibpowerbackup.result,
-                                                        idsNo,
-                                                        str_IpAddress
-                                                    );
-                                            } else {
-                                                //clearing of different user entry if entry is not present in calibrationpowerbackup table
-                                                var tempCalibStatus = globalData.calibrationStatus.find(
-                                                    (k) => k.BalId == tempBalace
-                                                );
-                                                const tempUserObject = globalData.arrUsers.find(
-                                                    (k) => k.IdsNo == idsNo
-                                                );
-                                                var curruser = tempUserObject.UserId;
-                                                var calibrationentrypresent = false;
-                                                var differentuserentrypresent = false;
+                                            //     for (var i in tempCalibStatus.status) {
+                                            //         if (tempCalibStatus.status[i] == "1") {
+                                            //             calibrationentrypresent = true;
+                                            //             break;
+                                            //         }
+                                            //     }
+                                            //     if (calibrationentrypresent) {
+                                            //         var selectCalibData = {
+                                            //             str_tableName:
+                                            //                 "tbl_calibration_periodic_master_incomplete",
+                                            //             data: "*",
+                                            //             condition: [
+                                            //                 // { str_colName: "IdsNo", value: IdsNo },
+                                            //                 {
+                                            //                     str_colName: "Periodic_BalID",
+                                            //                     value: tempBalace,
+                                            //                 },
+                                            //             ],
+                                            //         };
+                                            //         var result = await database.select(selectCalibData);
+                                            //         if (result[0][0].Periodic_UserID != curruser) {
+                                            //             differentuserentrypresent = true;
+                                            //         }
+                                            //     }
 
-                                                for (var i in tempCalibStatus.status) {
-                                                    if (tempCalibStatus.status[i] == "1") {
-                                                        calibrationentrypresent = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (calibrationentrypresent) {
-                                                    var selectCalibData = {
-                                                        str_tableName:
-                                                            "tbl_calibration_periodic_master_incomplete",
-                                                        data: "*",
-                                                        condition: [
-                                                            // { str_colName: "IdsNo", value: IdsNo },
-                                                            {
-                                                                str_colName: "Periodic_BalID",
-                                                                value: tempBalace,
-                                                            },
-                                                        ],
-                                                    };
-                                                    var result = await database.select(selectCalibData);
-                                                    if (result[0][0].Periodic_UserID != curruser) {
-                                                        differentuserentrypresent = true;
-                                                    }
-                                                }
+                                            //     if (differentuserentrypresent) {
+                                            //         await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                                            //             tempBalace,
+                                            //             idsNo
+                                            //         );
+                                            //         strReturnProtocol = "DIFUSER";
+                                            //     }
+                                            // }
+                                            // if (strReturnProtocol == "DIFUSER") {
+                                            //     this.handleProtocol("CRN￻", str_IpAddress, "");
+                                            // } else {
+                                            //     if (!strReturnProtocol.includes("VI")) {
+                                            //         var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
+                                            //         if (tempVerifyforfailed) {
+                                            //             await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
+                                            //         }
+                                            //         else {
+                                            //             this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            //         }
+                                            //     } else {
+                                            //         this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            //     }
 
-                                                if (differentuserentrypresent) {
-                                                    await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
-                                                        tempBalace,
-                                                        idsNo
-                                                    );
-                                                    strReturnProtocol = "DIFUSER";
-                                                }
-                                            }
-                                            if (strReturnProtocol == "DIFUSER") {
-                                                this.handleProtocol("CRN￻", str_IpAddress, "");
-                                            } else {
-                                                if (!strReturnProtocol.includes("VI")) {
-                                                    var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
-                                                    if (tempVerifyforfailed) {
-                                                        await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
-                                                    }
-                                                    else {
-                                                        this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                                    }
-                                                } else {
-                                                    this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                                }
-
-                                            }
+                                            // }
 
                                         } else {
                                             //message change for mesage validation*******************
@@ -1610,12 +1610,12 @@ class ProtocolHandler {
                             break;
                         case "LO":
                             var logOutType = str_Protocol.substring(2, 3);
-                            //powerbackup/////////////////////////////////////////////////////////////////////////////
-                            if (logOutType == "U") {
-                                await CalibPowerBackup.deletepowerbackupaftercalibterminated(
-                                    idsNo
-                                );
-                            }
+                            // //powerbackup/////////////////////////////////////////////////////////////////////////////
+                            // if (logOutType == "U") {
+                            //     await CalibPowerBackup.deletepowerbackupaftercalibterminated(
+                            //         idsNo
+                            //     );
+                            // }
                             ///////////////////////////////////////////////////////////////////////////////////////////////////////
                             await objIncompleteRemark.updateReportRemarkOnLO(idsNo);
                             await handleLoginModal.logOut(str_IpAddress.split('.')[3], logOutType);
