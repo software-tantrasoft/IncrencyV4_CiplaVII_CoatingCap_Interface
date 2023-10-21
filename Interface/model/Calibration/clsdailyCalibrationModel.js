@@ -312,7 +312,12 @@ class CalibrationModel {
                 //return `CR${calibDId}0Daily Verification,Pending,,,`;
                 //}
                 //else {
-                return `CR${calibDId}1Daily Verification,Pending,,,`;
+                  if(objOwner.owner == 'analytical' && strBalId != 'None'){
+                    return `CR${calibDId}1Daily Verification,Pending,,,`;
+                  }else{
+                    return "CR0";
+                  }
+                
                 //}
               } else {
                 //ont take calibartions
@@ -766,6 +771,23 @@ class CalibrationModel {
         }
       }
 
+      var resultBal;
+      if (strBalId != "None") {
+
+        if (objOwner.owner == 'analytical') {
+          strBalId = tempCubicInfo.Sys_BalID;
+        } else {
+          strBalId = tempCubicInfo.Sys_BinBalID;
+        }
+        var selectBalObj = {
+          str_tableName: 'tbl_balance',
+          data: '*',
+          condition: [
+            { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
+          ]
+        }
+         resultBal = await database.select(selectBalObj);
+      }
 
 
       // calculating below parameted from string 
@@ -774,6 +796,19 @@ class CalibrationModel {
       var recieveWt = str_Protocol.split(',')[1].split(' ')[0]; //20.01
       // fetching calibration weights for that balance from global array with reference to Ids
       var objIdsrelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
+
+      var decimalValue;
+      if (recieveWt.match(/^\d+$/)) {
+        decimalValue = 0;
+      }
+      else {
+        var weightVal = recieveWt.split(".");
+        decimalValue = weightVal[1].length;
+      }
+      if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0  || weightVal.length > 2 ) {
+        var strprotocol = `EMDC00INVALID SAMPLE,RECIEVED,,,`
+        return strprotocol;
+      }
 
       // calculating positive negative tolerence for the weight that we send 
       //commented by vivek on 28012020 as per new change*************************************************/ 

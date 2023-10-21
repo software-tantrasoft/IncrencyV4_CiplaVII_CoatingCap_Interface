@@ -412,12 +412,41 @@ class Eccentricity {
             } else {
                 var strBalId = tempCubicInfo.Sys_BinBalID;
             }
+            var resultBal;
+            if (strBalId != "None") {
 
+                if (objOwner.owner == 'analytical') {
+                    strBalId = tempCubicInfo.Sys_BalID;
+                } else {
+                    strBalId = tempCubicInfo.Sys_BinBalID;
+                }
+                var selectBalObj = {
+                    str_tableName: 'tbl_balance',
+                    data: '*',
+                    condition: [
+                        { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
+                    ]
+                }
+                resultBal = await database.select(selectBalObj);
+              }
             // calculating below parameted from string 
             var srNo = str_Protocol.split(',')[0].substring(2, 4); // Weight Sr Number
             var sendWt = str_Protocol.split(',')[0].substring(4).slice(0, -1); // Weight send for calibration
             var recieveWt = str_Protocol.split(',')[1].split(' ')[0]; // recived weight after calibration
             var objBalRelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
+
+            var decimalValue;
+            if (recieveWt.match(/^\d+$/)) {
+                decimalValue = 0;
+            }
+            else {
+                var weightVal = recieveWt.split(".");
+                decimalValue = weightVal[1].length;
+            }
+            if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0  || weightVal.length > 2) {
+                var strprotocol = `EMPC00INVALID SAMPLE,RECIEVED,,,`
+                return strprotocol;
+                }
             // getting weight  for previously weight which we sent
             //commented by vivek on 28012020 as per new change*************************************************/ 
             //user can add balance haviing same weigths with different/same tollerence's
