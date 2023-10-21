@@ -216,7 +216,7 @@ class LOD {
 
                     }
                     var abort=arrLodData.filter(k => k.hasOwnProperty('abort'))
-                    var Aborted=abort.length==1?"Test Aborted":null
+                    var Aborted=abort.length==1?"Test Aborted": "NULL"
                     if (!lossOnWt == 0) {
                         var saveLodData = {
                             str_tableName: 'tbl_lodmaster',
@@ -412,6 +412,12 @@ class LOD {
         }
         objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'MOISTURE ANALYZER', flag: 'COMPLETED' } });
         var resultRemark = `${protocolIncomingType}R3,,,,,`;
+
+        var abort=tempLODdata.arr.filter(k => k.hasOwnProperty('abort'))
+        var Aborted=abort.length==1?"Test Aborted": "NULL"
+
+       
+
         var LOD = await database.execute(`SELECT ROUND(CAST((((DryWt-LossOnWt)/DryWt)*100) AS DECIMAL(20,15)),2) AS lodPer,ROUND(CAST(minLimit AS DECIMAL(20,15)),2)  AS MINWT,ROUND(CAST(maxLimit AS DECIMAL(20,15)),2) AS MAXWT FROM tbl_lodmaster WHERE RepSerNo=${maxRepNo}`);
         Object.assign(responseObj, { status: 'success' })
         if (parseFloat(LOD[0][0].MINWT) <= parseFloat(LOD[0][0].lodPer) &&
@@ -421,6 +427,9 @@ class LOD {
             resultRemark = `${protocolIncomingType}R2,,,,,`;
         }
 
+        if(Aborted == "Test Aborted"){
+            resultRemark = `${protocolIncomingType}R2,,,,,`;
+        }
         if (productObj.Sys_RptType == 0) {
             var objOnlineReport = {
                 SelectedAction: maxRepNo,
