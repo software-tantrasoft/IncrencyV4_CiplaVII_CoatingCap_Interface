@@ -427,7 +427,8 @@ class ProtocolHandler {
                                         if ((tempCubicInfo.Sys_Area == "Compression" || tempCubicInfo.Sys_Area == "Capsule Filling"
                                             || tempCubicInfo.Sys_Area == "Coating" || tempCubicInfo.Sys_Area == 'Granulation'
                                             || tempCubicInfo.Sys_Area == 'Effervescent Compression' || tempCubicInfo.Sys_Area == 'Effervescent Granulation'
-                                            || tempCubicInfo.Sys_Area == 'Strepsils' || tempCubicInfo.Sys_Area == 'Allopathic' || tempCubicInfo.Sys_Area == 'Personal Care') && tempCubicInfo.Sys_CubType == globalData.objNominclature.BinText) {
+                                            || tempCubicInfo.Sys_Area == 'Strepsils' || tempCubicInfo.Sys_Area == 'Allopathic' || tempCubicInfo.Sys_Area == 'Personal Care' 
+                                            || tempCubicInfo.Sys_Area == "Inprocess-I" || tempCubicInfo.Sys_Area == "Inprocess-IV") && tempCubicInfo.Sys_CubType == globalData.objNominclature.BinText) {
 
                                             var response = await objContainer.sendIPCProductList(tempCubicInfo.Sys_CubType, tempCubicInfo.Sys_Area);
                                             strReturnProtocol = response;
@@ -960,7 +961,7 @@ class ProtocolHandler {
 
                         // For menu Printing
                         case "MP":
-                            var tempVerify = await objCommanFun.calibrationVerification(idsNo);
+                            var tempVerify = await objCommanFun.calibrationVerificationafterfailed(idsNo); //CR-54 UNable to login after calibration failed
                             if (tempVerify) {
                                 this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
                             } else {
@@ -1875,10 +1876,12 @@ class ProtocolHandler {
                                         tempWhich.side = side;
                                     }
                                 }
+                                var  objLot = globalData.arrLot.find(k => k.idsNo == idsNo);
+                                var testType = objLot.MS.substring(2,3);
                                 for (let key in tempArrLimits) {
                                     if (key !== "idsNo") {
                                         tempArrLimits[key].side = side
-                                        if (key == "Hardness") {
+                                        if (key == "Hardness" && testType == "T") {
                                             var remarkObj = globalData.arrLLsampleRemark.find(k => k.idsNo == idsNo);
                                             if (remarkObj != undefined) {
                                                 if (globalData.arrLLsampleRemark != undefined) {
@@ -1889,8 +1892,10 @@ class ProtocolHandler {
                                             var objHardness = globalData.arrHardness425.find(
                                                 (ht) => ht.idsNo == idsNo
                                             );
+                                            if(objHardness != undefined){
                                             objHardness.dataFlowStatus = true;
                                             this.sendProtocol('HS', str_IpAddress);
+                                            }
                                             break;
                                         }
                                     }
@@ -1899,6 +1904,26 @@ class ProtocolHandler {
                             }
 
                             break;
+                        case "ER":
+                            if (str_Protocol.includes("ERDC") || str_Protocol.includes("ERPC")) {  //FOR DIFFERNTIAL
+                                this.sendProtocol("+", str_IpAddress);
+                            }
+                            //  else if (str_Protocol.substring(3, 4) == 'T' || str_Protocol.substring(3, 4) == 'G') {  //For IPC
+                            //     await this.sendProtocol('WL212', str_IpAddress);
+                            // }
+                             else {
+                                var fetchpowerbackup = await clspowerbackup.fetchPowerBackupData(idsNo);
+                                if (fetchpowerbackup.result.length != 0) {
+                                    let objhandelpcprotocol;
+                                    var weightment_type = str_Protocol.substring(3, 4);
+                                    objhandelpcprotocol = await clspowerbackup.handelPCProtocol(fetchpowerbackup.result, weightment_type, idsNo)
+                                    await this.sendProtocol(objhandelpcprotocol, str_IpAddress);
+                                } else {
+                                    await this.handleProtocol('MRN￻', str_IpAddress, '');
+                                }
+                            }
+                            break;
+                            
                         case "DR":
                             if (str_Protocol.substring(3, 4) == 'G') {
                                 await this.handleDRForAlert(str_IpAddress.split('.')[3]);
@@ -2088,7 +2113,8 @@ class ProtocolHandler {
                                 || tempCubicInfoIPC.Sys_Area == 'Effervescent Compression' || tempCubicInfoIPC.Sys_Area == 'Effervescent Granulation'
                                 || tempCubicInfoIPC.Sys_Area == 'Strepsils'
                                 || tempCubicInfoIPC.Sys_Area == 'Allopathic'
-                                || tempCubicInfoIPC.Sys_Area == 'Personal Care')
+                                || tempCubicInfoIPC.Sys_Area == 'Personal Care'
+                                || tempCubicInfoIPC.Sys_Area == "Inprocess-I" || tempCubicInfoIPC.Sys_Area == "Inprocess-IV")
                                 && (tempCubicInfoIPC.Sys_CubType == globalData.objNominclature.BinText)) {
                                 var response = await objContainer.sendIPCProductList(tempCubicInfoIPC.Sys_CubType, tempCubicInfoIPC.Sys_Area);
                                 strReturnProtocol = response;

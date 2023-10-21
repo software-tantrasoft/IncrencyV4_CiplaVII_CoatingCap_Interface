@@ -8913,6 +8913,17 @@ class BulkWeighment {
                                 };
 
                                 var masterSrno = await database.save(masterIncopleteData);
+                                
+                                var tempObj = globalData.arrIncompleteRemark.find(k => k.IdsNo == IdsNo);
+                                if (tempObj == undefined) {
+                                    globalData.arrIncompleteRemark.push({ weighment: true, RepoSr: masterSrno[0].insertId, Type: 7, IdsNo: IdsNo });
+                                }
+                                else {
+                                    tempObj.weighment = true;
+                                    tempObj.RepoSr = masterSrno[0].insertId;
+                                    tempObj.Type = 7;
+                                    //globalData.arrIncompleteRemark.IdsNo = IdsNo;
+                                }
 
                                 var objIncompIdHardness = globalData.hardnessIncompleteId.find(
                                     (sr) => sr.idsNo == IdsNo
@@ -15517,8 +15528,8 @@ class BulkWeighment {
                                 case 'a100':
                                     message = "ABOVE 100 MESH";
                                     break;
-                                case 'aTray':
-                                    message = "FINES ON TRAY";
+                                case 'b100':
+                                    message = "BELOW 100 MESH";
                                     break;
                                 default:
                                     message = "";
@@ -15575,8 +15586,8 @@ class BulkWeighment {
                                 case 'a100':
                                     message = "ABOVE 100 MESH";
                                     break;
-                                case 'aTray':
-                                    message = "FINES ON TRAY";
+                                case 'b100':
+                                    message = "BELOW 100 MESH";
                                     break;
                                 default:
                                     message = "";

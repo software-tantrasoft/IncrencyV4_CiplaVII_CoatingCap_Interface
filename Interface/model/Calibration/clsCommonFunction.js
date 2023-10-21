@@ -23,7 +23,7 @@ class CommanFunction {
     // ******************************************************************************************//
     // Below function updateRepSrNoStatus status `tbl_calibration_status` table      //
     //****************************************************************************************** */
-    updateRepSrNo(Type, strBalId, IDSSrNo) {
+    async updateRepSrNo(Type, strBalId, IDSSrNo) {
         // based on which is first calibration repSroNo will get update in calibration_status table
         // on the very first weight
         switch (Type) {
@@ -1857,8 +1857,15 @@ class CommanFunction {
             var tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
             var DailyRes = false;
             var PeriodicRes = false;
-            if (tempCubicInfo.Sys_Port1 == 'Balance' || tempCubicInfo.Sys_Port2 == 'Balance') {
-                let strBalId = tempCubicInfo.Sys_BalID;
+            if (tempCubicInfo.Sys_Port1 == 'Balance' || tempCubicInfo.Sys_Port2 == 'Balance' || tempCubicInfo.Sys_Port1 == 'IPC Balance') {
+                var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == idsNo);
+                var strBalId
+                if (objOwner.owner == 'analytical') {
+                    strBalId = tempCubicInfo.Sys_BalID;
+                } else {
+                    strBalId = tempCubicInfo.Sys_BinBalID;
+                }
+                
                 // let check for latest entry in dailyCalibrationTable
                 let selectDaily = {
                     str_tableName: 'tbl_calibration_daily_master_incomplete',
