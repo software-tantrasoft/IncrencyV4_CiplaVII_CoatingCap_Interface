@@ -2786,16 +2786,11 @@ class MenuSelect {
     var CubicleObj = globalData.arr_limits.find(k => k.idsNo == IdsNo)
 
     if (tempObjProdType.productType == 1 || tempObjProdType.productType == 2) {
+      currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 1, SI: 1 });
       if(IsPSDPrd == 1){
       for (let i = startIndex; i <= endIndex; i++) {
         if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {  // without parameter particle size also perform
           switch (i) {
-            case 9:
-              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 9, SI: 1 });
-              break;
-            // case 12:
-            //   currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 12, SI: 2 });
-            //   break;
             case 13:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 20, flag: 'a', paramIndex: 13, SI: 3 });
               break;
@@ -2811,8 +2806,8 @@ class MenuSelect {
             case 17:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 100, flag: 'a', paramIndex: 17, SI: 7 });
               break;
-            case 18:
-              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "Tray", flag: 'a', paramIndex: 18, SI: 8 });
+            case 9:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 100, flag: 'b', paramIndex: 9, SI: 9 });
               break;
           }
         }
@@ -2820,12 +2815,6 @@ class MenuSelect {
       }else{
         for (let i = startIndex; i <= endIndex; i++) {
           switch (i) {
-            case 9:
-              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 9, SI: 1 });
-              break;
-            // case 12:
-            //   currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 60, flag: 'b', paramIndex: 12, SI: 2 });
-            //   break;
             case 13:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 20, flag: 'a', paramIndex: 13, SI: 3 });
               break;
@@ -2841,8 +2830,8 @@ class MenuSelect {
             case 17:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 100, flag: 'a', paramIndex: 17, SI: 7 });
               break;
-            case 18:
-              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "Tray", flag: 'a', paramIndex: 18, SI: 8 });
+            case 9:
+              currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 100, flag: 'b', paramIndex: 9, SI: 9 });
               break;
           }
         }

@@ -183,9 +183,9 @@ class ProcessWTModel {
                                     case "aTestSample":
                                         message = "TEST SAMPLE";
                                         break;
-                                    case 'b60':
-                                        message = "BELOW 60 MESH";
-                                        break;
+                                    // case 'b60':
+                                    //     message = "BELOW 60 MESH";
+                                    //     break;
                                     case 'a20':
                                         message = "ABOVE 20 MESH";
                                         break;
@@ -201,8 +201,8 @@ class ProcessWTModel {
                                     case 'a100':
                                         message = "ABOVE 100 MESH";
                                         break;
-                                    case 'aTray':
-                                        message = "FINES ON TRAY";
+                                    case 'b100':
+                                        message = "BELOW 100 MESH";
                                         break;
                                     default:
                                         message = "";

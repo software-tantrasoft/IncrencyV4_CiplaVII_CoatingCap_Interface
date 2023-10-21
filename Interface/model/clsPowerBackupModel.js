@@ -8,6 +8,8 @@ const clsRemarkInComplete = require('../model/clsRemarkIncomplete');
 const objRemarkInComplete = new clsRemarkInComplete();
 const clsActivityLog = require('./clsActivityLogModel');
 const objActivityLog = new clsActivityLog();
+const clsIncompleteUpdation = require('../model/clsIncompleteRemark');
+const objIncompleteUpdation = new clsIncompleteUpdation();
 
 // created by vivek11101997 on 27 march 2021 powerbackup 
 class PowerBackup {
@@ -417,8 +419,8 @@ class PowerBackup {
                         case 'a100':
                             message = "ABOVE 100 MESH";
                             break;
-                        case 'aTray':
-                            message = "FINES ON TRAY";
+                        case 'b100':
+                            message = "BELOW 100 MESH";
                             break;
                         default:
                             message = "";
@@ -862,7 +864,8 @@ class PowerBackup {
                                         if ((tempCubicInfo.Sys_Area == "Compression" || tempCubicInfo.Sys_Area == "Capsule Filling"
                                             || tempCubicInfo.Sys_Area == "Coating" || tempCubicInfo.Sys_Area == 'Granulation'
                                             || tempCubicInfo.Sys_Area == 'Effervescent Compression' || tempCubicInfo.Sys_Area == 'Effervescent Granulation'
-                                            || tempCubicInfo.Sys_Area == 'Strepsils' || tempCubicInfo.Sys_Area == 'Allopathic' || tempCubicInfo.Sys_Area == 'Personal Care') && tempCubicInfo.Sys_CubType == globalData.objNominclature.BinText) {
+                                            || tempCubicInfo.Sys_Area == 'Strepsils' || tempCubicInfo.Sys_Area == 'Allopathic' || tempCubicInfo.Sys_Area == 'Personal Care'
+                                            || tempCubicInfo.Sys_Area == "Inprocess-I" || tempCubicInfo.Sys_Area == "Inprocess-IV") && tempCubicInfo.Sys_CubType == globalData.objNominclature.BinText) {
 
                                             var response = await objContainer.sendIPCProductList(tempCubicInfo.Sys_CubType, tempCubicInfo.Sys_Area);
                                             strReturnProtocol = response;
@@ -2214,7 +2217,8 @@ class PowerBackup {
                                 || tempCubicInfoIPC.Sys_Area == 'Effervescent Compression' || tempCubicInfoIPC.Sys_Area == 'Effervescent Granulation'
                                 || tempCubicInfoIPC.Sys_Area == 'Strepsils'
                                 || tempCubicInfoIPC.Sys_Area == 'Allopathic'
-                                || tempCubicInfoIPC.Sys_Area == 'Personal Care')
+                                || tempCubicInfoIPC.Sys_Area == 'Personal Care'
+                                || tempCubicInfoIPC.Sys_Area == "Inprocess-I" || tempCubicInfoIPC.Sys_Area == "Inprocess-IV")
                                 && (tempCubicInfoIPC.Sys_CubType == globalData.objNominclature.BinText)) {
                                 var response = await objContainer.sendIPCProductList(tempCubicInfoIPC.Sys_CubType, tempCubicInfoIPC.Sys_Area);
                                 strReturnProtocol = response;

@@ -408,30 +408,26 @@ class IncompleteGranulationData {
                     }
                     const detaildata = await database.select(checkTabDetails)
                     var  Limit1, Limit2;
-                    if(actualSampleValue == 1){
-                        typeVal = 9
-                    }
+                
                     if(actualSampleValue == 2){
-                        typeVal = 12
-                    }
-                    if(actualSampleValue == 3){
                         typeVal = 13
                     }
-                    if(actualSampleValue == 4){
+                    if(actualSampleValue == 3){
                         typeVal = 14
                     }
-                    if(actualSampleValue == 5){
+                    if(actualSampleValue == 4){
                         typeVal = 15
                     }
-                    if(actualSampleValue == 6){
+                    if(actualSampleValue == 5){
                         typeVal = 16
                     }
-                    if(actualSampleValue == 7){
+                    if(actualSampleValue == 6){
                         typeVal = 17
                     }
-                    if(actualSampleValue == 8){
-                        typeVal = 18
+                    if(actualSampleValue == 7){
+                        typeVal = 9
                     }
+
 
                     Limit1 =  `Param${typeVal}_Low`;
                     Limit2 =  `Param${typeVal}_Upp`;
@@ -445,8 +441,8 @@ class IncompleteGranulationData {
                                 { str_colName: 'RecSeqNo', value: 1 },
                                 { str_colName: 'DataValue', value: newWeight },
                                 { str_colName: 'DecimalPoint', value: decimalValue },
-                                { str_colName: 'Limit1', value: res[1][Limit1] },
-                                { str_colName: 'Limit2', value: res[1][Limit2] },
+                                { str_colName: 'Limit1', value: actualSampleValue == 1 ?"NULL" : res[1][Limit1] },
+                                { str_colName: 'Limit2', value: actualSampleValue == 1 ?"NULL" : res[1][Limit2] },
                                 // { str_colName: 'Remark', value: decimalValue },
                                 
                             ]
@@ -472,30 +468,25 @@ class IncompleteGranulationData {
                     const resRepoSr = await database.select(selrepo)
                     var recSeqNo = resRepoSr[0][0].RecSeqNo + 1;
 
-                    if(actualSampleValue == 1){
-                        typeVal = 9
-                    }
                     if(actualSampleValue == 2){
-                        typeVal = 12
-                    }
-                    if(actualSampleValue == 3){
                         typeVal = 13
                     }
-                    if(actualSampleValue == 4){
+                    if(actualSampleValue == 3){
                         typeVal = 14
                     }
-                    if(actualSampleValue == 5){
+                    if(actualSampleValue == 4){
                         typeVal = 15
                     }
-                    if(actualSampleValue == 6){
+                    if(actualSampleValue == 5){
                         typeVal = 16
                     }
-                    if(actualSampleValue == 7){
+                    if(actualSampleValue == 6){
                         typeVal = 17
                     }
-                    if(actualSampleValue == 8){
-                        typeVal = 18
+                    if(actualSampleValue == 7){
+                        typeVal = 9
                     }
+
 
                     Limit1 =  `Param${typeVal}_Low`;
                     Limit2 =  `Param${typeVal}_Upp`;
@@ -508,8 +499,8 @@ class IncompleteGranulationData {
                             { str_colName: 'RecSeqNo', value: recSeqNo },
                             { str_colName: 'DataValue', value: newWeight },
                             { str_colName: 'DecimalPoint', value: decimalValue },
-                            { str_colName: 'Limit1', value: res[1][Limit1] },
-                            { str_colName: 'Limit2', value: res[1][Limit2] },
+                            { str_colName: 'Limit1', value: actualSampleValue == 1 ?"NULL" : res[1][Limit1] },
+                            { str_colName: 'Limit2', value: actualSampleValue == 1 ?"NULL" : res[1][Limit2] },
                               // { str_colName: 'Remark', value: decimalValue },
                         ]
                     }

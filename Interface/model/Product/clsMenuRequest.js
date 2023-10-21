@@ -20,6 +20,8 @@ const objloginModel = new LoginModel();
 const clsActivityLog = require('../clsActivityLogModel');
 const objActivityLog = new clsActivityLog();
 const menuSelectModel = new MenuSelectModel();
+const ProductDetailModel = require('../../model/clsProductDetailModel');
+const objProduct = new ProductDetailModel();
 
 // const clsLogger = require('../../model/clsLogger');
 // const clsProtocolHandler = require('../../controller/protocolHandlerController');
@@ -2369,7 +2371,7 @@ class MenuRequestModel {
             else if ((CubicInfo.Sys_Area == "Compression" || CubicInfo.Sys_Area == "Capsule Filling"
                 || CubicInfo.Sys_Area == "Coating" || CubicInfo.Sys_Area == 'Granulation'
                 || CubicInfo.Sys_Area == 'Effervescent Compression' || CubicInfo.Sys_Area == 'Effervescent Granulation' || CubicInfo.Sys_Area == 'Inprocess' ||
-                CubicInfo.Sys_Area.includes('IPQA'))
+                CubicInfo.Sys_Area.includes('IPQA') || CubicInfo.Sys_Area == "Inprocess-I" || CubicInfo.Sys_Area == "Inprocess-IV")
                 && CubicInfo.Sys_CubType == globalData.objNominclature.BinText || tempForBinFlag) {
 
                 var selectedTypeLS = str_Protocol.substr(2, 1); // if Protocol will be LSP then we will get P
@@ -2547,22 +2549,34 @@ class MenuRequestModel {
                         //     objLodData.arr = [];
                         // }
                         // var Obj = globalData.arr_menuList.find(k => k.MenuName == 'LOD');
-                        var objArrLimits =  globalData.arrPerFineCurrentTest.find((k) => k.idsNo == IdsSrNo);
-                       
-                        // var MenuTypeObj = globalData.arrGranulationMenuType.find(k => k.idsNo == IdsSrNo)
+                        var selectedType =  globalData.arrPerFineTypeSelectedMenu.find((k) => k.idsNo == IdsSrNo);
+                        var selectedIds;
+                        var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsSrNo);
+                        if (IPQCObject != undefined) {
+                            selectedIds = IPQCObject.selectedIds;
+                        } else {
+                            selectedIds = IdsNo;
+                        }
+                        var cubicalObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds);
+                     
+
+                        const res = await objProduct.productData(cubicalObj)
+
+                        if (selectedType.selectedPerFine == 'PerFineComp') {
+                            var lowerLimit = res[1].Param8_Low;
+                            var upperLimit = res[1].Param8_Upp;
+                        } else {
+                            var lowerLimit = res[1].Param11_Low;
+                            var upperLimit = res[1].Param11_Upp;
+                        }
                         var MenuType = "H";
-                        var Limit = objArrLimits[PerFineType];
-                        var noOfsamples = objArrLimits[PerFineType].noOfSamples;
-                        noOfsamples = ("00" + noOfsamples).slice(-3);
+                        var noOfsamples = "002";
                         var intInstrumentID = 1;
-                        // if (MenuTypeObj.LODMenuType == 'H') {
-                        //     intInstrumentID = 4;
-                        // } else {
-                        //     intInstrumentID = 3;
-                        // }
+                        var unit = '';
+                       
                         //***************commented and added by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
                         //let strReturnProtocol = `MS${MenuTypeObj.LODMenuType}${intInstrumentID}${side}${LODType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1`;
-                        let strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}${PerFineType},${Limit.T1Pos},${Limit.T1Neg},N.A,0000,1,${objArrLimits[PerFineType].unit},`;
+                        let strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}${PerFineType},${upperLimit},${lowerLimit},N.A,0000,1,${unit},`;
                         //************************************************************************* *****************************************************/
                         return strReturnProtocol;
                     }
