@@ -71,7 +71,7 @@ class ProcessWeighment {
                     { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
                 ]
             }
-            let resultBal = await database.select(selectBalObj);
+            var resultBal = await database.select(selectBalObj);
 
             if (resultBal[0].length != 0) {
                 balSrNo = resultBal[0][0].Bal_SrNo;
@@ -322,9 +322,26 @@ class ProcessWeighment {
                 }
                 var responseType = actualWt[3].split("");
                 var actualResponseType = responseType[1].toUpperCase();//here weight is check, R = repeat and N = new
-                var weightValue = parseFloat(actualWt[2]);
                 //    if (actualResponseType == "N" || actualResponseType == "R") {
                 var intNos, maxLimit, minLimit, productUnit;
+
+                var weightValue = actualWt[2];
+                var decimalValue;
+                if (weightValue.match(/^\d+$/)) {
+                    decimalValue  = 0;
+                    weightValue = parseFloat(actualWt[2]);
+                }
+                else {
+                    var weightVal = actualWt[2].split('.');
+                    decimalValue = weightVal[1].length;
+                    weightValue = parseFloat(actualWt[2]);
+                }
+                var sidecheck = actualWt[0].split('WT')[1].substring(1,2)
+
+                if (weightValue < parseFloat(resultBal[0][0].Bal_MinCap) || weightValue > parseFloat(resultBal[0][0].Bal_MaxCap)  || decimalValue == 0 || weightVal.length > 2) {
+                    var strprotocol = `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,`
+                    return strprotocol;
+                }
 
                 var objActivity = {}
                 //Storing Activity Log*****************************************************
@@ -485,6 +502,21 @@ class ProcessWeighment {
                 var actualResponseType = actualWt[4].split('');
                 var sample = '001';
 
+                var decimalValue;
+                if (groupWeightVal.match(/^\d+$/)) {
+                    decimalValue  = 0; 
+                }
+                else {
+                    var weightVal = actualWt[3].split('.');
+                    decimalValue = weightVal[1].length;
+                }
+                var sidecheck = actualWt[0].split('WT')[1].substring(1,2)
+
+                if (parseFloat(groupWeightVal) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(groupWeightVal) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2 ) {
+                    var strprotocol = `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,`
+                    return strprotocol;
+                }
+
                 // if (actualResponseType[1].toUpperCase() == "N" || actualResponseType[1].toUpperCase() == "R") {
                 var intNos, maxLimit, minLimit;
                 //for storing activity log*****************************************************************
@@ -557,11 +589,19 @@ class ProcessWeighment {
                     objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'in' } })
                 }
                 // Activity Log for completion of weigghment
+
+                var weighmentname = "Group" ;
+                if (typeValue == '9') {
+                    weighmentname = "Group Layer 1" ;
+                }else if(typeValue == 'K'){
+                    weighmentname =  "Group Layer 2" ;
+                }
+
                 var objActivity = {}
                 Object.assign(objActivity,
                     { strUserId: tempUserObject.UserId },
                     { strUserName: tempUserObject.UserName },
-                    { activity: 'Weighment completed on IDS' + IdsNo });
+                    { activity: `${weighmentname} Weighment completed on IDS` + IdsNo });
                 var objresActLogGrpUpdt = await objActivityLog.ActivityLogEntry(objActivity);
                 var objresInstLogGrpUpdt = await objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', '', 'completed')
                 return le;
@@ -703,8 +743,25 @@ class ProcessWeighment {
             {
                 var responseType = actualWt[3].split('');
                 responseType[1].toUpperCase();
-                var actualSampleValue = actualWt[1].substring(4, 3);
-                actualSampleValue = parseFloat(actualSampleValue);
+                var actualSampleValue1 = actualWt[1].substring(4, 3);
+                actualSampleValue = parseFloat(actualSampleValue1);
+
+             
+                var decimalValue;
+                if (actualSampleValue1.match(/^\d+$/)) {
+                    decimalValue  = 0;
+                }
+                else {
+                    var weightVal = actualSampleValue1.split('.');
+                    decimalValue = weightVal[1].length;
+                }
+                var sidecheck = actualWt[0].split('WT')[1].substring(1,2)
+
+                if (actualSampleValue < parseFloat(resultBal[0][0].Bal_MinCap) || actualSampleValue > parseFloat(resultBal[0][0].Bal_MaxCap)  || decimalValue == 0 || weightVal.length > 2) {
+                    var strprotocol = `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,`
+                    return strprotocol;
+                }
+
                 // if (actualResponseType == "N" || actualResponseType == "R") // only new weight will accept
                 // {
                 var intNos, maxLimit, minLimit;
@@ -818,8 +875,23 @@ class ProcessWeighment {
             {
                 var responseType = actualWt[3].split('');
                 var actualResponseType = responseType[1].toUpperCase();
-                var actualSampleValue = actualWt[1].substring(4, 3);
-                actualSampleValue = parseFloat(actualSampleValue);
+                var actualSampleValue1 = actualWt[1].substring(4, 3);
+                actualSampleValue = parseFloat(actualSampleValue1);
+
+                var decimalValue;
+                if (actualSampleValue1.match(/^\d+$/)) {
+                    decimalValue  = 0;
+                }
+                else {
+                    var weightVal = actualSampleValue1.split('.');
+                    decimalValue = weightVal[1].length;
+                }
+                var sidecheck = actualWt[0].split('WT')[1].substring(1,2)
+
+                if (actualSampleValue < parseFloat(resultBal[0][0].Bal_MinCap) || actualSampleValue > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0  || weightVal.length > 2 ) {
+                    var strprotocol = `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,`
+                    return strprotocol;
+                }
                 // if (actualResponseType == "N" || actualResponseType == "R") // only new weight will accept
                 // {
                 var intNos, maxLimit, minLimit;
@@ -1082,6 +1154,25 @@ class ProcessWeighment {
                     }
                 }
 
+                var sidecheck = actualWt[0].split('WT')[1].substring(1,2);
+                weightValue = actualWt[1];
+                var decimalValue;
+                if (weightValue.match(/^\d+$/)) {
+                     decimalValue = 0;
+                    
+                }
+                else {
+                    var weightVal = actualWt[1].split('.');
+                     decimalValue = weightVal[1].length;
+                    
+                }
+
+                if (DiffType == 'E' || DiffType == "F" || DiffType == "C") {
+                    if (parseFloat(weightValue) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(weightValue) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0  || weightVal.length > 2) {
+                        var strprotocol = `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,`
+                        return strprotocol;
+                    }
+                }
                 // if (actualResponseType == "N" || actualResponseType == "R") {
                 var intNos, maxLimitFill, minLimitFill, maxLimitEmpty, minLimitEmpty;
 
@@ -1604,6 +1695,22 @@ class ProcessWeighment {
                 console.log(protocol)
                 var tempFriObj = globalData.FrabilityOnBal.find(k => k.idsNo == IdsNo);
                 var returnProtocol;
+
+                var weightValue = actualWt[2];
+                var decimalValue;
+                if (weightValue.match(/^\d+$/)) {
+                     decimalValue = 0;
+                }
+                else {
+                    var weightVal = actualWt[2].split('.');
+                     decimalValue = weightVal[1].length;
+                }
+                var sidecheck =  actualWt[0].split('WT')[1].substring(1,2);
+
+                if (parseFloat(weightValue) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(weightValue) > parseFloat(resultBal[0][0].Bal_MaxCap)|| decimalValue == 0  || weightVal.length > 2 ) {
+                    var strprotocol = `EM${sidecheck}${typeValue}00INVALID SAMPLE,RECIEVED,,,`
+                    return strprotocol;
+                }
                 if (protocol.substring(3, 4) == 'L') {
 
                     if (tempFriObj == undefined) {
@@ -1877,12 +1984,115 @@ class ProcessWeighment {
             globalData.arrIncompleteRemark = globalData.arrIncompleteRemark.filter(k => k.IdsNo != IdsNo);
         }
         // Activity Log for completion of weigghment
+        let TEST = '';
+        switch (typeValue) {
+            case '1':
+                TEST = 'Individual';
+                break;
+            case '3':
+                if (objProductType.productType == '1') {
+                    TEST = 'Thickness';
+                }
+                break;
+            case '4':
+                if (objProductType.productType == '1') {
+                    TEST = 'Breadth';
+                } else {
+                    TEST = 'Diameter';
+                }
+                break;
+            case '5':
+                TEST = 'Length';
+
+                break;
+            case '6':
+                if (objProductType.productType == '1') {
+                    TEST = 'Diameter';
+                }
+                break;
+            case '8':
+                TEST = 'Individual Layer 1';
+                if (serverConfig.ProjectName == 'RBH') {
+                    TEST = 'Individual Empty';
+                }
+                break;
+            case '11':
+                TEST = 'Individual Layer 2';
+
+                break;
+            case 'L':
+                TEST = 'Individual Layer 2';
+                break;
+            case 'P':
+                TEST = 'Particle Size';
+                break;
+            case 'F':
+                TEST = '%Fine';
+                break;
+            case 'p':
+                TEST = 'Particle Size L1';
+                break;
+            case 'f':
+                TEST = '%Fine L1';
+                break;
+            case 'D':
+                if (objProductType.productType == '2') {
+                    // if (contentpresent) {
+                    //     TEST = 'Content1';
+                    // } else {
+                        TEST = 'Differential';
+                    // }
+                }
+
+                break;
+            case 'Hardness':
+                TEST = 'Hardness';
+                break;
+            case 'DISINTEGRATION TESTER':
+                TEST = 'Disintegration Tester';
+                break;
+            case 'LOD':
+                TEST = 'LOD';
+                break;
+
+            case 'TAPPED DENSITY':
+                TEST = 'Tapped Density';
+                break;
+
+            case 'FRIABILATOR':
+                TEST = 'Friablity';
+
+                break;
+            case 'BALANCE':
+                TEST = 'Friablity';
+                break;
+            case 'Tablet Tester':
+                TEST = 'Tablet Tester';
+                break;
+            case 'I':
+                if (objMenuMLHR.menu != 'Sealed Cartridge' && objProductType.productType == '2') {
+                    TEST = objMenuMLHR.menu;
+                } else {
+                    TEST = "";
+                }
+                break;
+
+            case '2':
+                TEST = 'Group';
+                break;
+            case '10':
+                TEST = 'Group Layer 1';
+                break;
+            case 'K':
+                TEST = 'Group Layer 2';
+                break;
+        }
         var objActivity = {}
         // const tempUserObject = globalData.arrUsers.find(k => k.IdsNo === IdsNo);
         Object.assign(objActivity,
             { strUserId: tempUserObject.UserId },
             { strUserName: tempUserObject.UserName },
-            { activity: 'Weighment completed on IDS' + IdsNo });
+            { activity: `${TEST} Weighment completed on IDS` + IdsNo });
         // Instrument Usage log for balance start
         if (IsBalOrVer == "Vernier") {
             objInstrumentUsage.InstrumentUsage('Vernier', IdsNo, 'tbl_instrumentlog_vernier', '', 'completed')
