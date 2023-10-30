@@ -8647,6 +8647,20 @@ class BulkWeighment {
                         if (includeMM == true) {
 
                             objHardness.thicknessVal = protocolValueData.split("mm")[0].trim();
+
+                            if(objHardness.thicknessVal != "--"){
+                                // objHardness.thicknessVal=Math.abs(objHardness.thicknessVal)
+                                if(isNaN(objHardness.thicknessVal)== true ||
+                                objHardness.thicknessVal== " "|| 
+                                objHardness.thicknessVal.includes("+") ||
+                                objHardness.thicknessVal.includes("-")){
+                                    console.log(`${objHardness.thicknessVal} this is invalid`);
+                                    objHardness.sampleNo = objHardness.dimensionParam == 0 ? objHardness.sampleNo : objHardness.sampleNo - 1
+                                    objHardness.dimensionParam = 0;
+                                    var msg = "Invalid String,,,,"
+                                    return `${protocolIncomingType}R40${msg}`;
+                                }
+                            }
                             objHardness.dataValues.push({
                                 mmth: protocolValueData.split("mm")[0].trim()
                             });
@@ -8663,6 +8677,20 @@ class BulkWeighment {
                         if (includeMM == true) {
 
                             objHardness.dimensionVal = protocolValueData.split("mm")[0].trim();
+                            if(objHardness.dimensionVal != "--"){
+                                // objHardness.dimensionVal=Math.abs(objHardness.dimensionVal)
+                                if(isNaN(objHardness.dimensionVal)== true ||
+                                objHardness.dimensionVal== " "|| 
+                                objHardness.dimensionVal.includes("+") ||
+                                objHardness.dimensionVal.includes("-")){
+                                    console.log(`${objHardness.dimensionVal} this is invalid`);
+                                    objHardness.sampleNo = objHardness.dimensionParam == 0 ? objHardness.sampleNo : objHardness.sampleNo - 1
+                                    objHardness.dimensionParam = 0;
+                                    var msg = "Invalid String,,,,"
+                                    return `${protocolIncomingType}R40${msg}`;
+                                }
+                            }
+
                             if (objHardness.dataValues.length) objHardness.dataValues[objHardness.dataValues.length - 1].mmdimen = protocolValueData.split("mm")[0].trim();
                             // }
                             objHardness.dimensionDecimal = 2; // dimensionVal.split('.').replace(/\D/g, '').length;//count number in given string
@@ -8702,6 +8730,18 @@ class BulkWeighment {
                             else {
                                 HardnessVal = includeUnit.substring(0, includeUnit.length - 2).trim();
                                 HardnessUnit = includeUnit.substring(includeUnit.length, HardnessVal.length).trim()
+                            }
+                            if(HardnessVal != "--"){
+                                if(isNaN(HardnessVal)== true ||
+                                HardnessVal== " " || 
+                                HardnessVal.includes("+") ||
+                                HardnessVal.includes("-")){
+                                    console.log(`${HardnessVal} this is invalid`);
+                                    objHardness.sampleNo = objHardness.dimensionParam == 0 ? objHardness.sampleNo : objHardness.sampleNo - 1
+                                    objHardness.dimensionParam = 0;
+                                    var msg = "Invalid String,,,,"
+                                    return `${protocolIncomingType}R40${msg}`;
+                                }
                             }
 
                             objHardness.hardnessVal = HardnessVal
@@ -9553,13 +9593,13 @@ class BulkWeighment {
                     let hardness = dataValueObj.hardness;
                     let thickness = dataValueObj.thickness;
                     let dimension = dataValueObj.dimension;
-                    if ((hardness != 'NA') && (hardness != '--') && (isNaN(Number(hardness)))) {
+                    if ((hardness != '--') && (isNaN(Number(hardness)))) {
                         isInvalisString = true;
                     }
-                    if ((thickness != 'NA') && (thickness != '--') && (isNaN(Number(thickness)))) {
+                    if ((thickness != '--') && (isNaN(Number(thickness)))) {
                         isInvalisString = true;
                     }
-                    if ((dimension != 'NA') && (dimension != '--') && (isNaN(Number(dimension)))) {
+                    if ((dimension != '--') && (isNaN(Number(dimension)))) {
                         isInvalisString = true;
                     }
 
@@ -9968,13 +10008,13 @@ class BulkWeighment {
                         return `${objHardness.protocolIncomingType}R40Invalid String,,,,`;
                     }
                     
-                    // if ((hardness != 'NA') && (hardness != '--') && (isNaN(Number(hardness)))) {
-                    //     isInvalisString = true;
-                    // }
-                    if ((thickness != '--') && (isNaN(Number(thickness)))) {
+                    if ((hardness != 'NA') && (hardness != '--') && (isNaN(Number(hardness)))) {
                         isInvalisString = true;
                     }
-                    if ((dimension != '--') && (isNaN(Number(dimension)))) {
+                    if ((thickness != 'NA') && (thickness != '--') && (isNaN(Number(thickness)))) {
+                        isInvalisString = true;
+                    }
+                    if ((dimension != 'NA') && (dimension != '--') && (isNaN(Number(dimension)))) {
                         isInvalisString = true;
                     }
 
