@@ -277,6 +277,12 @@ class PowerBackup {
                 return protocol;
             } else {
                 this.deletePowerBackupData(IdsNo)
+                var objActivity = {};
+                Object.assign(objActivity,
+                    { strUserId: objUser.UserId },
+                    { strUserName: objUser.UserName },
+                    { activity: `${Weightment_name} Test Discarded by different user on IDS` + IdsNo});
+                await objActivityLog.ActivityLogEntry(objActivity);
                 return protocol = "MR";
             }
             // protocol = `WI${WeighmentType}${Weightment_name},0,8`;
