@@ -1829,7 +1829,7 @@ class MenuRequestModel {
                                 }
                                 break;
                             case 'Group':
-                                if (tempIM.IM != 'IMC') {
+                                if (tempIM.IM != 'IMC' && CubicleInfo.Sys_Validation !=1) {
                                     if (serverConfig.ProjectName == "RBH" && CubicleObj.Ind_Empty !== undefined) {//this if block is added by vivek on 08-06-2020 for "RBH"
                                         var result = await this.RBHCheckIndEptyData(idsNo)
                                         if (result == true) {
@@ -1995,7 +1995,7 @@ class MenuRequestModel {
                                 returnProtocol += '8INDEMP,';
                                 break;
                             case 'Grp_Layer':
-                                if (tempIM.IM != 'IMC') {
+                                if (tempIM.IM != 'IMC' && CubicleInfo.Sys_Validation !=1) {
                                     returnProtocol += '9GRPLA1,';
                                 } else {
                                     lenght = lenght - 1;
@@ -2012,7 +2012,7 @@ class MenuRequestModel {
 
                                 break;
                             case 'Grp_Layer1':
-                                if (tempIM.IM != 'IMC') {
+                                if (tempIM.IM != 'IMC' && CubicleInfo.Sys_Validation !=1) {
                                     returnProtocol += 'KGRPLA2,';
                                 } else {
                                     lenght = lenght - 1;

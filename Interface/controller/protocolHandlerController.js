@@ -117,7 +117,7 @@ class ProtocolHandler {
 
                     var RepeatResponse = "";
                     if (oldProtocolData.Response == "" || oldProtocolData.Response == undefined) {
-                        RepeatResponse = "+";
+                        // RepeatResponse = "+";
                     }
                     else {
                         RepeatResponse = oldProtocolData.Response;
@@ -1509,6 +1509,7 @@ class ProtocolHandler {
                             }
                             break;
                         case "WC":
+                            globalData.arrIdsInfo =await objFetchDetails.getIds();
                             var tempCubic = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
                             objMonitor.monit({ case: 'WC', idsNo: idsNo });
                             if (serverConfig.ProjectName == "SunHalolGuj1" || tempCubic.Sys_Area == 'Dosa Dry Syrup') {
