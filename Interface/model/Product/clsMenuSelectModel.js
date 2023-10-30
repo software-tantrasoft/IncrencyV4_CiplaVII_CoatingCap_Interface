@@ -1637,7 +1637,7 @@ class MenuSelect {
           //***************commented and added by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
           //strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}DT   ,0,0,N.A,0000,1`;
           //strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}DT   ,0,0,N.A,0000,1,${tempLimitObj.DT.unit},`;
-          strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}DT    ,0,0,${noOfsamples},0000,0,${tempLimitObj.DT.unit},`;
+          strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}DT    ,0,0,006,0000,0,${tempLimitObj.DT.unit},`;
           //strReturnProtocol = `MS1${menuObj.InstruId}${tempSide}INDIVI,${upperLimit},${lowerLimit},${noOfsamples},${timeOutPeriod},0,${tempLimitObj.Individual.unit},`;
           //************************************************************************* *****************************************************/
           var tempTDObj = globalData.arrDTData.find((td) => td.idsNo == IdsNo);
