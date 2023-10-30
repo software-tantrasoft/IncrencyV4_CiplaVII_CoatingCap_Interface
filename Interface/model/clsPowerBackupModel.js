@@ -299,6 +299,7 @@ class PowerBackup {
             const { ProductType, Incomp_RepSerNo, TableType, Instrument_Model } = powerbackupdata[0];
             //let currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == Idsno);
             let protocol;
+            var Weightment_name;
             // here ids sending 8 for indivisual layer 1 // Dosa dry // softshell
             if (Weightment_type == "H" && powerbackupdata[0].WeighmentType == "P") {
                 Weightment_type = "P"
@@ -312,22 +313,39 @@ class PowerBackup {
                 case "1":
                     if (ProductType == 5) {//dosa dry
                         Weightment_type = 19;
+                        Weightment_name = 'DosaDry';
+                    }else{
+                        Weightment_name = 'Individual';
                     }
                     break;
                 case "8": // case is according to hex only for individual layer 
                     Weightment_type = 9;// individual layer 
+                    Weightment_name = 'Individual layer 1';
                     break;
                 case "L":
                     Weightment_type = 11;// individual layer 1
+                    Weightment_name = 'Individual layer 2';
                     break;
-                case "D":
+                case "3":
                     Weightment_type = 3;// individual layer 1
+                    Weightment_name = 'Thickness';
+                    break; 
+                case "4":
+                    Weightment_name = 'Breadth';
+                    break; 
+                case "5":
+                    Weightment_name = 'Length';
+                    break;          
+                case "6":
+                    Weightment_name = 'Diameter';
                     break;
                 case "P":
                     Weightment_type = 18
+                    Weightment_name = 'Particle Size';
                     break;
                 case "F":
                     Weightment_type = 17
+                    Weightment_name = '%Fine';
                     break;
             }
             let master_incomplete, detail_incomplate, product;
@@ -342,6 +360,7 @@ class PowerBackup {
             if (Weightment_type == "H" || Weightment_type == "T") {
                 master_incomplete = `tbl_${product}_master${TableType}_incomplete`.trim();
                 detail_incomplate = `tbl_${product}_detail${TableType}_incomplete`.trim();
+                Weightment_name = "Hardness";
             }
             else {
                 master_incomplete = `tbl_${product}_master${Weightment_type}_incomplete`.trim();
@@ -630,8 +649,13 @@ class PowerBackup {
                         }
 
                 }
-
-
+                var objUser = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
+                var objActivity = {};
+                Object.assign(objActivity,
+                    { strUserId: objUser.UserId },
+                    { strUserName: objUser.UserName },
+                    { activity: `${Weightment_name} Test Resume on IDS` + IdsNo});
+                await objActivityLog.ActivityLogEntry(objActivity);
 
                 return protocol;
 
