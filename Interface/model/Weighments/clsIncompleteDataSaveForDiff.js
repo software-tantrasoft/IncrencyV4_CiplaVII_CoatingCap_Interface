@@ -212,6 +212,8 @@ class IncompleteDataSave {
                             { str_colName: 'MachineCode', value: productObj.Sys_MachineCode },
                             { str_colName: 'MFGCode', value: productObj.Sys_MfgCode },
                             { str_colName: 'BatchSize', value: `${productObj.Sys_BatchSize} ${productObj.Sys_BatchSizeUnit}` },
+
+                            { str_colName: 'Sys_MachineCap', value: productObj.Sys_MachineCap },
                             { str_colName: 'FriabilityID', value: currentCubicalObj.Sys_FriabID },
                             { str_colName: 'HardnessID', value: currentCubicalObj.Sys_HardID },
                             { str_colName: 'CubicleName', value: productObj.Sys_CubicName },

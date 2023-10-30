@@ -4438,6 +4438,12 @@ class BulkWeighment {
 
                                 );
                             }
+
+
+                            if (ProductType.productType == 2) {
+                                masterCompleteData.data.push(
+                                    { str_colName: 'Sys_MachineCap', value: productObj.Sys_MachineCap })
+                            }
                             //console.log(masterCompleteData);
                             var resultCompleteData = await database.save(masterCompleteData);
                             var lastInsertedID = resultCompleteData[0].insertId;
