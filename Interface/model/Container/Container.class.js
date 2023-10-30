@@ -60,7 +60,7 @@ class Container {
             var tareResult = await database.select(objSelectTare);
 
             var objBin = globalData.arrBinInfo.find(k => k.idsNo == idsNo);
-            objBin.tareWt = tareResult[0][0].Bin_TareWt;
+            objBin.tareWt = tareResult[0].length>0 ? tareResult[0][0].Bin_TareWt : 0;
             return objBin.tareWt;
 
         } catch (error) {

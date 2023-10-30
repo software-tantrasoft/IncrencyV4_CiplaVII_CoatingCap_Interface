@@ -1343,7 +1343,7 @@ class ProtocolHandler {
                             if (ObjCheckPoweBackUp.status && ObjCheckPoweBackUp.result.length > 0) {
                                 objMonitor.monit({ case: 'WS', idsNo: idsNo });
                                 var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol, str_IpAddress);
-                                this.sendProtocol(returnProtocol, str_IpAddress);
+                               await this.sendProtocol(returnProtocol, str_IpAddress);
                             }
                             else {
                                 // var instrument = await this.instrumentCheck(str_Protocol.substring(2, 3), idsNo)
@@ -2119,7 +2119,7 @@ class ProtocolHandler {
                                 && (tempCubicInfoIPC.Sys_CubType == globalData.objNominclature.BinText)) {
                                 var response = await objContainer.sendIPCProductList(tempCubicInfoIPC.Sys_CubType, tempCubicInfoIPC.Sys_Area);
                                 strReturnProtocol = response;
-                                this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                await this.sendProtocol(strReturnProtocol, str_IpAddress);
 
                             } else {
                                 var strReturnProtocol = "ID3 Area Setting, Mismatched For, IPC Hex,";

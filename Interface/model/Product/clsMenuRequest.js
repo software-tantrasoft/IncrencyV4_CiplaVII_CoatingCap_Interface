@@ -2324,6 +2324,27 @@ class MenuRequestModel {
             var tempForBinFlag = false;
             var tempCheck = globalData.arrisIMGBForBin.find(k => k.idsNo == IdsSrNo);
             tempForBinFlag = tempCheck == undefined ? tempForBinFlag = false : tempForBinFlag = tempCheck.flag;
+
+            ///bin_dp
+            const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IdsSrNo));
+            var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == parseInt(IdsSrNo));
+            var strBalId;
+            if (objOwner.owner == 'analytical') {
+                strBalId = tempCubicInfo.Sys_BalID;
+
+            } else {
+                strBalId = tempCubicInfo.Sys_BinBalID;
+
+            }
+            const selectBalInfoObj = {
+                str_tableName: "tbl_balance",
+                data: "*",
+                condition: [{ str_colName: "Bal_ID", value: strBalId, comp: "eq" }],
+            };
+            var result = await database.select(selectBalInfoObj);
+            var bin_dp = result[0].length > 0 ? result[0][0].Bal_DP : 3;
+            //
+            // const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
             if (objLocation != undefined) {
                 var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsSrNo); // for VeerSAndra IPQC 
                 if (IPQCObject != undefined) {
@@ -2487,7 +2508,7 @@ class MenuRequestModel {
                                 },
                                 { activity: 'IPC weighing started on ' + IdsSrNo })
                             await objActivityLog.ActivityLogEntry(objActivity);
-                            return "WTG0" + "PRODUCT:" + objBin.selProductId + "," + Number(dblTareWt).toFixed(2) + " Kg,";
+                            return "WTG0" + "PRODUCT:" + objBin.selProductId + "," + Number(dblTareWt).toFixed(bin_dp) + " Kg,";
                         }
                         break;
                     default:
@@ -2770,7 +2791,7 @@ class MenuRequestModel {
         objBin.tareWt = dblTareWt;
         if (parseFloat(objBin.tareWt) >= parseFloat(dblGrossWt)) {
             //return "DM000GROSS WT CANNOT BE,LESS THAN OR,EQUAL TO TARE WT,,";
-            return "DM000Gross Weight must be,>" + parseFloat(objBin.tareWt).toFixed(2) + ",,,";
+            return "DM000Gross Weight must be,>" + parseFloat(objBin.tareWt).toFixed(3) + ",,,";
         }
         else {
             objBin.grossWt = dblGrossWt;
