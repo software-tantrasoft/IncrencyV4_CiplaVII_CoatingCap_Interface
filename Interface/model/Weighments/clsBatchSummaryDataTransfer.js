@@ -764,7 +764,8 @@ class BatchDataTransfer {
                 { str_colName: 'PVersion', value: inCompleteData.PVersion },
                 { str_colName: 'Version', value: inCompleteData.Version },
                 { str_colName: 'BatchNo', value: inCompleteData.BatchNo },
-                { str_colName: 'Side', value: selectedSide }
+                { str_colName: 'Side', value: selectedSide },
+                { str_colName: 'CubType', value: inCompleteData.CubicleType, comp: 'eq' },
             ]
         }
         let selectRes = await database.select(selectDetailData);

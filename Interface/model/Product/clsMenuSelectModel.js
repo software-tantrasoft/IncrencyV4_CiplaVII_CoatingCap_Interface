@@ -1914,7 +1914,7 @@ class MenuSelect {
                 dataValues: [],
                 isFirstSampleSaved: false,
                 moveToComplete: false,
-                dataFlowStatus: false,
+                // dataFlowStatus: false,
                 idsIPAddress: ''
               };
               globalData.arrHardness425.push(obj);
@@ -1942,7 +1942,7 @@ class MenuSelect {
               objHardness.dataValues = [];
               objHardness.isFirstSampleSaved = false;
               objHardness.moveToComplete = true;
-              objHardness.dataFlowStatus = false;
+              // objHardness.dataFlowStatus = false;
               objHardness.idsIPAddress = '';
             }
 
@@ -2789,7 +2789,8 @@ class MenuSelect {
       currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 1, SI: 1 });
       if(IsPSDPrd == 1){
       for (let i = startIndex; i <= endIndex; i++) {
-        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {  // without parameter particle size also perform
+        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999 ||
+        productObj[0][0][`Param${i}_Low`] && parseFloat(productObj[0][0][`Param${i}_Low`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Low`]) != 99999) {  // without parameter particle size also perform
           switch (i) {
             case 13:
               currentParticleSeizingMeshArr.particleSeizing.push({ isCompleted: 'NotCompleted', mesh: 20, flag: 'a', paramIndex: 13, SI: 3 });
@@ -2897,7 +2898,7 @@ class MenuSelect {
 
     if (tempObjProdType.productType == 1 || tempObjProdType.productType == 2) {
       for (let i = startIndex; i <= endIndex; i++) {
-        if (productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) {
+        if ((productObj[0][0][`Param${i}_Upp`] && parseFloat(productObj[0][0][`Param${i}_Upp`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Upp`]) != 99999) || (productObj[0][0][`Param${i}_Low`] && parseFloat(productObj[0][0][`Param${i}_Low`]) > 0 && parseFloat(productObj[0][0][`Param${i}_Low`]) != 99999)) {
           switch (i) {
             case 8:
               currentPerFineMeshArr.PerFineComp.push({ isCompleted: 'NotCompleted', mesh: "TestSample", flag: 'a', paramIndex: 8, SI: 1 });

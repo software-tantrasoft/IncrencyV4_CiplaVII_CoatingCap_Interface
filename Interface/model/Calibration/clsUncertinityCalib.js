@@ -40,7 +40,7 @@ class Uncertinity {
             if (bln_isPresent) {
                 const selectRepSrNoObj = {
                     str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                    data: 'Uncertinity_RepNo',
+                    data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                     condition: [
                         { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                     ]
@@ -611,7 +611,7 @@ class Uncertinity {
                     // Selecting data from tbl_calibration_uncertinity_master_incomplete based on 'strBalId'
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                        data: 'Uncertinity_RepNo',
+                        data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                         condition: [
                             { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                         ]
@@ -742,7 +742,7 @@ class Uncertinity {
                     // We have to move records to failed tables
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                        data: 'Uncertinity_RepNo',
+                        data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                         condition: [
                             { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                         ]

@@ -38,20 +38,20 @@ class Repetabilty {
             var strBalId = tempCubicInfo.Sys_BinBalID;
         }
         // Check if there is entries in incomplete tables so we need to move it into failed tables
-        // var bln_isPresent = await comman.checkIfRecordInIncomplete('R', strBalId)
-        // if (bln_isPresent) {
-        //     const selectRepSrNoObj = {
-        //         str_tableName: 'tbl_calibration_repetability_master_incomplete',
-        //         data: 'Repet_RepNo',
-        //         condition: [
-        //             { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
-        //         ]
-        //     }
-        //     var result = await database.select(selectRepSrNoObj)
-        //     let int_Repet_RepNo = result[0][0].Repet_RepNo;
-        //     await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
+        var bln_isPresent = await comman.checkIfRecordInIncomplete('R', strBalId)
+        if (bln_isPresent) {
+            const selectRepSrNoObj = {
+                str_tableName: 'tbl_calibration_repetability_master_incomplete',
+                data: 'MAX(Repet_RepNo) AS Repet_RepNo',
+                condition: [
+                    { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
+                ]
+            }
+            var result = await database.select(selectRepSrNoObj)
+            let int_Repet_RepNo = result[0][0].Repet_RepNo;
+            await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
 
-        // }
+        }
         if (str_Protocol.substring(0, 2) == "VI") {
 
 
@@ -627,7 +627,7 @@ class Repetabilty {
                 // Selecting data from tbl_calibration_repetability_master_incomplete based on 'strBalId'
                 const selectRepSrNoObj = {
                     str_tableName: 'tbl_calibration_repetability_master_incomplete',
-                    data: 'Repet_RepNo',
+                    data: 'MAX(Repet_RepNo) AS Repet_RepNo',
                     condition: [
                         { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
                     ]
@@ -767,7 +767,7 @@ class Repetabilty {
             // We have to move records to failed tables
             const selectRepSrNoObj = {
                 str_tableName: 'tbl_calibration_repetability_master_incomplete',
-                data: 'Repet_RepNo',
+                data: 'MAX(Repet_RepNo) AS Repet_RepNo',
                 condition: [
                     { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
                 ]

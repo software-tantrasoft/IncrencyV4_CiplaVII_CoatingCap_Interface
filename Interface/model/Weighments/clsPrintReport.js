@@ -91,27 +91,56 @@ class PrintReportOnline {
       console.log(printerName);
       if (printerName != "NA" && printerName != "" && printerName != null && printerName != 'None') {
         const objSaveTemp = {
-          RecNo: reportObj.data.RecNo,
+          RecNo: reportObj.data,
           UserId: reportObj.data.UserId,
           UserName: reportObj.data.UserName,
           str_ICReport: reportObj.data.str_ICReport,
           str_cubicleType: reportObj.data.str_cubicleType,
-          idsNo: reportObj.data.idsNo,
+          idsNo: reportObj.data.Bin_IDSNo
         }
 
         console.log(objSaveTemp);
         console.log(reportObj);
         var resSaveToTemp = await axios.post(`http://${serverConfig.hostApi}:${serverConfig.APIPORT}/API_V1/bin/storeBinLabelDataInTemp`, objSaveTemp)
         if (resSaveToTemp.data.status == "Success") {
-          var genReport = await axios.post(`http://${serverConfig.hostApi}:${serverConfig.APIPORT}/API_V1/report/GenerateReport`, reportObj);
+          const generateObj = {}
+          var data = {
+            objSaveTemp,
+             UserId: reportObj.data.UserId,
+             UserName: reportObj.data.UserName,
+             HmiId : resSaveToTemp.data.data,
+             cubType: reportObj.data.str_cubicleType,
+             watermark : "false"
+          };
+          // Object.assign(generateObj, { data: data })
+          Object.assign(generateObj, { data: data }, { FileName: reportObj.FileName });
+          var genReport = await axios.post(`http://${serverConfig.hostApi}:${serverConfig.APIPORT}/API_V1/report/GenerateReport`, generateObj);
           if (genReport.data.filepath != "") {
             var filepath = genReport.data.filepath;
-
+            const objPrintData = {
+              str_ICReport: "Current",
+              str_batchNo: objBin.selBatch,
+              str_type: reportObj.data.str_cubicleType,
+              int_printNo: 1,
+              intRecNo: reportObj.data.RecNo,
+              str_prdID: objBin.selProductId,
+              str_prdName: objBin.selProductName,
+              str_prdVersion: objBin.selProductVersion,
+              str_version: objBin.selVersion,
+              strReason: "",
+              strUserId: reportObj.data.UserId,
+              strUserName: reportObj.data.UserName,
+              rptLabelForActivity: "Label Generation-Compression Report Printed",
+            }
+            var API_PATH = 'report/increasePrintCountUpBinLabel'
             let printRep = {}
             Object.assign(
               printRep,
+              { apiEndPoint: API_PATH},
               { filepath: filepath },
-              { strSelectedPrinter: printerName }
+              { strSelectedPrinter: printerName },
+              { reportObj : objPrintData},
+             
             )
             console.log(printRep);
             //logFromPC.addtoProtocolLog(printRep)
@@ -119,27 +148,27 @@ class PrintReportOnline {
             console.log(printReport.data.Message)
 
             if (printReport.data.Message == "Print Successfull") {
-              const objPrintData = {
-                str_ICReport: "Current",
-                str_batchNo: objBin.selBatch,
-                str_type: reportObj.data.cubType,
-                int_printNo: 0,
-                intRecNo: reportObj.data.RecNo,
-                str_prdID: objBin.selProductId,
-                str_prdName: objBin.selProductName,
-                str_prdVersion: objBin.selProductVersion,
-                str_version: objBin.selVersion,
-                strReason: "",
-                strUserId: reportObj.data.UserId,
-                strUserName: reportObj.data.UserName,
-                rptLabelForActivity: "Label Generation-Compression Report Printed"
-              }
+              // const objPrintData = {
+              //   str_ICReport: "Current",
+              //   str_batchNo: objBin.selBatch,
+              //   str_type: reportObj.data.cubType,
+              //   int_printNo: 0,
+              //   intRecNo: reportObj.data.RecNo,
+              //   str_prdID: objBin.selProductId,
+              //   str_prdName: objBin.selProductName,
+              //   str_prdVersion: objBin.selProductVersion,
+              //   str_version: objBin.selVersion,
+              //   strReason: "",
+              //   strUserId: reportObj.data.UserId,
+              //   strUserName: reportObj.data.UserName,
+              //   rptLabelForActivity: "Label Generation-Compression Report Printed",
+              // }
 
-              var updateCount = await axios.post(`http://${serverConfig.hostApi}:${serverConfig.APIPORT}/API_V1/report/increasePrintCountUpBinLabel`, objPrintData);
-              //logFromPC.addtoProtocolLog("count" + updateCount)
-              if (updateCount.data.status == "Success") {
+              // var updateCount = await axios.post(`http://${serverConfig.hostApi}:${serverConfig.APIPORT}/API_V1/report/increasePrintCountUpBinLabel`, objPrintData);
+              // //logFromPC.addtoProtocolLog("count" + updateCount)
+              // if (updateCount.data.status == "Success") {
                 return true;
-              }
+              // }
             }
 
 

@@ -38,20 +38,20 @@ class Eccentricity {
             }
 
             // Check if there is entries in incomplete tables so we need to move it into failed tables
-            // var bln_isPresent = await comman.checkIfRecordInIncomplete('E', strBalId)
-            // if (bln_isPresent) {
-            //     const selectRepSrNoObj = {
-            //         str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-            //         data: 'Eccent_RepNo',
-            //         condition: [
-            //             { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
-            //         ]
-            //     }
-            //     var result = await database.select(selectRepSrNoObj)
-            //     let int_eccent_RepNo = result[0][0].Eccent_RepNo;
-            //     await comman.caibrationFails('E', strBalId, int_eccent_RepNo)
+            var bln_isPresent = await comman.checkIfRecordInIncomplete('E', strBalId)
+            if (bln_isPresent) {
+                const selectRepSrNoObj = {
+                    str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                    data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
+                    condition: [
+                        { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
+                    ]
+                }
+                var result = await database.select(selectRepSrNoObj)
+                let int_eccent_RepNo = result[0][0].Eccent_RepNo;
+                await comman.caibrationFails('E', strBalId, int_eccent_RepNo)
 
-            // }
+            }
             if (str_Protocol.substring(0, 2) == "VI") {
 
 
@@ -621,7 +621,7 @@ class Eccentricity {
                     // Selecting data from tbl_calibration_repetability_master_incomplete based on 'strBalId'
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                        data: 'Eccent_RepNo',
+                        data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
                         condition: [
                             { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                         ]
@@ -747,7 +747,7 @@ class Eccentricity {
                     // We have to move records to failed tables
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                        data: 'Eccent_RepNo',
+                        data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
                         condition: [
                             { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                         ]

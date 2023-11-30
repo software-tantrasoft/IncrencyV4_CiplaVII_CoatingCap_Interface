@@ -51,16 +51,28 @@ class TDT {
           }
           if ("tapCount1" in key) {
             count1 = key['tapCount1']
+            if(isNaN(count1) || count1.trim() == ''){
+              return 'Invalid data string';
+            }
           }
 
           if ("tapCount2" in key) {
             count2 = key['tapCount2']
+            if(isNaN(count2) || count2.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("tapCount3" in key) {
             count3 = key['tapCount3']
+            if(isNaN(count3) || count3.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("tapCount4" in key) {
             count4 = key['tapCount4']
+            if(isNaN(count4) || count4.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("wtOfSample" in key) {
             wtofSampleVal = key['wtOfSample']
@@ -70,18 +82,33 @@ class TDT {
           }
           if ("tapCountvol1" in key) {
             vol1 = key['tapCountvol1']
+            if(isNaN(vol1) || vol1.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("tapCountvol2" in key) {
             vol2 = key['tapCountvol2']
+            if(isNaN(vol2) || vol2.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("tapCountvol3" in key) {
             vol3 = key['tapCountvol3']
+            if(isNaN(vol3) || vol3.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("add1" in key) {
             add1 = key['add1']
+            if(isNaN(add1) || add1.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("add2" in key) {
             add2 = key['add2']
+            if(isNaN(add2) || add2.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("tapDensity" in key) {
             tapDensityVal = key['tapDensity']
@@ -123,6 +150,12 @@ class TDT {
         // tapDensityVal = parseFloat(wtofSampleVal / finalVolume);
         // tapDensityVal = tapDensityVal.toFixed(2);
         //////////////////////////////////////
+
+        if(initialVolumeVal == 0 || tapDensityVal == 0
+          || BulkDensity == 0 || wtofSampleVal == 0 || method == ""){
+            console.log('InValid data String');
+            return 'Invalid data string';
+          }
         var arrTempSplit = wtofSampleVal.split(".");
         decimalPoint = arrTempSplit[1].length;
 

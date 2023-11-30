@@ -110,7 +110,7 @@ class CommanFunction {
     // Below function updates the status to 0 -> 1 for that particular Caibration in 
     // calibration_status table
     //****************************************************************************************** */  
-    updateCalibStatus(columName, strBalId, IDSSrNo) {
+    async updateCalibStatus(columName, strBalId, IDSSrNo) {
         return new Promise((resolve, reject) => {
             // columName is like 'P', 'E', 'U' ....etc
             var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == IDSSrNo);
@@ -162,7 +162,7 @@ class CommanFunction {
     //****************************************************************************************************** */
     // Below Function handles failed calibration, it will move incomplete tables to failed tables 
     //******************************************************************************************************* */
-    async caibrationFails(CalibrationType, strBalId, RepNo) {
+    async caibrationFailsold(CalibrationType, strBalId, RepNo) {
         // CalibrationType is like 'P', 'R', 'E', 'U'..etc
         // strBalId holds the balance associated with that cubicle
         // RepNo holds the report sr no of incomplete tables
@@ -576,6 +576,433 @@ class CommanFunction {
                 }).catch(err => { console.log(err) })
             })
         })
+    }
+
+    async caibrationFails(CalibrationType, strBalId, RepNo) {
+        // CalibrationType is like 'P', 'R', 'E', 'U'..etc
+        // strBalId holds the balance associated with that cubicle
+        // RepNo holds the report sr no of incomplete tables
+        return new Promise((resolve, reject) => {
+            // getting position of current caibration in sorted array of calibrations
+            sort.sortedSeqArray(globalData.arrSortedCalib, strBalId).then(sortedArray => {
+                var int_curentCalibrationIndex = sortedArray.indexOf(CalibrationType);
+                // calculating first caalibration
+                var str_first_calibration = sortedArray[0];
+                this.getFrepSrNo(str_first_calibration).then(fRerSrNo => {
+                    // fRerSrNo is failed repSrNo which will insert in all failed tables
+                    var arr_CalibArray = []; // array holds calibration which done and one which failed
+                    for (let i = 0; i < int_curentCalibrationIndex + 1; i++) {
+                        arr_CalibArray.push(sortedArray[i])
+                    }
+                    // console.log('arr_CalibArray', arr_CalibArray);
+                    arr_CalibArray.forEach(async (v) => {
+                        // v holds value such as 'P', 'U', 'E' .....etc
+                        switch (v) {
+                            // For case PERIODIC CALIBRATION
+                            case 'P':
+                                try {
+                                    var obj = await copyObjects.periodic('tbl_calibration_periodic_master_incomplete'
+                                        , 'tbl_calibration_periodic_master_failed', RepNo, 0, 'master');
+                                    // Copying Incomplete master to failed master
+                                    var result = await database.copy(obj);
+                                    // last inserted Id got here form query
+                                    var lastInsertedId = result[0].insertId;
+                                    // Updating the report serial number in failed master
+                                    const updateObj = {
+                                        str_tableName: 'tbl_calibration_periodic_master_failed',
+                                        data: [
+                                            { str_colName: 'Periodic_RepNo', value: fRerSrNo }
+                                        ],
+                                        condition: [
+                                            { str_colName: 'srNo', value: lastInsertedId }
+                                        ]
+                                    }
+                                    await database.update(updateObj);// failed master report number updated
+                                    // selecting data from incomplete details for copying
+                                    var selectDetailObj = {
+                                        str_tableName: 'tbl_calibration_periodic_detail_incomplete',
+                                        data: 'Periodic_RepNo,Periodic_RecNo',
+                                        condition: [
+                                            { str_colName: 'Periodic_RepNo', value: RepNo, comp: 'eq' }
+                                        ]
+                                    }
+                                    var result1 = await database.select(selectDetailObj);// selected
+                                    for (let i = 0; i < result1[0].length; i++) {
+                                        const objn = result1[0][i];
+                                        // as we have multiple entries i n details table so we need 
+                                        // Async loop
+                                        var obj1 = await copyObjects.periodic('tbl_calibration_periodic_detail_incomplete'
+                                            , 'tbl_calibration_periodic_detail_failed', objn.Periodic_RepNo, objn.Periodic_RecNo, 'detail');
+                                        var res2 = await database.copy(obj1);
+                                        var lastInsertedId = res2[0].insertId;
+                                        const updateDetObj = {
+                                            str_tableName: 'tbl_calibration_periodic_detail_failed',
+                                            data: [
+                                                { str_colName: 'Periodic_RepNo', value: fRerSrNo }
+                                            ],
+                                            condition: [
+                                                { str_colName: 'SrNo', value: lastInsertedId }
+                                            ]
+                                        }
+                                        await database.update(updateDetObj);// updated repSrNo in failed details 
+
+                                    }
+
+                                    // console.log('P Copy')
+                                    // If ongoing calibration is failed ('Periodic') then only we have to delete
+                                    // records from incomplete tables for new entries
+                                    if (sortedArray.indexOf('P') == int_curentCalibrationIndex) {
+                                        // delete records from incomplete tables
+                                        var deleteMasteObj = {
+                                            str_tableName: 'tbl_calibration_periodic_master_incomplete',
+                                            condition: [
+                                                { str_colName: 'Periodic_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        var deleteDetObj = {
+                                            str_tableName: 'tbl_calibration_periodic_detail_incomplete',
+                                            condition: [
+                                                { str_colName: 'Periodic_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        database.delete(deleteMasteObj).then(() => {
+                                            database.delete(deleteDetObj).then(() => {
+                                                resolve('ok')
+                                            }).catch(err => { console.log(err) });
+                                        }).catch(err => console.log(err))
+                                    }
+
+
+
+
+
+
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                                break;
+                            // For case REPETABILITY CALIBRATION
+                            case 'R':
+                                try {
+                                    var obj = await copyObjects.repetability('tbl_calibration_repetability_master_incomplete'
+                                        , 'tbl_calibration_repetability_master_failed', RepNo, 0, 'master');
+                                    // Copying Incomplete master to failed master
+                                    var result = await database.copy(obj);
+                                    // last inserted Id got here form query
+                                    var lastInsertedId = result[0].insertId;
+                                    // Updating the report serial number in failed master
+                                    const updateObj = {
+                                        str_tableName: 'tbl_calibration_repetability_master_failed',
+                                        data: [
+                                            { str_colName: 'Repet_RepNo', value: fRerSrNo }
+                                        ],
+                                        condition: [
+                                            { str_colName: 'SrNo', value: lastInsertedId }
+                                        ]
+                                    }
+                                    await database.update(updateObj) // failed master report number updated
+                                    // selecting data from incomplete details for copying
+                                    var selectDetailObj = {
+                                        str_tableName: 'tbl_calibration_repetability_detail_incomplete',
+                                        data: 'Repet_RepNo,Repet_RecNo',
+                                        condition: [
+                                            { str_colName: 'Repet_RepNo', value: RepNo, comp: 'eq' }
+                                        ]
+                                    }
+                                    var result1 = await database.select(selectDetailObj);
+                                    // as we have multiple entries i n details table so we need 
+                                    // Async loop
+                                    for (let i = 0; i < result1[0].length; i++) {
+                                        const objn = result1[0][i];
+                                        var obj1 = await copyObjects.repetability('tbl_calibration_repetability_detail_incomplete'
+                                            , 'tbl_calibration_repetability_detail_failed', objn.Repet_RepNo, objn.Repet_RecNo, 'detail');
+                                        var res2 = await database.copy(obj1);
+                                        var lastInsertedId = res2[0].insertId;
+                                        const updateDetObj = {
+                                            str_tableName: 'tbl_calibration_repetability_detail_failed',
+                                            data: [
+                                                { str_colName: 'Repet_RepNo', value: fRerSrNo }
+                                            ],
+                                            condition: [
+                                                { str_colName: 'SrNo', value: lastInsertedId }
+                                            ]
+                                        }
+                                        await database.update(updateDetObj);
+
+
+                                    };
+                                    if (sortedArray.indexOf('R') == int_curentCalibrationIndex) {
+                                        // delete records from incomplete tables
+                                        console.log('inside delete');
+                                        var deleteMasteObj = {
+                                            str_tableName: 'tbl_calibration_repetability_master_incomplete',
+                                            condition: [
+                                                { str_colName: 'Repet_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        var deleteDetObj = {
+                                            str_tableName: 'tbl_calibration_repetability_detail_incomplete',
+                                            condition: [
+                                                { str_colName: 'Repet_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        database.delete(deleteMasteObj).then(() => {
+                                            database.delete(deleteDetObj).then(() => {
+                                                resolve('ok');
+                                            }).catch(err => { console.log(err) });
+                                        }).catch(err => console.log(err));
+                                    }
+
+
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                                break;
+                            // For case UNCERTINITY CALIBRATION
+
+                            case 'U':
+                                try {
+                                    var obj = await copyObjects.uncertinity('tbl_calibration_uncertinity_master_incomplete'
+                                        , 'tbl_calibration_uncertinity_master_failed', RepNo, 0, 'master');
+
+                                    var result = await database.copy(obj);
+                                    var lastInsertedId = result[0].insertId;
+                                    const updateObj = {
+                                        str_tableName: 'tbl_calibration_uncertinity_master_failed',
+                                        data: [
+                                            { str_colName: 'Uncertinity_RepNo', value: fRerSrNo }
+                                        ],
+                                        condition: [
+                                            { str_colName: 'SrNo', value: lastInsertedId }
+                                        ]
+                                    }
+
+                                    await database.update(updateObj);
+                                    var selectDetailObj = {
+                                        str_tableName: 'tbl_calibration_uncertinity_detail_incomplete',
+                                        data: 'Uncertinity_RepNo,Uncertinity_RecNo',
+                                        condition: [
+                                            { str_colName: 'Uncertinity_RepNo', value: RepNo, comp: 'eq' }
+                                        ]
+                                    }
+
+                                    var result1 = await database.select(selectDetailObj);
+                                    for (let i = 0; i < result1[0].length; i++) {
+                                        const objn = result1[0][i];
+                                        // console.log('n', obj)
+                                        var obj1 = await copyObjects.uncertinity('tbl_calibration_uncertinity_detail_incomplete'
+                                            , 'tbl_calibration_uncertinity_detail_failed', objn.Uncertinity_RepNo, objn.Uncertinity_RecNo, 'detail');
+
+                                        var res2 = await database.copy(obj1);
+                                        var lastInsertedId = res2[0].insertId;
+                                        const updateDetObj = {
+                                            str_tableName: 'tbl_calibration_uncertinity_detail_failed',
+                                            data: [
+                                                { str_colName: 'Uncertinity_RepNo', value: fRerSrNo }
+                                            ],
+                                            condition: [
+                                                { str_colName: 'SrNo', value: lastInsertedId }
+                                            ]
+                                        }
+
+                                        await database.update(updateDetObj);
+
+
+                                    };
+                                    if (sortedArray.indexOf('U') == int_curentCalibrationIndex) {
+                                        // delete records from incomplete tables
+                                        console.log('inside delete')
+                                        var deleteMasteObj = {
+                                            str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                                            condition: [
+                                                { str_colName: 'Uncertinity_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        var deleteDetObj = {
+                                            str_tableName: 'tbl_calibration_uncertinity_detail_incomplete',
+                                            condition: [
+                                                { str_colName: 'Uncertinity_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        database.delete(deleteMasteObj).then(() => {
+                                            database.delete(deleteDetObj).then(() => {
+                                                resolve('ok')
+                                            }).catch(err => { console.log(err) });
+                                        }).catch(err => console.log(err))
+
+
+                                    }
+
+
+
+                                } catch (err) {
+                                    console.log(err)
+                                }
+                                break;
+                            // For case ECCENTRICITY CALIBRATION
+                            case 'E':
+                                // First copying data
+                                try {
+                                    var obj = await copyObjects.eccentricity('tbl_calibration_eccentricity_master_incomplete'
+                                        , 'tbl_calibration_eccentricity_master_failed', RepNo, 0, 'master');
+                                    // console.log(obj)
+                                    var result = await database.copy(obj);
+                                    // console.log(result)
+                                    var lastInsertedId = result[0].insertId
+                                    const updateObj = {
+                                        str_tableName: 'tbl_calibration_eccentricity_master_failed',
+                                        data: [
+                                            { str_colName: 'Eccent_RepNo', value: fRerSrNo }
+                                        ],
+                                        condition: [
+                                            { str_colName: 'SrNo', value: lastInsertedId }
+                                        ]
+                                    }
+                                    await database.update(updateObj);
+                                    var selectDetailObj = {
+                                        str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
+                                        data: 'Eccent_RepNo,Eccent_RecNo',
+                                        condition: [
+                                            { str_colName: 'Eccent_RepNo', value: RepNo, comp: 'eq' }
+                                        ]
+                                    }
+                                    var result1 = await database.select(selectDetailObj);
+                                    // console.log(result[0])
+                                    for (let i = 0; i < result1[0].length; i++) {
+                                        const objn = result1[0][i];
+                                        // console.log('n', obj)
+                                        var obj1 = await copyObjects.eccentricity('tbl_calibration_eccentricity_detail_incomplete'
+                                            , 'tbl_calibration_eccentricity_detail_failed', objn.Eccent_RepNo, objn.Eccent_RecNo, 'detail');
+                                        var res2 = await database.copy(obj1);
+
+                                        var lastInsertedId = res2[0].insertId;
+                                        const updateDetObj = {
+                                            str_tableName: 'tbl_calibration_eccentricity_detail_failed',
+                                            data: [
+                                                { str_colName: 'Eccent_RepNo', value: fRerSrNo }
+                                            ],
+                                            condition: [
+                                                { str_colName: 'SrNo', value: lastInsertedId }
+                                            ]
+                                        }
+                                        await database.update(updateDetObj);
+                                    }
+                                    if (sortedArray.indexOf('E') == int_curentCalibrationIndex) {
+                                        // delete records from incomplete tables
+                                        console.log('inside delete')
+                                        var deleteMasteObj = {
+                                            str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                                            condition: [
+                                                { str_colName: 'Eccent_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        var deleteDetObj = {
+                                            str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
+                                            condition: [
+                                                { str_colName: 'Eccent_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        database.delete(deleteMasteObj).then(() => {
+                                            database.delete(deleteDetObj).then(() => {
+                                                resolve('ok')
+                                            }).catch(err => { console.log(err) });
+                                        }).catch(err => console.log(err))
+                                    }
+
+
+
+
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                                break;
+                            // For case LINEARITY CALIBRATION
+                            case 'L':
+                                try {
+                                    // First copying data
+                                    var obj = await copyObjects.linearity('tbl_calibration_linearity_master_incomplete'
+                                        , 'tbl_calibration_linearity_master_failed', RepNo, 0, 'master');
+                                    // console.log(obj)
+                                    var result = await database.copy(obj);
+                                    // console.log(result)
+                                    var lastInsertedId = result[0].insertId;
+                                    const updateObj = {
+                                        str_tableName: 'tbl_calibration_linearity_master_failed',
+                                        data: [
+                                            { str_colName: 'Linear_RepNo', value: fRerSrNo }
+                                        ],
+                                        condition: [
+                                            { str_colName: 'SrNo', value: lastInsertedId }
+                                        ]
+                                    }
+                                    await database.update(updateObj);
+                                    var selectDetailObj = {
+                                        str_tableName: 'tbl_calibration_linearity_detail_incomplete',
+                                        data: 'Linear_RepNo,Linear_RecNo',
+                                        condition: [
+                                            { str_colName: 'Linear_RepNo', value: RepNo, comp: 'eq' }
+                                        ]
+                                    }
+                                    var result1 = await database.select(selectDetailObj);
+                                    // console.log(result[0])
+                                    for (let i = 0; i < result1[0].length; i++) {
+                                        const objn = result1[0][i];
+                                        var obj1 = await copyObjects.linearity('tbl_calibration_linearity_detail_incomplete'
+                                            , 'tbl_calibration_linearity_detail_failed', objn.Linear_RepNo, objn.Linear_RecNo, 'detail');
+                                        var res2 = await database.copy(obj1);
+
+                                        var lastInsertedId = res2[0].insertId;
+                                        const updateDetObj = {
+                                            str_tableName: 'tbl_calibration_linearity_detail_failed',
+                                            data: [
+                                                { str_colName: 'Linear_RepNo', value: fRerSrNo }
+                                            ],
+                                            condition: [
+                                                { str_colName: 'SrNo', value: lastInsertedId }
+                                            ]
+                                        }
+                                        await database.update(updateDetObj);
+
+
+                                    }
+                                    if (sortedArray.indexOf('L') == int_curentCalibrationIndex) {
+                                        // delete records from incomplete tables
+                                        console.log('inside delete')
+                                        var deleteMasteObj = {
+                                            str_tableName: 'tbl_calibration_linearity_master_incomplete',
+                                            condition: [
+                                                { str_colName: 'Linear_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        var deleteDetObj = {
+                                            str_tableName: 'tbl_calibration_linearity_detail_incomplete',
+                                            condition: [
+                                                { str_colName: 'Linear_RepNo', value: RepNo }
+                                            ]
+                                        }
+                                        database.delete(deleteMasteObj).then(() => {
+                                            database.delete(deleteDetObj).then(() => {
+                                                resolve('ok')
+                                            }).catch(err => { console.log(err) });
+                                        }).catch(err => console.log(err))
+                                    }
+                                } catch (error) {
+                                    console.log(error)
+                                }
+
+                                break;
+                        }
+
+                    });
+
+
+                }).catch(err => { console.log(err) });
+
+            })
+
+
+        })
+
     }
     //******************************************************************************************************* */
     //******************************************************************************************************* */
@@ -1204,7 +1631,7 @@ class CommanFunction {
     //************************************************************************************************8 */
     //Below function checks if data is present or not in incomplete master tables
     //************************************************************************************************* */
-    checkIfRecordInIncomplete(calibrationType, strBalId) {
+     async checkIfRecordInIncomplete(calibrationType, strBalId) {
         return new Promise((resolve, reject) => {
             switch (calibrationType) {
                 case 'P':

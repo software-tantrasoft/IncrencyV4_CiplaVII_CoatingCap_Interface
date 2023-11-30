@@ -4,7 +4,7 @@ class CopyObject {
     constructor() {
     }
     // periodic copy object for master and details
-    periodic(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
+    async periodic(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
         return new Promise((resolve, reject) => {
             if (type == 'master') {
                 var copyObj = {
@@ -81,7 +81,7 @@ class CopyObject {
     }
     //********************************************************************************** */
     // repetability copy object for master and details
-    repetability(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
+    async repetability(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
         return new Promise((resolve, reject) => {
             if (type == 'master') {
                 var copyObj = {
@@ -155,7 +155,7 @@ class CopyObject {
     }
     //********************************************************************************** */
     // uncertinity copy object for master and details
-    uncertinity(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
+    async uncertinity(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
         return new Promise((resolve, reject) => {
             if (type == 'master') {
                 var copyObj = {
@@ -225,7 +225,7 @@ class CopyObject {
     }
     //********************************************************************************** */
     // eccentricity copy object for master and details
-    eccentricity(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
+    async eccentricity(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
         return new Promise((resolve, reject) => {
             if (type == 'master') {
                 var copyObj = {

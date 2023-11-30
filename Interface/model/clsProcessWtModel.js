@@ -163,7 +163,7 @@ class ProcessWTModel {
                 if (Sys_PortNo == 101 || Sys_PortNo == 102) {
                     var instrument = cubicalObj.Sys_Port1;
                     if (instrument == 'Hardness') {
-                        objHardness.dataFlowStatus = true;
+                        // objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'H';
                         objHardness.idsIPAddress = str_IpAddress;
                     }
@@ -242,16 +242,16 @@ class ProcessWTModel {
                 } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
                     var instrument = cubicalObj.Sys_Port4;
                     if (instrument == 'Hardness') {
-                        objHardness.dataFlowStatus = true;
+                        // objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'H';
                         objHardness.idsIPAddress = str_IpAddress;
                     }
                 }
-                if(hardnessModelObj != undefined &&  instrument == 'Hardness'  ){
-                    sendProtocol = "HS";
-                }else{
+                // if(hardnessModelObj != undefined &&  instrument == 'Hardness'  ){
+                //     sendProtocol = "HS";
+                // }else{
                     sendProtocol = "+";
-                }
+                // }
                 return (sendProtocol);
                 break;
             case 'T':
@@ -259,23 +259,23 @@ class ProcessWTModel {
                 if (Sys_PortNo == 101 || Sys_PortNo == 102) {
                     var instrument = cubicalObj.Sys_Port2;
                     if (instrument == 'Hardness') {
-                        objHardness.dataFlowStatus = true;
+                        // objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'T';
                         objHardness.idsIPAddress = str_IpAddress;
                     }
                 } else if (Sys_PortNo == 103 || Sys_PortNo == 104) {
                     var instrument = cubicalObj.Sys_Port3;
                     if (instrument == 'Hardness') {
-                        objHardness.dataFlowStatus = true;
+                        // objHardness.dataFlowStatus = true;
                         objHardness.protocolIncomingType = 'T';
                         objHardness.idsIPAddress = str_IpAddress;
                     }
                 }
-                if(hardnessModelObj != undefined &&  instrument == 'Hardness'  ){
-                    sendProtocol = "HS";
-                }else{
+                // if(hardnessModelObj != undefined &&  instrument == 'Hardness'  ){
+                //     sendProtocol = "HS";
+                // }else{
                     sendProtocol = "+";
-                }
+                // }
                 return (sendProtocol);
                 break;
             default:

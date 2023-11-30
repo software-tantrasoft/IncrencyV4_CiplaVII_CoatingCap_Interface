@@ -10,7 +10,7 @@ class IncompleteRemark {
             var productType = globalData.arrProductTypeArray.find(k => k.idsNo == idsNo);
             if (tempObj != undefined) {
                 if (tempObj.Type != 0) {
-                    if (tempObj.Type == 7) {
+                    if (tempObj.Type == 7 || tempObj.Type == 'H') {
                         var updateObj = {
                             str_tableName: 'tbl_tab_masterhtd_incomplete',
                             data: [
@@ -217,7 +217,7 @@ class IncompleteRemark {
             var productType = globalData.arrProductTypeArray.find(k => k.idsNo ==idsNo);
             if (tempObj != undefined) {
                 if (tempObj.Type != 0) {
-                    if (tempObj.Type == 7) {
+                    if (tempObj.Type == 7  || tempObj.Type == 'H') {
                         var updateObj = {
                             str_tableName: 'tbl_tab_masterhtd_incomplete',
                             data: [
@@ -320,7 +320,7 @@ class IncompleteRemark {
             var productType = globalData.arrProductTypeArray.find(k => k.idsNo ==idsNo);
             if (tempObj != undefined) {
                 if (tempObj.Type != 0) {
-                    if (tempObj.Type == 7) {
+                    if (tempObj.Type == 7 || tempObj.Type == 'H') {
                         var updateObj = {
                             str_tableName: 'tbl_tab_masterhtd_incomplete',
                             data: [

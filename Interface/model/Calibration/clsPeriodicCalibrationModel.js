@@ -42,19 +42,19 @@ class CalibrationModel {
                 var strBalId = tempCubicInfo.Sys_BinBalID;
             }
             // Check if there is entries in incomplete tables so we need to move it into failed tables
-            // var bln_isPresent = await comman.checkIfRecordInIncomplete('P', strBalId)
-            // if (bln_isPresent) {
-            //     const selectRepSrNoObj = {
-            //         str_tableName: 'tbl_calibration_periodic_master_incomplete',
-            //         data: 'Periodic_RepNo',
-            //         condition: [
-            //             { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
-            //         ]
-            //     }
-            //     var result = await database.select(selectRepSrNoObj)
-            //     let int_periodic_RepNo = result[0][0].Periodic_RepNo;
-            //     await comman.caibrationFails('P', strBalId, int_periodic_RepNo)
-            // }
+            var bln_isPresent = await comman.checkIfRecordInIncomplete('P', strBalId)
+            if (bln_isPresent) {
+                const selectRepSrNoObj = {
+                    str_tableName: 'tbl_calibration_periodic_master_incomplete',
+                    data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
+                    condition: [
+                        { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
+                    ]
+                }
+                var result = await database.select(selectRepSrNoObj)
+                let int_periodic_RepNo = result[0][0].Periodic_RepNo;
+                await comman.caibrationFails('P', strBalId, int_periodic_RepNo)
+            }
             if (str_Protocol.substring(0, 2) == "VI") {
 
 
@@ -681,7 +681,7 @@ class CalibrationModel {
                     // Selecting data from tbl_calibration_periodic_master_incomplete based on 'strBalId'
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_periodic_master_incomplete',
-                        data: 'Periodic_RepNo',
+                        data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
                         condition: [
                             { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
                         ]
@@ -838,7 +838,7 @@ class CalibrationModel {
                     // We have to move records to failed tables
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_periodic_master_incomplete',
-                        data: 'Periodic_RepNo',
+                        data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
                         condition: [
                             { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
                         ]

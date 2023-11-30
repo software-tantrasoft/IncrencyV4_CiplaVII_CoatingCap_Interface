@@ -27,20 +27,21 @@ class Group {
             var actualWt = protocol.split(" ");
             var unit = actualWt[4].split("");
             var unitVal = unit[0];
+            var tempLimObj = globalData.arr_limits.find(k => k.idsNo == IdsNo);
+            var wgt = actualWt[3]; 
+            var decimalValue = tempLimObj.Group.dp; //confirm with vaishnavi for balance dp set as product master
 
-            var wgt = actualWt[3];
-            var decimalValue = 0;
-            // var newWeight;
-            var weight;
-            if (groupWeightVal.toString().match(/^\d+$/)) {
-                // newWeight = actualWt[3];
-                decimalValue = 0;
-            }
-            else {
-                weight = groupWeightVal.split(".");
-                // newWeight = actualWt[3];
-                decimalValue = weight[1].length
-            }
+            // // var newWeight;
+            // var weight;
+            // if (groupWeightVal.toString().match(/^\d+$/)) {
+            //     // newWeight = actualWt[3];
+            //     decimalValue = 0;
+            // }
+            // else {
+            //     weight = groupWeightVal.split(".");
+            //     // newWeight = actualWt[3];
+            //     decimalValue = weight[1].length
+            // }
 
             var ResultOfReport = `LE0`;
             var arrLimits = globalData.arr_limits.find(k => k.idsNo == IdsNo);

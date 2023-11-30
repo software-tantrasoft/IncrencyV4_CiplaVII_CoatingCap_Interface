@@ -72,8 +72,11 @@ class StoredProcedure {
         return new Promise((resolve, reject) => {
             var repSerNo = resultdata;
             var tableName = "tbl_tab_tapdensity";
-            let strquery = "CALL reportCalculationTapDensity(" + repSerNo + ",'" + tableName + "'," +
-                "@stdNeg,@stdPos,@bulkNegLimit,@bulkPosLimit,@tapDensity,@bulkDensity,@remark);" +
+            // let strquery = "CALL reportCalculationTapDensity(" + repSerNo + ",'" + tableName + "'," +
+            //     "@stdNeg,@stdPos,@bulkNegLimit,@bulkPosLimit,@tapDensity,@bulkDensity,@remark);" +
+            //     "SELECT @remark;";
+            let strquery =  "CALL reportCalculationTapDensity(" + repSerNo + ",'" + tableName + "'," + 0+ 
+            ",'" + 1+ "',"+"@stdNeg,@stdPos,@bulkNegLimit,@bulkPosLimit,@tapDensity,@bulkDensity,@remark);" +
                 "SELECT @remark;";
             connection.query(strquery, function (err, rows, fields) {
                 if (err) {

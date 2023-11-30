@@ -52,18 +52,18 @@ class ProcessWeighment {
         //console.log(protocol);
         const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IdsNo));
         var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == parseInt(IdsNo));
-        let strBalId = tempCubicInfo.Sys_BalID;
+        // let strBalId = tempCubicInfo.Sys_BalID;
+        var strBalId;
         var tareCmd = "";
         var appendVal = "";
         var balSrNo = "";
 
+        if (objOwner.owner == 'analytical') {
+            strBalId = tempCubicInfo.Sys_BalID;
+        } else {
+            strBalId = tempCubicInfo.Sys_BinBalID;
+        }
         if (strBalId != "None") {
-
-            if (objOwner.owner == 'analytical') {
-                strBalId = tempCubicInfo.Sys_BalID;
-            } else {
-                strBalId = tempCubicInfo.Sys_BinBalID;
-            }
             var selectBalObj = {
                 str_tableName: 'tbl_balance',
                 data: '*',

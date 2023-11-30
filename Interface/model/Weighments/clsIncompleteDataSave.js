@@ -80,10 +80,13 @@ class IncompleteDataSave {
                 if ((typeValue == 1) || (typeValue == 8) || (typeValue == 'L')) {
                     if (typeValue == 1) {
                         productUnit = tempLimObj.Individual.unit;
+                        decimalValue = tempLimObj.Individual.dp //confirm with vaishnavi for balance dp set as product master
                     } else if (typeValue == 8) {
                         productUnit = tempLimObj.Ind_Layer.unit;
+                        decimalValue = tempLimObj.Ind_Layer.dp //confirm with vaishnavi for balance dp set as product master
                     } else if (typeValue == 'L') {
                         productUnit = tempLimObj.Ind_Layer1.unit;
+                        decimalValue = tempLimObj.Ind_Layer1.dp //confirm with vaishnavi for balance dp set as product master
                     } else {
                         productUnit = res[1][paramUnit];
                     }
@@ -96,18 +99,16 @@ class IncompleteDataSave {
 
 
                     //to string is integer
-                    if (wgt.toString().match(/^\d+$/)) {
-                        newWeight = wgt;
-                        decimalValue = 0;
-                    }
-                    else {
-                        weight = wgt.toString().split(".");
-                        newWeight = wgt;
-                        decimalValue = weight[1].length
-                    }
-
-
-
+                    // if (wgt.toString().match(/^\d+$/)) {   
+                    //     newWeight = wgt;
+                    //     decimalValue = 0;
+                    // }
+                    // else {
+                    //     weight = wgt.toString().split(".");
+                    //     newWeight = wgt;
+                    //     decimalValue = weight[1].length
+                    // }
+                    newWeight = wgt;
                     let compareUnit = incomingUnit.toLowerCase().substring(0, 1);
                     if (compareUnit != productUnit.toLowerCase().substring(0, 1)) {
                         if (productUnit.toLowerCase().substring(0, 1) == 'g') {

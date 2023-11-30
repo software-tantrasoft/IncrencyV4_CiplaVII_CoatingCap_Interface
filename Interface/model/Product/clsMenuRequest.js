@@ -952,7 +952,7 @@ class MenuRequestModel {
                                 }                           
                         }
                         else if (key == 'Param7_Upp') { // for tab density and from tab_gran
-                            if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
+                            if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999 || parseFloat(result[0][0].Param7_Low) > 0 && parseFloat(result[0][0].Param7_Low) != 99999) {   // Min or Max
                                 // check for product type and check TDT is set 
                                 if ((productType == 1 || productType == 2) && CubicInfo.Sys_TapDensityID != 'None' && instrument == 'TDT'
                                     // && (CubicInfo.Sys_Area == 'Effervescent Granulation'|| CubicInfo.Sys_Area == 'Granulation')
@@ -999,7 +999,7 @@ class MenuRequestModel {
                                 }
                             }
                             if (key == 'Param1_Upp') {
-                                if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
+                                if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999 || parseFloat(result[0][0].Param1_Low) > 0 && parseFloat(result[0][0].Param1_Low) != 99999) { // Min or Max
                                     // check for product type and check LOD is set 
                                     if ((productType == 1 || productType == 2) && CubicInfo.Sys_MoistID != 'None' && instrument == 'LOD'
                                         // && (CubicInfo.Sys_Area == 'Effervescent Granulation' || CubicInfo.Sys_Area == 'Granulation')
@@ -1021,7 +1021,7 @@ class MenuRequestModel {
                                     }
                                 }
                             } else if (key == 'Param2_Upp') {
-                                if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
+                                if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999 || parseFloat(result[0][0].Param2_Low) > 0 && parseFloat(result[0][0].Param2_Low) != 99999) { // Min or Max
                                     // check for product type and check LOD is set 
                                     if ((productType == 1 || productType == 2) && CubicInfo.Sys_MoistID != 'None' && instrument == 'LOD'
                                         // && (CubicInfo.Sys_Area == 'Effervescent Granulation' || CubicInfo.Sys_Area == 'Granulation')
@@ -1613,7 +1613,7 @@ class MenuRequestModel {
                                         T2Neg: result[0][0].Param11_T2Neg,
                                         T2Pos: result[0][0].Param11_T2Pos,
                                         LimitOn: result[0][0].Param11_LimitOn,
-                                        dp: result[0][0].Param11_DP,
+                                        dp: result[0][0].Param11_Dp,
                                         isonstd: result[0][0].Param11_IsOnStd,
                                         port: portNo,
                                         noOfSamples: productSamples.Individual,
@@ -1632,7 +1632,7 @@ class MenuRequestModel {
                                         T2Neg: result[0][0].Param11_T2Neg,
                                         T2Pos: result[0][0].Param11_T2Pos,
                                         LimitOn: result[0][0].Param11_LimitOn,
-                                        dp: result[0][0].Param11_DP,
+                                        dp: result[0][0].Param11_Dp,
                                         isonstd: result[0][0].Param11_IsOnStd,
                                         port: portNo,
                                         noOfSamples: productSamples.Individual,

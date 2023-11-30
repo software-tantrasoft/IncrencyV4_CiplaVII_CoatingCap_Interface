@@ -121,9 +121,10 @@ class ProtocolHandler {
                     }
                     else {
                         RepeatResponse = oldProtocolData.Response;
+                        this.sendProtocol(RepeatResponse, oldProtocolData.ip);
                     }
                     //console.log(`REPEAT TRANSMISSION ${oldProtocolData.protocolRecived} -> ${RepeatResponse}`);
-                    this.sendProtocol(RepeatResponse, oldProtocolData.ip);
+                    
                     //console.log("I INVALID");
                     return "NVALID";
                 }
@@ -461,7 +462,7 @@ class ProtocolHandler {
                                                         }
                                                         console.log('Sys_CalibInProcess set from CP=1')
                                                         await database.update(objUpdateCubicle);
-                                                        this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
+                                                       await this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
                                                     } else {
                                                         //message change for mesage validation*******************
                                                         // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
@@ -470,7 +471,7 @@ class ProtocolHandler {
                                                     }
                                                 } else {
                                                     // CR0
-                                                    this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
+                                                   await this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
                                                 }
 
                                             } else {
@@ -488,7 +489,7 @@ class ProtocolHandler {
                                                 console.log('Sys_CalibInProcess set from CP=1')
                                                 await database.update(objUpdateCubicle);
 
-                                                this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                                await this.sendProtocol(strReturnProtocol, str_IpAddress);
                                             }
 
                                         }
@@ -510,7 +511,7 @@ class ProtocolHandler {
                                             await database.update(objUpdateCubicle);
 
                                             strReturnProtocol = strReturnProtocol.substring(0, strReturnProtocol.length - 1)
-                                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            await this.sendProtocol(strReturnProtocol, str_IpAddress);
                                             // //sending powerbackup
                                             // var calibtype = strReturnProtocol.substring(2, 3);
                                             // switch (calibtype) {
@@ -613,7 +614,7 @@ class ProtocolHandler {
                                             //message change for mesage validation*******************
                                             // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
                                             //*********************************************** */
-                                            this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
+                                            await this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
                                         }
                                     }
                                 } else if (tempVernier != 'None' && tempCubicInfo.Sys_Port2 == 'Vernier') {
@@ -1274,6 +1275,7 @@ class ProtocolHandler {
 
                             var fetchpowerbackup = await clspowerbackup.fetchPowerBackupData(idsNo);
                             var tempObjforremark = globalData.arrIncompleteRemark.find(k => k.IdsNo == idsNo);
+                            if (fetchpowerbackup.result.length > 0) {
                             if (tempObjforremark == undefined) {
                                 globalData.arrIncompleteRemark.push({
                                     weighment: true,
@@ -1287,6 +1289,7 @@ class ProtocolHandler {
                                 tempObjforremark.Type = fetchpowerbackup.result[0].WeighmentType;
                                 // tempObjforremark.IdsNo = fetchpowerbackup.result[0].Idsno ;
                             }
+                        }
 
                             var weightment_type = str_Protocol.substring(2, 3);
                             if (weightment_type == '0') {//handling powerbackup discard condition 
@@ -1882,23 +1885,23 @@ class ProtocolHandler {
                                 for (let key in tempArrLimits) {
                                     if (key !== "idsNo") {
                                         tempArrLimits[key].side = side
-                                        if (key == "Hardness" && testType == "T") {
-                                            var remarkObj = globalData.arrLLsampleRemark.find(k => k.idsNo == idsNo);
-                                            if (remarkObj != undefined) {
-                                                if (globalData.arrLLsampleRemark != undefined) {
-                                                    globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
-                                                        .filter(k => k.idsNo != idsNo);
-                                                }
-                                            }
-                                            var objHardness = globalData.arrHardness425.find(
-                                                (ht) => ht.idsNo == idsNo
-                                            );
-                                            if(objHardness != undefined){
-                                            objHardness.dataFlowStatus = true;
-                                            this.sendProtocol('HS', str_IpAddress);
-                                            }
-                                            break;
-                                        }
+                                        // if (key == "Hardness" && testType == "T") {
+                                        //     var remarkObj = globalData.arrLLsampleRemark.find(k => k.idsNo == idsNo);
+                                        //     if (remarkObj != undefined) {
+                                        //         if (globalData.arrLLsampleRemark != undefined) {
+                                        //             globalData.arrLLsampleRemark = globalData.arrLLsampleRemark
+                                        //                 .filter(k => k.idsNo != idsNo);
+                                        //         }
+                                        //     }
+                                        //     var objHardness = globalData.arrHardness425.find(
+                                        //         (ht) => ht.idsNo == idsNo
+                                        //     );
+                                        //     if(objHardness != undefined){
+                                        //     objHardness.dataFlowStatus = true;
+                                        //     this.sendProtocol('HS', str_IpAddress);
+                                        //     }
+                                        //     break;
+                                        // }
                                     }
                                 }
                                 this.sendProtocol('+', str_IpAddress);
