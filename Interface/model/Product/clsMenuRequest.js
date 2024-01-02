@@ -2263,7 +2263,19 @@ class MenuRequestModel {
             query = `SELECT * FROM tbl_cubical WHERE Sys_Area = '${sysArea}' 
                 AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
                 AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType != 'IPC'`;
-        } else {
+        } else if(sysArea == 'Compression' && CubicalData.Sys_CubType == 'IPC'){       //Inprocess-III
+            query = `SELECT * FROM tbl_cubical WHERE Sys_Area = 'Compression' 
+            AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
+            AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType = 'IPC'`;
+        } else if(sysArea == 'Inprocess-I'){                                           //Inprocess-I
+            query = `SELECT * FROM tbl_cubical WHERE Sys_Area = 'Inprocess-I' 
+            AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
+            AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType = 'IPC'`;
+        } else if(sysArea == 'Inprocess-IV'){                                          //Inprocess-IV
+            query = `SELECT * FROM tbl_cubical WHERE Sys_Area = 'Inprocess-IV' 
+            AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
+            AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType = 'IPC'`;
+        }else {
             query = `SELECT * FROM tbl_cubical WHERE Sys_Area LIKE '${sysArea}%' 
             AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
             AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType != 'IPC'`;

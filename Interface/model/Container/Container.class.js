@@ -26,7 +26,7 @@ class Container {
             //         { str_colName: 'Bin_Status', value: 0, comp: 'eq' }
             //     ]
             // }
- 
+
             var objSelectTare = {
                 str_tableName: '',
                 data: '*',
@@ -43,7 +43,7 @@ class Container {
 
                 ]
             }
-            
+
             if ((area.toUpperCase() == "COMPRESSION" || area.toUpperCase() == "EFFERVESCENT COMPRESSION"
                 || area.toUpperCase() == "EFFERVESCENT GRANULATION" || area.toUpperCase() == "GRANULATION")
                 && cubType.toUpperCase() != 'IPC') {
@@ -60,7 +60,7 @@ class Container {
             var tareResult = await database.select(objSelectTare);
 
             var objBin = globalData.arrBinInfo.find(k => k.idsNo == idsNo);
-            objBin.tareWt = tareResult[0].length>0 ? tareResult[0][0].Bin_TareWt : 0;
+            objBin.tareWt = tareResult[0].length > 0 ? tareResult[0][0].Bin_TareWt : 0;
             return objBin.tareWt;
 
         } catch (error) {
@@ -314,6 +314,7 @@ class Container {
                     { str_colName: 'Bin_DoneUserID', value: objBin.userid },
                     { str_colName: 'Bin_DoneUserName', value: objBin.username },
                     { str_colName: 'Bin_IDSNoWeighment', value: objBin.idsNo },
+                    { str_colName: 'Bin_BatchComplete', value: 1 },  //after gross weight enter the batchcomplete flag set 1 bcoz of ipc in corrioder only
 
                 ],
                 condition: [
@@ -325,7 +326,7 @@ class Container {
                     { str_colName: 'Bin_Version', value: objBin.selVersion },
                     { str_colName: 'Bin_BatchNo', value: objBin.selBatch },
                     { str_colName: 'Bin_GrossWt', value: 0 },
-                    { str_colName: 'Bin_Status', value: 0, comp: 'eq'  },
+                    { str_colName: 'Bin_Status', value: 0, comp: 'eq' },
                     { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
                 ]
             }
@@ -393,60 +394,60 @@ class Container {
                 // }
 
                 var data = {
-                    Bin_Area : selectRes[0][0].Bin_Area,
-                    Bin_BatchComplete : selectRes[0][0].Bin_BatchComplete,
-                    Bin_BatchNo : selectRes[0][0].Bin_BatchNo,
-                    Bin_BatchSize : selectRes[0][0].Bin_BatchSize,
-                    Bin_BinID : selectRes[0][0].Bin_BinID,
-                    Bin_CheckedByID : selectRes[0][0].Bin_CheckedByID,
-                    Bin_CheckedByName : selectRes[0][0].Bin_CheckedByName,
-                    Bin_CleanerID : selectRes[0][0].Bin_CleanerID,
-                    Bin_CleanerName : selectRes[0][0].Bin_CleanerName,
-                    Bin_CubicName : selectRes[0][0].Bin_CubicName,
-                    Bin_CubicleNo : selectRes[0][0].Bin_CubicleNo,
-                    Bin_DP : selectRes[0][0].Bin_DP,
-                    Bin_DoneUserID : selectRes[0][0].Bin_DoneUserID,
-                    Bin_DoneUserName : selectRes[0][0].Bin_DoneUserName,
-                    Bin_ExpDt : selectRes[0][0].Bin_ExpDt,
-                    Bin_GrossWt : selectRes[0][0].Bin_GrossWt,
-                    Bin_IDSNo : selectRes[0][0].Bin_IDSNo,
-                    Bin_IDSNoWeighment : selectRes[0][0].Bin_IDSNoWeighment,
-                    Bin_InitialStage : selectRes[0][0].Bin_InitialStage,
-                    Bin_IsArchived : selectRes[0][0].Bin_IsArchived,
-                    Bin_LabelHeader : selectRes[0][0].Bin_LabelHeader,
-                    Bin_Lot : selectRes[0][0].Bin_Lot,
-                    Bin_MfgDt : selectRes[0][0].Bin_MfgDt,
-                    Bin_NextStage : selectRes[0][0].Bin_NextStage,
-                    Bin_PrDate : selectRes[0][0].Bin_PrDate,
-                    Bin_PrTime : selectRes[0][0].Bin_PrTime,
-                    Bin_PreviousUsedBatch : selectRes[0][0].Bin_PreviousUsedBatch,
-                    Bin_PreviousUsedPrdID : selectRes[0][0].Bin_PreviousUsedPrdID,
-                    Bin_PreviousUsedPrdName : selectRes[0][0].Bin_PreviousUsedPrdName,
-                    Bin_PreviousUsedPrdVer : selectRes[0][0].Bin_PreviousUsedPrdVer,
-                    Bin_PreviousUsedVer : selectRes[0][0].Bin_PreviousUsedVer,
-                    Bin_PrintNo : selectRes[0][0].Bin_PrintNo,
-                    Bin_PrintNoSummary : selectRes[0][0].Bin_PrintNoSummary,
-                    Bin_Printer : selectRes[0][0].Bin_Printer,
-                    Bin_ProductID : selectRes[0][0].Bin_ProductID,
-                    Bin_ProductName : selectRes[0][0].Bin_ProductName,
-                    Bin_ProductVersion : selectRes[0][0].Bin_ProductVersion,
-                    Bin_Released : selectRes[0][0].Bin_Released,
-                    Bin_SrNoCubicle : selectRes[0][0].Bin_SrNoCubicle,
-                    Bin_SrNoWeighment : selectRes[0][0].Bin_SrNoWeighment,
-                    Bin_Status : selectRes[0][0].Bin_Status,
-                    Bin_TareWt : selectRes[0][0].Bin_TareWt,
-                    Bin_TotalBinNo : selectRes[0][0].Bin_TotalBinNo,
-                    Bin_TotalSelectedBin : selectRes[0][0].Bin_TotalSelectedBin,
-                    Bin_Version : selectRes[0][0].Bin_Version, 
-                    Bin_WeighingBalID : selectRes[0][0].Bin_WeighingBalID,
-                    Bin_useBefore : selectRes[0][0].Bin_useBefore,
-                    RecNo : selectRes[0][0].RecNo,
-                    Sys_DateNA : selectRes[0][0].Sys_DateNA,
-                    bin_NetWeight : selectRes[0][0].bin_NetWeight,
-                    UserId : userObj.UserId,
-                    UserName :userObj.UserName,
-                    str_ICReport : "Current",
-                    str_cubicleType :cubType,
+                    Bin_Area: selectRes[0][0].Bin_Area,
+                    Bin_BatchComplete: selectRes[0][0].Bin_BatchComplete,
+                    Bin_BatchNo: selectRes[0][0].Bin_BatchNo,
+                    Bin_BatchSize: selectRes[0][0].Bin_BatchSize,
+                    Bin_BinID: selectRes[0][0].Bin_BinID,
+                    Bin_CheckedByID: selectRes[0][0].Bin_CheckedByID,
+                    Bin_CheckedByName: selectRes[0][0].Bin_CheckedByName,
+                    Bin_CleanerID: selectRes[0][0].Bin_CleanerID,
+                    Bin_CleanerName: selectRes[0][0].Bin_CleanerName,
+                    Bin_CubicName: selectRes[0][0].Bin_CubicName,
+                    Bin_CubicleNo: selectRes[0][0].Bin_CubicleNo,
+                    Bin_DP: selectRes[0][0].Bin_DP,
+                    Bin_DoneUserID: selectRes[0][0].Bin_DoneUserID,
+                    Bin_DoneUserName: selectRes[0][0].Bin_DoneUserName,
+                    Bin_ExpDt: selectRes[0][0].Bin_ExpDt,
+                    Bin_GrossWt: selectRes[0][0].Bin_GrossWt,
+                    Bin_IDSNo: selectRes[0][0].Bin_IDSNo,
+                    Bin_IDSNoWeighment: selectRes[0][0].Bin_IDSNoWeighment,
+                    Bin_InitialStage: selectRes[0][0].Bin_InitialStage,
+                    Bin_IsArchived: selectRes[0][0].Bin_IsArchived,
+                    Bin_LabelHeader: selectRes[0][0].Bin_LabelHeader,
+                    Bin_Lot: selectRes[0][0].Bin_Lot,
+                    Bin_MfgDt: selectRes[0][0].Bin_MfgDt,
+                    Bin_NextStage: selectRes[0][0].Bin_NextStage,
+                    Bin_PrDate: selectRes[0][0].Bin_PrDate,
+                    Bin_PrTime: selectRes[0][0].Bin_PrTime,
+                    Bin_PreviousUsedBatch: selectRes[0][0].Bin_PreviousUsedBatch,
+                    Bin_PreviousUsedPrdID: selectRes[0][0].Bin_PreviousUsedPrdID,
+                    Bin_PreviousUsedPrdName: selectRes[0][0].Bin_PreviousUsedPrdName,
+                    Bin_PreviousUsedPrdVer: selectRes[0][0].Bin_PreviousUsedPrdVer,
+                    Bin_PreviousUsedVer: selectRes[0][0].Bin_PreviousUsedVer,
+                    Bin_PrintNo: selectRes[0][0].Bin_PrintNo,
+                    Bin_PrintNoSummary: selectRes[0][0].Bin_PrintNoSummary,
+                    Bin_Printer: selectRes[0][0].Bin_Printer,
+                    Bin_ProductID: selectRes[0][0].Bin_ProductID,
+                    Bin_ProductName: selectRes[0][0].Bin_ProductName,
+                    Bin_ProductVersion: selectRes[0][0].Bin_ProductVersion,
+                    Bin_Released: selectRes[0][0].Bin_Released,
+                    Bin_SrNoCubicle: selectRes[0][0].Bin_SrNoCubicle,
+                    Bin_SrNoWeighment: selectRes[0][0].Bin_SrNoWeighment,
+                    Bin_Status: selectRes[0][0].Bin_Status,
+                    Bin_TareWt: selectRes[0][0].Bin_TareWt,
+                    Bin_TotalBinNo: selectRes[0][0].Bin_TotalBinNo,
+                    Bin_TotalSelectedBin: selectRes[0][0].Bin_TotalSelectedBin,
+                    Bin_Version: selectRes[0][0].Bin_Version,
+                    Bin_WeighingBalID: selectRes[0][0].Bin_WeighingBalID,
+                    Bin_useBefore: selectRes[0][0].Bin_useBefore,
+                    RecNo: selectRes[0][0].RecNo,
+                    Sys_DateNA: selectRes[0][0].Sys_DateNA,
+                    bin_NetWeight: selectRes[0][0].bin_NetWeight,
+                    UserId: userObj.UserId,
+                    UserName: userObj.UserName,
+                    str_ICReport: "Current",
+                    str_cubicleType: cubType,
                 }
 
 
@@ -482,27 +483,51 @@ class Container {
      */
     async sendIPCProductList(strCubicType, strArea) {
         try {
-
-            var objProductList = {
-                str_tableName: 'tbl_cubical',
-                data: '*',
-                condition: [
-                    { str_colName: 'Sys_Area', value: strArea, comp: 'eq' },
-                    { str_colName: 'Sys_CubType', value: 'IPQC', comp: 'ne' },
-                    { str_colName: 'Sys_ProductName', value: "None", comp: 'ne' },
-                ]
-            }
-            var resProduct = await database.select(objProductList);
-            var strProductList = "";
-            resProduct[0].forEach(Product => {
-                if (Product.Sys_BFGCode != null && Product.Sys_BFGCode != "" && Product.Sys_BFGCode != "NULL") {
-                    strProductList = strProductList + Product.Sys_IDSNo + " : " + Product.Sys_BFGCode + ",";
+            if(strArea == 'Compression' || strArea == 'Inprocess-IV'){
+                var objProductList = {
+                    str_tableName: 'tbl_cubical',
+                    data: '*',
+                    condition: [
+                        { str_colName: 'Sys_Area', value: strArea, comp: 'eq' },
+                        { str_colName: 'Sys_CubType', value: 'IPC', comp: 'eq' },
+                        { str_colName: 'Sys_ProductName', value: "None", comp: 'ne' },
+                    ]
                 }
-            });
-            if (strProductList != "") {
-                return "LDP00" + strProductList.trim(',') + ";";
-            } else {
-                return 'LEP';
+                var resProduct = await database.select(objProductList);
+                var strProductList = "";
+                resProduct[0].forEach(Product => {
+                    if (Product.Sys_BFGCode != null && Product.Sys_BFGCode != "" && Product.Sys_BFGCode != "NULL") {
+                        strProductList = strProductList + Product.Sys_IDSNo + " : " + Product.Sys_BFGCode + ",";
+                    }
+                });
+                if (strProductList != "") {
+                    return "LDP01" + strProductList.trim(',') + ";";
+                } else {
+                    return 'LEP';
+                }
+            }else {
+                var objProductList = {
+                    str_tableName: 'tbl_cubical',
+                    data: '*',
+                    condition: [
+                        { str_colName: 'Sys_Area', value: strArea, comp: 'eq' },
+                        { str_colName: 'Sys_CubType', value: 'IPQC', comp: 'ne' },
+                        { str_colName: 'Sys_ProductName', value: "None", comp: 'ne' },
+                    ]
+                }
+                var resProduct = await database.select(objProductList);
+                var strProductList = "";
+                resProduct[0].forEach(Product => {
+                    if (Product.Sys_BFGCode != null && Product.Sys_BFGCode != "" && Product.Sys_BFGCode != "NULL") {
+                        strProductList = strProductList + Product.Sys_IDSNo + " : " + Product.Sys_BFGCode + ",";
+                    }
+                });
+                if (strProductList != "") {
+                    return "LDP00" + strProductList.trim(',') + ";";
+                } else {
+                    return 'LEP';
+                }
+
             }
 
         } catch (error) {
