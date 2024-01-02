@@ -128,6 +128,7 @@ var arrparticleSizingCurrentTest = [];
 var arrpercentFineData = [];   // for %Fine Data store
 var arrPerFineCurrentTest = [];
 var arrPerFineTypeSelectedMenu = []; // selected menu is compaction or granulation 
+var impresentarr = [] ;
 
 module.exports.arrGroupIPC = arrGroupIPC;
 module.exports.arrHardnessPowerbackupFlag = arrHardnessPowerbackupFlag;
@@ -234,5 +235,6 @@ module.exports.arrpercentFineData = arrpercentFineData;
 module.exports.arrPerFineCurrentTest = arrPerFineCurrentTest;
 module.exports.arrPerFineTypeSelectedMenu = arrPerFineTypeSelectedMenu;
 module.exports.calibrationforhard = calibrationforhard;
+module.exports.impresentarr = impresentarr;
 
 

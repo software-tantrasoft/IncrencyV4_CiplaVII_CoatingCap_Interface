@@ -386,7 +386,7 @@ class FetchDetails {
         })
     }
 
-    getBatchTime() {
+    async getBatchTime() {
         return new Promise((resolve, reject) => {
             database.execute(`SELECT * FROM tbl_batches where status in ('S','R') `).then(result => {
                 resolve(result[0])
@@ -398,7 +398,7 @@ class FetchDetails {
     }
 
 
-    getAlertInfo() {
+    async getAlertInfo() {
         return new Promise((resolve, reject) => {
             const objAlert = {
                 str_tableName: 'tbl_alert_param_duration',
@@ -417,16 +417,27 @@ class FetchDetails {
 
 
         for (const value of objTime) {
+            if(value.tm1 != null && value.tm1 != undefined){
             const alertObject = {
                 intCubicleNo: "",
                 strBatch: "",
                 intGroupParam: "",
                 AlertTime: "",
-                IDSNO: ""
+                IDSNO: "",
+                AlertDate: ""
             }
             alertObject.intCubicleNo = value.CubicNo;
             alertObject.strBatch = value.Batch;
-            alertObject.AlertTime = value.tm;
+            // alertObject.AlertTime = value.tm;
+            alertObject.AlertDate = value.dt1;
+            
+            if(value.tm1.split(":")[0].length  == 1){
+                let updateTime = "0" +  value.tm1
+                alertObject.AlertTime = updateTime;
+            }
+            else{
+                alertObject.AlertTime = value.tm1;
+            }
 
             var AlertParam = objAlertInfo.filter(k => k.CubicNo == alertObject.intCubicleNo);
             var CubicParam = globalData.arrIdsInfo.filter(k => k.Sys_CubicNo == alertObject.intCubicleNo);
@@ -446,6 +457,8 @@ class FetchDetails {
                     if (CubicParam[0].Sys_CubType == 'Compression') {
                         tableName = 'tbl_product_tablet';
                     } else if (CubicParam[0].Sys_CubType == 'Coating') {
+                        tableName = 'tbl_product_tablet';
+                    }else if (CubicParam[0].Sys_CubType == 'Capsule Filling') {
                         tableName = 'tbl_product_capsule';
                     }
                     if (tableName != undefined) {
@@ -461,7 +474,7 @@ class FetchDetails {
                         }
                         let response = await database.select(selectObj);
                         if (response[0].length > 0) {
-                            if ((response[0][0].Param2_Nom != 99999 && AlertParam[0].Group != 0) && CubicParam[0].Sys_RptType == 0) {
+                            if ((response[0][0].Param2_Nom != 99999 && AlertParam[0].Group != 0)) {
                                 globalData.alertArr.push(alertObject);
                             }
                         }
@@ -469,7 +482,7 @@ class FetchDetails {
                 }
             }
         }
-
+    }
         return 'Success'
 
     }

@@ -18,7 +18,7 @@ class PreWeighmentChecks {
      * @returns object with batch status details
      * @memberof PreWeighmentChecks
      */
-    checkBatchStart(intIdsNo) {
+    async checkBatchStart(intIdsNo) {
         return new Promise((resolve, reject) => {
             /**
              * @description Here we have to check if in IPQC which product is set we have to check
@@ -67,8 +67,90 @@ class PreWeighmentChecks {
     }
 
 
+    async checkBatchStartFORAlert(batchInfo) {
+        try {
+
+            var query1 = `SELECT * FROM  tbl_cubical WHERE Sys_Batch='${batchInfo.strBatch}' AND Sys_IDSNo = '${batchInfo.IDSNO}' AND Sys_CubicNo = ${batchInfo.intCubicleNo} `
+            var result = await objDatabase.execute(query1);
+            var query = `SELECT * FROM tbl_batches WHERE Batch='${result[0][0].Sys_Batch}' AND RecNo = (`
+            query = query + `SELECT MAX(RecNo) FROM tbl_batches WHERE Batch='${result[0][0].Sys_Batch}' AND `
+            query = query + `Prod_ID = '${result[0][0].Sys_BFGCode}' AND Prod_Name= '${result[0][0].Sys_ProductName}' AND `;
+            query = query + `Prod_Version = '${result[0][0].Sys_PVersion}' AND Version='${result[0][0].Sys_Version}')`
+
+            var result1 = await objDatabase.execute(query);
+
+            if (result1[0].length > 0) {
+                if (result1[0][0].Status == "E") {//batch is ended
+                    return "Batch End"
+                }
+                else if (result1[0][0].Status == "P") {//batch is paused
+                    return "Pause Batch"
+                }
+                else if (result1[0][0].Status == "N") {//if batch is new   
+                    return "Start Batch,"
+                }
+                else {
+                    return "Batch Started,"
+                }
+            }
+            else {
+                return "Start Batch,"
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async checkgrpflag(batchInfo) {
+        // return new Promise(async (resolve, reject) => {
+        try {
+      
+            var query1 = `SELECT * FROM  tbl_cubical WHERE Sys_Batch='${batchInfo.strBatch}' AND Sys_IDSNo = '${batchInfo.IDSNO}' AND Sys_CubicNo = ${batchInfo.intCubicleNo} `
+            var result = await objDatabase.execute(query1);
+
+            var query = `SELECT * FROM tbl_batches WHERE Batch='${result[0][0].Sys_Batch}' AND RecNo = (`
+            query = query + `SELECT MAX(RecNo) FROM tbl_batches WHERE Batch='${result[0][0].Sys_Batch}' AND `
+            query = query + `Prod_ID = '${result[0][0].Sys_BFGCode}' AND Prod_Name= '${result[0][0].Sys_ProductName}' AND `;
+            query = query + `Prod_Version = '${result[0][0].Sys_PVersion}' AND Version='${result[0][0].Sys_Version}')`
+            var result1 = await objDatabase.execute(query);
+            if (result1[0][0].grpflag == 1) {
+                var now = new Date();
+                var todayDate = moment(now).format('YYYY-MM-DD');
+                var currentTime = moment(now, 'HH:mm:ss');
+                var updatedtime;
+                if (result1[0][0].tm1.split(":")[0].length == 1) {
+                    let updateTime1 = "0" + result1[0][0].tm1;
+                    updatedtime = updateTime1;
+                }
+                else {
+                    updatedtime = result1[0][0].tm1;
+                }
+
+                let datetimeA = moment(moment(batchInfo.AlertDate).format('YYYY-MM-DD') + " " + updatedtime);
+                let datetimeB = moment(moment(todayDate).format('YYYY-MM-DD') + " " + currentTime.format("HH:mm:ss"));
+                let datetimeC = datetimeB.diff(datetimeA, 'minutes');
+                if (datetimeC >= batchInfo.intGroupParam) {
+                    var groupAlertRes = await objDatabase.execute(`UPDATE tbl_batches SET  grpflag =0 WHERE Batch= '${result[0][0].Sys_Batch}' AND (Status = 'S' OR Status = 'R')`);
+                    console.log("FLAG UPDATED: ");
+                    return 0;
+                }
+                return result1[0][0].grpflag;
+            }else{
+                return result1[0][0].grpflag;
+            }
 
 
+
+            //   console.log(result[0][0]);
+           
+
+        } catch (error) {
+            console.log(error);
+        }
+        // var result = await objDatabase.execute(query);
+
+    }
+    
     getPreCalibrationDataDaily(strBalanceID, BalType = '') {
         return new Promise((resolve, reject) => {
             if (BalType == '') {

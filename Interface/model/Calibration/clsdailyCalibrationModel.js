@@ -1515,6 +1515,9 @@ class CalibrationModel {
             if (parseFloat(objSentWt.Bal_NegTol) <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= parseFloat(objSentWt.Bal_PosTol))) {
               tempcalibObj.Daily = {};
               tempcalibObj.datetimecount = 0;
+              if(RepFromPC == "CR0"){
+                RepFromPC =  "HRc0";
+              }
               return RepFromPC;
             } else {
               objFailedFlag.failFlagDaily = true;

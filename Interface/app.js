@@ -12,7 +12,12 @@ const clsprotocolHandlerController = require('./controller/protocolHandlerContro
 const protocolHandlerController = new clsprotocolHandlerController();
 var logFromPC = require('../Interface/model/clsLogger');
 const serverConfig = require('../Interface/global/severConfig')
+const FetchDetails = require('../Interface/model/clsFetchDetails');
+const fetchDetails = new FetchDetails();
+var ShowAlert = require('../Interface/model/Alert/alert.model');
 
+
+let objShowAlert = new ShowAlert();
 function protocolToString(buffIncommingProtocol) {
     var strProtocol = "";
     buffIncommingProtocol.forEach(char => {
@@ -27,6 +32,7 @@ function protocolToString(buffIncommingProtocol) {
 async function interface(inCommingMsg, info) {
     //console.log("First ",Buffer.from(inCommingMsg,'utf8'));
     try {
+        var impresent = false;
         var temp = inCommingMsg;
         var arrNonPrintableCharOctalNo = [0, 1, 2, 3, 4, 5, 6]
 
@@ -116,6 +122,10 @@ async function interface(inCommingMsg, info) {
                    // logFromPC.addtoProtocolLog(logQ)
                     //************************************************************** */
 
+                    if (strDecryptProtocol.substring(0, 2) === "IM") {
+                        impresent = true;
+                    }
+                    
                     //console.log('Incoming msg1', strDecryptProtocol,info.address)
                     protocolHandlerController.handleProtocol(strDecryptProtocol, info.address);
 
@@ -153,7 +163,7 @@ async function interface(inCommingMsg, info) {
                 arrNackProtocol.push(...Buffer.from(protocol, 'utf8'))
                 let result = await checksum.getCheckSumBuffer(arrNackProtocol)
                 protocol = result;
-                indexModule.server.send(protocol, serverConfig.port, info.address, function (error) {
+                indexModule.server.send(protocol, serverConfig.port, info.address, async function (error) {
                     if (error) {
                         console.log('new Error while sending ! for incorrect checksum', error)
                     }
@@ -171,6 +181,21 @@ async function interface(inCommingMsg, info) {
             protocolHandlerController.handleProtocol(strRecivedProtocol, info.address, inCommingMsg);
             // inCommingMsg is in buffer , strRecivedProtocol is string of that buffer
         }
+
+        if (impresent) {
+            var ids = info.address.split('.')[3];
+            var impre = globalData.impresentarr.find(k => k.ids == ids);
+            if (impre == undefined) {
+                var impreobj = {
+                    ids: ids,
+                    impresent: true
+                };
+                globalData.impresentarr.push(impreobj);
+            } else {
+                impre.impresent = true;
+            }
+        }
+        return impresent;
     } catch (err) {
         var logError = date.format(new Date(), 'DD-MM-YYYY HH:mm:ss') + " , ";
         logError = logError + err.stack;

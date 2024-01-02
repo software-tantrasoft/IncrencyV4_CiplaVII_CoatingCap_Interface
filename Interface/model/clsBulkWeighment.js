@@ -15319,6 +15319,17 @@ class BulkWeighment {
                 }
                 //console.log(saveFriData);
                 await database.save(saveFriData);
+
+                var objUpdateValidation = {
+                    str_tableName: "tbl_cubical",
+                    data: [
+                        { str_colName: 'Sys_Validation', value: 0 },
+                    ],
+                    condition: [
+                        { str_colName: 'Sys_IDSNo', value: IdsNo },
+                    ]
+                }
+                await database.update(objUpdateValidation);
                 objMonitor.monit({ case: 'FRIFINWT', idsNo: IdsNo, data: { test: 'FRIABILITY' } });
                 // As soon as Before weight is taken the we have to hide menu for specific time
                 var objActivity = {};

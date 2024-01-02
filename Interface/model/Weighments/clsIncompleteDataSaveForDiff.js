@@ -21,6 +21,7 @@ class IncompleteDataSave {
             var mstSerNo = ''
             var sideNo = ''
             var currentCubicalObj = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+            var objProductType = globalData.arrProductTypeArray.find(k => k.idsNo == IdsNo);
             var arraylimit = globalData.arr_limits.find(k => k.idsNo == IdsNo);
             var tempDiffData = globalData.arrdifferential.find(k => k.idsNo == IdsNo);
             let now = new Date();
@@ -302,6 +303,20 @@ class IncompleteDataSave {
                     //   if (DiffType == "E") {// For filled wgt 
                     var resultincomplete = await database.save(insertIncompleteObj)
                     var lastInsertedID = resultincomplete[0].insertId;
+                    if(objProductType.productType == 2){
+                        var updateIncompleteObj = {
+                            str_tableName: tblMaster,
+                            data: [
+                                { str_colName: 'Sys_MachineCap', value: productObj.Sys_MachineCap },
+                            ],
+                            condition: [
+                                { str_colName: 'RepSerNo', value: lastInsertedID },
+                            ]
+                        }
+                        await database.update(updateIncompleteObj);
+                    }
+                    
+
                     const checkTabDetails = {
                         str_tableName: tblDetail,
                         data: '*',

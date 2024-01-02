@@ -19,16 +19,17 @@ var objArrayInit = new clsArrayInit();
 var ShowAlert = require('./Interface/model/Alert/alert.model');
 var logFromPC = require('./Interface/model/clsLogger');
 const date = require('date-and-time');
+let objShowAlert = new ShowAlert();
 let TCP = require('./tcpServer');
 /**
  * INTERFACE SERVER INITIALZATION
  * @description Below is the implementation of UDP server
  */
-server.on('message', (msg, rinfo) => {
-    appInterFace.interface(msg, rinfo);
+server.on('message', async (msg, rinfo) => {
+    await appInterFace.interface(msg, rinfo);
 });
 
-server.on('listening', () => {
+server.on('listening', async () => {
 
     var IdsArray = [];
     for (let i = 0; i < globalData.arrIdsInfo.length; i++) {
@@ -51,7 +52,7 @@ server.on('listening', () => {
                 arr_IDS = IdsArray;
                 for (let i = 0; i < arr_IDS.length; i++) {
                     if (arr_IDS[i].Sys_IDSNo != 0) {
-                        server.send(result, serverConfig.port, arr_IDS[i], (error) => {
+                        server.send(result, serverConfig.port, arr_IDS[i], async (error) => {
                             if (error) {
                                 console.log(error);// ERROR WHILE SENDING
                             }
@@ -59,7 +60,7 @@ server.on('listening', () => {
                                 var logQ = date.format(new Date(), 'DD-MM-YYYY HH:mm:ss') + " , (SENT) From PC : To  " + arr_IDS[i] + " : ?";
                                 //commented by vivek on 31-07-2020********************************
                                 //logFromPC.info(logQ);
-                                logFromPC.addtoProtocolLog(logQ)
+                                await logFromPC.addtoProtocolLog(logQ)
                                 //************************************************************** */
                                 let ipSplit = arr_IDS[i].split(3);
                                 if (globalData.arrCommunication.find(k => k.IdsNo == arr_IDS[i].split('.')[3])) {
@@ -71,7 +72,7 @@ server.on('listening', () => {
                                         */
                                         //  console.log(globalData.arrCommunication[i])
                                         if (globalData.arrCommunication[i].QCount == 17) {
-                                            loginModal.releaseUserFromIds(globalData.arrCommunication[i]);
+                                            await loginModal.releaseUserFromIds(globalData.arrCommunication[i]);
                                         }
                                     }
                                 }
@@ -119,17 +120,13 @@ server.on('listening', () => {
 
     }, 1000)
 
-    fetchDetails.prepareAlertObject().then(() => {
-        // here 
-        globalData.alertArrTemp = globalData.alertArr;
+    await fetchDetails.prepareAlertObject();
+    globalData.alertArrTemp = globalData.alertArr;
 
-    }); // This function filled the global array i-e alert object
-
-    let objShowAlert = new ShowAlert()
-    setInterval(() => {
-        objShowAlert.updateAlertObject();
-        objShowAlert.showAlert();
-    }, 3000)
+    setInterval(async () => {
+        await objShowAlert.updateAlertObject();
+        await objShowAlert.showAlert();
+    }, 2000)
     // Friability Timer
     setInterval(() => {
         for (let obj of globalData.arrFriabilityMenuVisibility) {

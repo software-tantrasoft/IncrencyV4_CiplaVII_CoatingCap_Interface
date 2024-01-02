@@ -2913,7 +2913,8 @@ class BatchDataTransfer {
                         ProductName: obj.ProductName,
                         PVersion: obj.PVersion,
                         Version: obj.Version,
-                        BatchNo: obj.BatchNo
+                        BatchNo: obj.BatchNo,
+                        CubicleType :obj.CubicleType 
                     }
                     let recSeqNo = await this.calculateSeqNo(side, 'tbl_batchsummary_master13', 'tbl_batchsummary_detail13', incompleteData);
                     if (resultData[0][0].SrNo == null) {

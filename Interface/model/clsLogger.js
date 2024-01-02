@@ -6,7 +6,7 @@ const { createLogger, format, transports } = winston;
 
 
 
-function addtoProtocolLog(logQ) {
+async function addtoProtocolLog(logQ) {
     var dir = './Logs';
     var FilePath = './Logs/Protocol' + date.format(new Date(), 'MM-YYYY') + '.log';
     if (!fs.existsSync(dir)) {//it will create new folder if its not exists

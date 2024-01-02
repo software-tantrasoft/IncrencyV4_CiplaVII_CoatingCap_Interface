@@ -588,11 +588,10 @@ class LoginModal {
                 }
 
                 await database.update(objUpdateLogOutData);
-                await this.clearArrays(idsNo);
                 await this.updateWeighmentStatus(idsNo, 0)
+               
+
                 // return '+';
-            } else {
-                await this.clearArrays(idsNo);
             }
             let objUpdateCubicle = {
                 str_tableName: 'tbl_cubical',
@@ -606,7 +605,24 @@ class LoginModal {
             console.log('Sys_CalibInProcess set from logOutOnStart=0')
             await database.update(objUpdateCubicle);
             await this.updateWeighmentStatus(idsNo, 0);
-
+            let tempAlertObj = globalData.alertArrTemp.find(k => k.IDSNO == idsNo);
+            if(tempAlertObj != undefined){
+                var objselectData = {
+                    str_tableName: 'tbl_batches',
+                    data: 'grpflag',
+                    condition: [
+                        { str_colName: 'Batch  ', value: tempAlertObj.strBatch }
+                    ]
+                }
+                let result1 = await database.select(objselectData);
+                if(result1[0][0].grpflag == 1){
+                    var groupAlertRes = await database.execute(`UPDATE tbl_batches SET  grpflag =0  WHERE Batch= '${tempAlertObj.strBatch}' AND (Status = 'S' OR Status = 'R')`);
+                    console.log("FLAG UPDATED: ");
+                }
+    
+            }
+            await this.clearArrays(idsNo);
+          
         } catch (err) {
             console.log(err);
             // return '+';

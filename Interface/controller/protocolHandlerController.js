@@ -235,6 +235,8 @@ class ProtocolHandler {
                             break;
                         // STR (Start Protocol)
                         case "ST":
+                            console.log(idsNo + " : CLEARING IMPRESENT ARRAY");
+                            globalData.impresentarr = globalData.impresentarr.filter(k => k.ids != idsNo);
                             //Activity Log for Ids powered on 
                             var objActivity = {};
                             Object.assign(objActivity,
@@ -325,9 +327,13 @@ class ProtocolHandler {
 
 
                             var SIRCommand = await objSendSIR.prepareCommand(idsNo);
+                            var tempCubicInfo = globalData.arrIdsInfo.find(ids => ids.Sys_IDSNo == idsNo);
                             // this.sendProtocol(SIRCommand, str_IpAddress);
-                            await this.sendProtocol(`SP10SIR,`, str_IpAddress);
+                            if (tempCubicInfo.Sys_Area != 'Granulation'){
+                                await this.sendProtocol(`SP10SIR,`, str_IpAddress);
 
+                            }
+                           
                             /* Here We need to check If balance connected or not If balance is not connected then
                                calibration should not be asked, So we need to check in Cubicle object , as well as 
                                we check for balId is set to none or actual id or check for all Port for 101,102,103,104 
@@ -1409,41 +1415,45 @@ class ProtocolHandler {
                                     var portInstrument2 = currentCubicObject.Sys_Port2.toUpperCase();
                                     let objLot = globalData.arrLot.find(k => k.idsNo == idsNo);
 
-                                    if (portInstrument1 == 'FRIABILATOR' && objLot.MS.substring(2, 3) == 'T') {
+                                    if (portInstrument1 == 'FRIABILATOR' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "FRIABILATOR"
-                                    } else if (portInstrument2 == 'FRIABILATOR' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'FRIABILATOR' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "FRIABILATOR"
-                                    } else if (portInstrument1 == 'HARDNESS' && objLot.MS.substring(2, 3) == 'T') {
+                                    } else if (portInstrument1 == 'HARDNESS' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "Hardness"
-                                    } else if (portInstrument2 == 'HARDNESS' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'HARDNESS' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "Hardness"
                                     }
-                                    else if (portInstrument1 == 'DISINTEGRATION TESTER' && objLot.MS.substring(2, 3) == 'T') {
+                                    else if (portInstrument1 == 'DISINTEGRATION TESTER' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "DISINTEGRATION TESTER"
-                                    } else if (portInstrument2 == 'DISINTEGRATION TESTER' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'DISINTEGRATION TESTER' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "DISINTEGRATION TESTER"
                                     }
-                                    else if (portInstrument1 == 'TAPPED DENSITY' && objLot.MS.substring(2, 3) == 'T') {
+                                    else if (portInstrument1 == 'TAPPED DENSITY' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "TAPPED DENSITY"
-                                    } else if (portInstrument2 == 'TAPPED DENSITY' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'TAPPED DENSITY' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "TAPPED DENSITY"
                                     }
-                                    else if (portInstrument1 == 'TABLET TESTER' && objLot.MS.substring(2, 3) == 'T') {
+                                    else if (portInstrument1 == 'TABLET TESTER' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "Tablet Tester"
 
-                                    } else if (portInstrument2 == 'TABLET TESTER' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'TABLET TESTER' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "Tablet Tester"
 
                                     }
-                                    if (portInstrument1 == 'BALANCE' && serverConfig.friabilityType == 'OB' && objLot.MS.substring(2, 3) == 'T') {
+                                    if (portInstrument1 == 'BALANCE' && serverConfig.friabilityType == 'OB' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "BALANCE"
 
-                                    } else if (portInstrument2 == 'BALANCE' && serverConfig.friabilityType == 'OB' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'BALANCE' && serverConfig.friabilityType == 'OB' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "BALANCE"
-                                    }
-                                    else if (portInstrument1 == 'MOISTURE ANALYZER' && objLot.MS.substring(2, 3) == 'T') {
+                                    } else if(portInstrument1 == 'BALANCE' && objLot.MS.substring(2, 3) == 'F'){
+                                        testType = "F"
+                                    } else if(portInstrument1 == 'BALANCE' && objLot.MS.substring(2, 3) == 'P'){
+                                        testType = "P"
+                                    } 
+                                    else if (portInstrument1 == 'MOISTURE ANALYZER' && objLot.MS.substring(2, 3) == 'H') {
                                         testType = "LOD"
-                                    } else if (portInstrument2 == 'MOISTURE ANALYZER' && objLot.MS.substring(2, 3) == 'H') {
+                                    } else if (portInstrument2 == 'MOISTURE ANALYZER' && objLot.MS.substring(2, 3) == 'T') {
                                         testType = "LOD"
                                     }
 
@@ -2445,24 +2455,35 @@ class ProtocolHandler {
             throw new Error(err);
         }
     }
+    // async handleDRForAlert(IDSNO) {
+    //     try {
+    //         // First we have to update the time for specific Ids in alerts array
+    //         let now = new Date();
+    //         let tempAlertObj = globalData.alertArrTemp.find(k => k.IDSNO == parseInt(IDSNO));
+    //         if (tempAlertObj != undefined) {
+    //             let currentTime = date1.format(now, 'HH:mm:ss')
+    //             tempAlertObj.AlertTime = currentTime;
+    //         }
+    //         // console.log(globalData.alertArrTemp)
+    //         var groupAlertRes = await database.execute(`UPDATE tbl_batches SET dt='${date1.format(now, 'YYYY-MM-DD')}', tm='${date1.format(now, 'HH:mm:ss')}' WHERE Batch='PB24121' AND (Status = 'S' OR Status = 'R')`);
+    //         return '+';
+
+    //     } catch (err) {
+    //         throw new Error(err);
+    //     }
+    // }
     async handleDRForAlert(IDSNO) {
         try {
             // First we have to update the time for specific Ids in alerts array
-            let now = new Date();
             let tempAlertObj = globalData.alertArrTemp.find(k => k.IDSNO == parseInt(IDSNO));
-            if (tempAlertObj != undefined) {
-                let currentTime = date1.format(now, 'HH:mm:ss')
-                tempAlertObj.AlertTime = currentTime;
-            }
-            // console.log(globalData.alertArrTemp)
-            var groupAlertRes = await database.execute(`UPDATE tbl_batches SET dt='${date1.format(now, 'YYYY-MM-DD')}', tm='${date1.format(now, 'HH:mm:ss')}' WHERE Batch='PB24121' AND (Status = 'S' OR Status = 'R')`);
+            var groupAlertRes = await database.execute(`UPDATE tbl_batches SET  grpflag =0  WHERE Batch= '${tempAlertObj.strBatch}' AND (Status = 'S' OR Status = 'R')`);
+            console.log("FLAG UPDATED: ");
             return '+';
 
         } catch (err) {
             throw new Error(err);
         }
     }
-
 
     async instrumentCheck(menuType, idsNo) {
         var instrument;
