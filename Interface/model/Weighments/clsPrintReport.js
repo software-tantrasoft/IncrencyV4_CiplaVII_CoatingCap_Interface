@@ -121,7 +121,7 @@ class PrintReportOnline {
               str_ICReport: "Current",
               str_batchNo: objBin.selBatch,
               str_type: reportObj.data.str_cubicleType,
-              int_printNo: 1,
+              int_printNo: 0,                             //IPC is auto print the printcount increaesd by 1 from angular side hence set 0
               intRecNo: reportObj.data.RecNo,
               str_prdID: objBin.selProductId,
               str_prdName: objBin.selProductName,
@@ -130,7 +130,7 @@ class PrintReportOnline {
               strReason: "",
               strUserId: reportObj.data.UserId,
               strUserName: reportObj.data.UserName,
-              rptLabelForActivity: "Label Generation-Compression Report Printed",
+              rptLabelForActivity: "Label Generation-IPC Report Printed",
             }
             var API_PATH = 'report/increasePrintCountUpBinLabel'
             let printRep = {}
