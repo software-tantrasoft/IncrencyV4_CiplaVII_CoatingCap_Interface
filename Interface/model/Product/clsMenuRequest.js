@@ -22,9 +22,10 @@ const objActivityLog = new clsActivityLog();
 const menuSelectModel = new MenuSelectModel();
 const ProductDetailModel = require('../../model/clsProductDetailModel');
 const objProduct = new ProductDetailModel();
-
+const HandleLoginModal = require('../../model/clsLoginModal.js');
 // const clsLogger = require('../../model/clsLogger');
 // const clsProtocolHandler = require('../../controller/protocolHandlerController');
+const handleLoginModal = new HandleLoginModal();
 const cubicleSetting = new CubicalSetting();
 const productdetail = new ProductDetail();
 const database = new Database();
@@ -2338,23 +2339,23 @@ class MenuRequestModel {
             tempForBinFlag = tempCheck == undefined ? tempForBinFlag = false : tempForBinFlag = tempCheck.flag;
 
             ///bin_dp
-            const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IdsSrNo));
-            var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == parseInt(IdsSrNo));
-            var strBalId;
-            if (objOwner.owner == 'analytical') {
-                strBalId = tempCubicInfo.Sys_BalID;
+            // const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IdsSrNo));
+            // var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == parseInt(IdsSrNo));
+            // var strBalId;
+            // if (objOwner.owner == 'analytical') {
+            //     strBalId = tempCubicInfo.Sys_BalID;
 
-            } else {
-                strBalId = tempCubicInfo.Sys_BinBalID;
+            // } else {
+            //     strBalId = tempCubicInfo.Sys_BinBalID;
 
-            }
-            const selectBalInfoObj = {
-                str_tableName: "tbl_balance",
-                data: "*",
-                condition: [{ str_colName: "Bal_ID", value: strBalId, comp: "eq" }],
-            };
-            var result = await database.select(selectBalInfoObj);
-            var bin_dp = result[0].length > 0 ? result[0][0].Bal_DP : 3;
+            // }
+            // const selectBalInfoObj = {
+            //     str_tableName: "tbl_balance",
+            //     data: "*",
+            //     condition: [{ str_colName: "Bal_ID", value: strBalId, comp: "eq" }],
+            // };
+            // var result = await database.select(selectBalInfoObj);
+            // var bin_dp = result[0].length > 0 ? result[0][0].Bal_DP : 3;
             //
             // const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
             if (objLocation != undefined) {
@@ -2411,7 +2412,7 @@ class MenuRequestModel {
 
                 switch (selectedTypeLS) {
                     case 'P':
-                        //  await handleLoginModal.updateWeighmentStatus(idsNo, 1);
+                         await handleLoginModal.updateWeighmentStatus(IdsSrNo, 1);
                         var objLocation = globalData.arrIPCLocation.find(k => k.idsNo == IdsSrNo);
                         if (objLocation != undefined) {
                             var arrSelProduct = str_Protocol.split(":");
@@ -2520,7 +2521,7 @@ class MenuRequestModel {
                                 },
                                 { activity: 'IPC weighing started on ' + IdsSrNo })
                             await objActivityLog.ActivityLogEntry(objActivity);
-                            return "WTG0" + "PRODUCT:" + objBin.selProductId + "," + Number(dblTareWt).toFixed(bin_dp) + " Kg,";
+                            return "WTG0" + "PRODUCT:" + objBin.selProductId + "," + Number(dblTareWt).toFixed(2) + " Kg,";
                         }
                         break;
                     default:
@@ -2803,7 +2804,7 @@ class MenuRequestModel {
         objBin.tareWt = dblTareWt;
         if (parseFloat(objBin.tareWt) >= parseFloat(dblGrossWt)) {
             //return "DM000GROSS WT CANNOT BE,LESS THAN OR,EQUAL TO TARE WT,,";
-            return "DM000Gross Weight must be,>" + parseFloat(objBin.tareWt).toFixed(3) + ",,,";
+            return "DM000Gross Weight must be,>" + parseFloat(objBin.tareWt).toFixed(2) + ",,,";
         }
         else {
             objBin.grossWt = dblGrossWt;

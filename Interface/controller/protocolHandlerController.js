@@ -329,7 +329,8 @@ class ProtocolHandler {
                             var SIRCommand = await objSendSIR.prepareCommand(idsNo);
                             var tempCubicInfo = globalData.arrIdsInfo.find(ids => ids.Sys_IDSNo == idsNo);
                             // this.sendProtocol(SIRCommand, str_IpAddress);
-                            if (tempCubicInfo.Sys_Area != 'Granulation'){
+                            var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == idsNo);
+                            if (tempCubicInfo.Sys_Area != 'Granulation' || objOwner.owner != 'IPC'){  //IPC balance not send the tare cmd confirmed by aniket mail
                                 await this.sendProtocol(`SP10SIR,`, str_IpAddress);
 
                             }
@@ -1919,7 +1920,7 @@ class ProtocolHandler {
 
                             break;
                         case "ER":
-                            if (str_Protocol.includes("ERDC") || str_Protocol.includes("ERPC")) {  //FOR DIFFERNTIAL
+                            if (str_Protocol.includes("ERDC") || str_Protocol.includes("ERPC") || str_Protocol.includes("ERIP")) {  //FOR DIFFERNTIAL
                                 this.sendProtocol("+", str_IpAddress);
                             }
                             //  else if (str_Protocol.substring(3, 4) == 'T' || str_Protocol.substring(3, 4) == 'G') {  //For IPC
@@ -2131,6 +2132,7 @@ class ProtocolHandler {
                                 || tempCubicInfoIPC.Sys_Area == "Inprocess-I" || tempCubicInfoIPC.Sys_Area == "Inprocess-IV")
                                 && (tempCubicInfoIPC.Sys_CubType == globalData.objNominclature.BinText)) {
                                 var response = await objContainer.sendIPCProductList(tempCubicInfoIPC.Sys_CubType, tempCubicInfoIPC.Sys_Area);
+                                await handleLoginModal.updateWeighmentStatus(idsNo, 0);
                                 strReturnProtocol = response;
                                 await this.sendProtocol(strReturnProtocol, str_IpAddress);
 

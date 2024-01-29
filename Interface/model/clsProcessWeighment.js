@@ -72,7 +72,7 @@ class ProcessWeighment {
                 ]
             }
             var resultBal = await database.select(selectBalObj);
-            var bin_dp = resultBal[0].length > 0 ? resultBal[0][0].Bal_DP : 3;
+            // var bin_dp = resultBal[0].length > 0 ? resultBal[0][0].Bal_DP : 3;
             if (resultBal[0].length != 0) {
                 balSrNo = resultBal[0][0].Bal_SrNo;
             } else {
@@ -1608,9 +1608,24 @@ class ProcessWeighment {
                 var dblGrossWt = protocol.substring(3, protocol.indexOf(' ') + 1).trim();
                 var objBin = globalData.arrBinInfo.find(k => k.idsNo == IdsNo);
 
+                var decimalValue;
+                if (dblGrossWt.match(/^\d+$/)) {
+                    decimalValue  = 0;
+                }
+                else {
+                    var weightVal = dblGrossWt.split('.');
+                    decimalValue = weightVal[1].length;
+                }
+               
                 if (parseFloat(objBin.tareWt) >= parseFloat(dblGrossWt)) {
                     //return "DM000GROSS WT CANNOT BE,LESS THAN OR,EQUAL TO TARE WT,,";
-                    return "DM000Gross Weight must be,>" + parseFloat(objBin.tareWt).toFixed(bin_dp) + ",,,";
+                    return "DM000Gross Weight must be,>" + parseFloat(objBin.tareWt).toFixed(2) + ",,,";
+                }else if(dblGrossWt < parseFloat(resultBal[0][0].Bal_MinCap) || dblGrossWt > parseFloat(resultBal[0][0].Bal_MaxCap)  || decimalValue == 0 || weightVal.length > 2 ){
+                    var strprotocol = `EMIP00INVALID SAMPLE,RECIEVED,,,`
+                    return strprotocol;
+                }else if(protocol.split(',')[0].split(' ')[1].toUpperCase() != "KG"){
+                    var strprotocol = `EMIP00INVALID UNIT,RECIEVED,,,`
+                    return strprotocol;
                 }
                 else {
                     
@@ -1618,18 +1633,18 @@ class ProcessWeighment {
                     var dblTareWt = await objContainer.getTareWt(objBin.selContainer, IdsNo, objCubicInfo.Sys_Area, objCubicInfo.Sys_CubType);
                     objBin.tareWt = dblTareWt;
                     objBin.grossWt = dblGrossWt;
-                    objBin.netWt = Number(dblGrossWt - objBin.tareWt).toFixed(bin_dp);
+                    objBin.netWt = Number(dblGrossWt - objBin.tareWt).toFixed(2);
                     objBin.balanceID = objCubicInfo.Sys_BinBalID;
                     objBin.prDate = date.format(now, 'YYYY-MM-DD');
                     objBin.prTime = date.format(now, 'HH:mm:ss');
-                    // objBin.dp = dblGrossWt.substring(dblGrossWt.indexOf('.') + 1, dblGrossWt.length).trim().length;
+                    objBin.dp = dblGrossWt.substring(dblGrossWt.indexOf('.') + 1, dblGrossWt.length).trim().length;
 
-                    objBin.dp = bin_dp ;
+                    // objBin.dp = bin_dp ;
                     objBin.userid = tempUserObject.UserId;
                     objBin.username = tempUserObject.UserName;
                     var result = await objContainer.saveContainerWeighment(objBin, objCubicInfo.Sys_Area, objCubicInfo.Sys_CubType, IdsNo);
                     var objresIntrLogind = await objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', 'IPC Weighing', 'started')
-                    return "WTN0" + "PRODUCT:" + objBin.selProductId + "," + Number(objBin.netWt).toFixed(bin_dp) + " Kg ,";
+                    return "WTN0" + "PRODUCT:" + objBin.selProductId + "," + Number(objBin.netWt).toFixed(2) + " Kg ,";
                 }
 
             } else if (typeValue == 'T') {
@@ -1686,7 +1701,7 @@ class ProcessWeighment {
                         { activity: `Tare Wt of Bin - ${objBin.selContainer} taken ` + IdsNo })
                     await objActivityLog.ActivityLogEntry(objActivity);
                     await database.update(updateObjTare);
-                    return "WTG0" + "PRODUCT:" + objBin.selProductId + "," + Number(dblTareWt).toFixed(bin_dp) + " ,";
+                    return "WTG0" + "PRODUCT:" + objBin.selProductId + "," + Number(dblTareWt).toFixed(2) + " ,";
                 }
             } else if (typeValue == 'N') // Bin Weighing
             {

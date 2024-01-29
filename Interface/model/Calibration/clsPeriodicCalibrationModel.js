@@ -469,10 +469,17 @@ class CalibrationModel {
                 var weightVal = recieveWt.split(".");
                 decimalValue = weightVal[1].length;
             }
-
+            var recieveUnit = str_Protocol.split(',')[1].split(' ')[1];
             if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2) {
                 var strprotocol = `EMPC00INVALID SAMPLE,RECIEVED,,,`
                 return strprotocol;
+            }
+
+            if (objOwner.owner == 'IPC') {    //unit check for IPC weigth testing bugs
+                if (recieveUnit.toUpperCase() !=  resultBal[0][0].Bal_Unit.toUpperCase()) {
+                    var strprotocol = `EMPC00INVALID UNIT,RECIEVED,,,`
+                    return strprotocol;
+                }
             }
 
             // getting weight  for previously weight which we sent

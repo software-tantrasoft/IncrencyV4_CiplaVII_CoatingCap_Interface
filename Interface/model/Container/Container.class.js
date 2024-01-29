@@ -60,7 +60,7 @@ class Container {
             var tareResult = await database.select(objSelectTare);
 
             var objBin = globalData.arrBinInfo.find(k => k.idsNo == idsNo);
-            objBin.tareWt = tareResult[0].length > 0 ? tareResult[0][0].Bin_TareWt : 0;
+            objBin.tareWt = tareResult[0][0].Bin_TareWt
             return objBin.tareWt;
 
         } catch (error) {
@@ -78,7 +78,7 @@ class Container {
      */
     async sendIPCList(idsNo, area, cubType, fillListAgain = false, typeSelection = '1') {
         try {
-            await objLogin.updateWeighmentStatus(idsNo, 0);
+            // await objLogin.updateWeighmentStatus(idsNo, 0);
             var objLocation = globalData.arrIPCLocation.find(k => k.idsNo == idsNo);
             var objBin = globalData.arrBinInfo.find(k => k.idsNo == idsNo);
             var objBinIndex = globalData.arrBinIndex.find(k => k.idsNo == idsNo);
@@ -274,7 +274,7 @@ class Container {
                     { str_colName: 'Bin_ProductVersion', value: objBin.selProductVersion },
                     { str_colName: 'Bin_Version', value: objBin.selVersion },
                     { str_colName: 'Bin_BatchNo', value: objBin.selBatch },
-                    { str_colName: 'Bin_BatchComplete', value: 0 },
+                    { str_colName: 'Bin_BatchComplete', value: 1 },       //IPC in Corrioder hence always set batchcomplete 1
                 ]
 
             }
@@ -346,7 +346,14 @@ class Container {
             }
 
             var SerialNoOfContainer = await this.getContainerSerialNo(objBin, objUpdateBinInfo.str_tableName);
-            SerialNoOfContainer.SrNo == undefined ? 0 : SerialNoOfContainer.SrNo = SerialNoOfContainer.SrNo + 1;
+            // SerialNoOfContainer.SrNo == undefined ? 0 : SerialNoOfContainer.SrNo = SerialNoOfContainer.SrNo + 1;
+
+            if(SerialNoOfContainer.SrNo == null){
+                SerialNoOfContainer.SrNo = 1
+            }
+                else{
+                    SerialNoOfContainer.SrNo = SerialNoOfContainer.SrNo + 1;
+                } 
             objUpdateBinInfo.data.push({ str_colName: 'Bin_SrNoWeighment', value: SerialNoOfContainer.SrNo });
             var objActivity = {};
             var userObj = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
