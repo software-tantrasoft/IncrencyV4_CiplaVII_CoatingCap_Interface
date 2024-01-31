@@ -48,7 +48,7 @@ class IncompleteGranulationData {
                 masterTable = 'tbl_cap_master18_incomplete';
                 detailTable = 'tbl_cap_detail18_incomplete';
             }
-            typeVal = 9;
+            typeVal = 12;               // NMT NLT show of param12 bcoz of (below60)
             WgmtModeNo = 18;
         } else {
             if (ProductType.productType == 1) {
@@ -105,7 +105,7 @@ class IncompleteGranulationData {
                         str_tableName: masterTable,
                         data: [
                             { str_colName: 'MstSerNo', value: intMstSerNo },
-                            { str_colName: 'InstruId', value: 1 },
+                            { str_colName: 'InstruId', value: currentCubic.Sys_SieveShakerID },    // Instrument id 
                             { str_colName: 'BFGCode', value: cubicalObj.Sys_BFGCode },
                             { str_colName: 'ProductName', value: cubicalObj.Sys_ProductName },
                             { str_colName: 'ProductType', value: ProductType.productType },
@@ -300,7 +300,7 @@ class IncompleteGranulationData {
                         str_tableName: masterTable,
                         data: [
                             { str_colName: 'MstSerNo', value: intMstSerNo },
-                            { str_colName: 'InstruId', value: 1 },
+                            { str_colName: 'InstruId', value: currentCubic.Sys_SieveShakerID },   //Instrument Id
                             { str_colName: 'BFGCode', value: cubicalObj.Sys_BFGCode },
                             { str_colName: 'ProductName', value: cubicalObj.Sys_ProductName },
                             { str_colName: 'ProductType', value: ProductType.productType },

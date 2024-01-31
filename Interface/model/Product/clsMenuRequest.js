@@ -2292,8 +2292,8 @@ class MenuRequestModel {
             strProtocol += ';';
             return strProtocol;
         } else {
-            //var strProtocol = 'LEP';
-            var strProtocol = await objArea.areaSelection();
+            var strProtocol = 'LEP';
+            // var strProtocol = await objArea.areaSelection();
             return strProtocol;
         }
         // return strProtocol;

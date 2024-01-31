@@ -219,10 +219,6 @@ class Individual extends clsIncompleteDataSave {
                     if (!(currentCubicle.Sys_IPQCType == 'Compression' && currentCubicle.Sys_Area == "Coating")) {
                         let isBatchSummary = await objBatchSummaryDataTransfer.saveBatchData(objWeighment, typeValue, result, IdsNo);
                     }
-
-
-
-
                 }
             }
             else {
