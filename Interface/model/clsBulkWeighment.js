@@ -3629,7 +3629,7 @@ class BulkWeighment {
                     if (testBasketType == true) {
                         var basketA = actualProtocol.split("|")[1].trim()
                         var basketB = actualProtocol.split("|")[2].trim()
-                        if (basketA.includes('10 Mesh') && basketB.includes('10 Mesh')) {
+                        if (basketA.includes('10 Mesh')|| basketA.includes('Bolus')) {
                             tempDTObj.basketType = basketA;
                         } else {
                             const objBulkInvalid = new bulkInvalid();
@@ -6788,14 +6788,14 @@ class BulkWeighment {
                 // according to new string with version 5.5 and make is ETD:1020X 
                 if (actualProtocol.includes("V0")) {
                     let V0 = actualProtocol.replace(/ +(?= )/g, '');
-                    V0 = parseFloat(V0.split(' ')[3])
+                    V0 = V0.split(' ')[3].split("N")[0]
 
                     let initialValue = { "initialVolume": V0 };
                     tempTDObj.arr.push(initialValue);
                 }
                 else if (actualProtocol.includes("V1")) {
                     var V1 = actualProtocol.replace(/ +(?= )/g, '');
-                    V1 = parseFloat(V1.split(' ')[3])
+                    V1 = V1.split(' ')[3].split("N")[0]
                     let tapVol1 = { "tapCountvol1": V1 };
                     let unitval = { "unit": 'ml' };
                     tempTDObj.arr.push(tapVol1);
@@ -6803,13 +6803,13 @@ class BulkWeighment {
                 }
                 else if (actualProtocol.includes("V2")) {
                     var V2 = actualProtocol.replace(/ +(?= )/g, '');
-                    V2 = parseFloat(V2.split(' ')[3])
+                    V2 = V2.split(' ')[3].split("N")[0]
                     var tapVol2 = { "tapCountvol2": V2 };
                     tempTDObj.arr.push(tapVol2);
                 }
                 else if (actualProtocol.includes("V3")) {
                     var V3 = actualProtocol.replace(/ +(?= )/g, '');
-                    let version = parseFloat(V3.split(' ')[3])
+                    let version = V3.split(' ')[3].split("N")[0]
 
                     let tapVol3 = { "tapCountvol3": version };
                     tempTDObj.arr.push(tapVol3);
@@ -6817,14 +6817,42 @@ class BulkWeighment {
                     var difference = parseFloat(parseFloat(V3.split(' ')[4]))
                     var diffCountValue = { "diff1": difference };
                     tempTDObj.arr.push(diffCountValue);
-                    tempTDObj.version = undefined;
+                    
                 }
+                else if (actualProtocol.includes("V4A")) {
+                    var V4 = actualProtocol.replace(/ +(?= )/g, '');
+                    let version = V4.split(' ')[3].split("N")[0]
 
+                    let tapVol4 = { "add1": version };
+                    tempTDObj.arr.push(tapVol4);
+
+                    var difference = parseFloat(parseFloat(V4.split(' ')[4]))
+                    var diffCountValue = { "diff2": difference };
+                    tempTDObj.arr.push(diffCountValue);
+                  
+                }
+                else if (actualProtocol.includes("V4B")) {
+                    var V4b = actualProtocol.replace(/ +(?= )/g, '');
+                    let version = V4b.split(' ')[3].split("N")[0]
+
+                    let tapVol4b = { "add2": version };
+                    tempTDObj.arr.push(tapVol4b);
+
+                    var difference = parseFloat(parseFloat(V4b.split(' ')[4]))
+                    var diffCountValue = { "diff3": difference };
+                    tempTDObj.arr.push(diffCountValue);
+                    // tempTDObj.version = undefined;
+                }
 
             }
 
 
-
+          var testResult = actualProtocol.includes("TEST RESULTS");
+          if(testResult ==  true){
+            if(newstring ==  true){
+                tempTDObj.version = undefined;
+            }
+          }
 
 
             var serialNo = actualProtocol.includes("Serial No");
@@ -7182,9 +7210,10 @@ class BulkWeighment {
                         // Clear Array on Invalid String 
                         var tempTDOb = globalData.arrTDTData.find(td => td.idsNo == IdsNo);
                         if (tempTDOb == undefined) {
-                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [] })
+                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version : undefined  })
                         } else {
                             tempTDOb.arr = [];
+                            tempTDOb.version = undefined 
                         }
                         var msg = `${protocolIncomingType}R40Invalid String,,,,`;
                         //var msg = `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
@@ -7205,9 +7234,10 @@ class BulkWeighment {
                             { activity: 'Tapped Density Weighment Completed on IDS' + IdsNo });
                         var tempTDOb = globalData.arrTDTData.find(td => td.idsNo == IdsNo);
                         if (tempTDOb == undefined) {
-                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [] })
+                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version : undefined })
                         } else {
                             tempTDOb.arr = [];
+                            tempTDOb.version = undefined 
                         }
                         objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
                         // Instrument usage for TDT completed
@@ -7221,9 +7251,10 @@ class BulkWeighment {
                 catch (err) {
                     var TDObj = globalData.arrTDTData.find(td => td.idsNo == IdsNo);
                     if (TDObj == undefined) {
-                        globalData.arrTDTData.push({ idsNo: IdsNo, arr: [] })
+                        globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version : undefined  })
                     } else {
                         TDObj.arr = [];
+                        TDObj.version = undefined 
                     }
                     console.log(err)
                     return '+';

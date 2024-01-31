@@ -18,7 +18,7 @@ class TDT {
 
     try {
       var currentCubicleInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
-      if (arrTDTData.length == 17 || arrTDTData.length == 18 || arrTDTData.length == 22 || arrTDTData.length == 13 || arrTDTData.length == 19) {
+      if (arrTDTData.length == 17 || arrTDTData.length == 18 || arrTDTData.length == 22 || arrTDTData.length == 13 || arrTDTData.length == 19 || arrTDTData.length == 23 || arrTDTData.length == 21) {
         //if (arrTDTData.length == 18 || arrTDTData.length == 22 || arrTDTData.length == 19) {
         let responseObj = {};
         var count1 = 0, count2 = 0, count3 = 0, count4 = 0, vol1 = 0, vol2 = 0, vol3 = 0, vol4 = 0, add1 = 0, add2 = 0;
@@ -76,9 +76,15 @@ class TDT {
           }
           if ("wtOfSample" in key) {
             wtofSampleVal = key['wtOfSample']
+            if(isNaN(wtofSampleVal) || wtofSampleVal.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("initialVolume" in key) {
             initialVolumeVal = key['initialVolume']
+            if(isNaN(initialVolumeVal) || initialVolumeVal.trim() == ''){
+              return 'Invalid data string';
+            }
           }
           if ("tapCountvol1" in key) {
             vol1 = key['tapCountvol1']
@@ -112,10 +118,16 @@ class TDT {
           }
           if ("tapDensity" in key) {
             tapDensityVal = key['tapDensity']
+            if(isNaN(tapDensityVal) || tapDensityVal.trim() == ''){
+              return 'Invalid data string';
+            }
           }
 
           if ("bulkDensity" in key) {
             BulkDensity = key['bulkDensity']
+            if(isNaN(BulkDensity) || BulkDensity.trim() == ''){
+              return 'Invalid data string';
+            }
           }
 
           if ("finalVolume" in key) {
