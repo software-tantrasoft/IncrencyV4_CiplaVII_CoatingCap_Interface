@@ -52,7 +52,7 @@ class IPCWeighing {
                   return strReturnProtocol;
                }
                if (strReturnProtocol.substring(0, 3) == 'CR4') {
-                  objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
+                  await objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
                   //strReturnProtocol = "CR0"; // to avoide calibraiton
                } else if (strReturnProtocol.substring(0, 3) == 'CR5') {
                   // objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Periodic' } });

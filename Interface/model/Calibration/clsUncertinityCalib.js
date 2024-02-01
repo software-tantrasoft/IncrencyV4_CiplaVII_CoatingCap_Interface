@@ -581,7 +581,7 @@ class Uncertinity {
                     await database.save(insertObj)
                     await database.save(insertIncompleteDetailsObj)
                     var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                     // activity Entry for Uncerinity Calibration Start
 
                     var objActivity = {}
@@ -648,7 +648,7 @@ class Uncertinity {
                     }
                     await database.save(inserDetailObj);
                     var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                 }
 
                 if (objSentWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSentWt.Bal_PosTol)) {

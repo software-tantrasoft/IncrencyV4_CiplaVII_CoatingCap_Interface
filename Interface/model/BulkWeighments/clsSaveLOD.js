@@ -312,7 +312,7 @@ class LOD {
                         await database.save(saveLodData);
                         Object.assign(responseObj, { status: 'success' });
                         // If Initial weight completes then set initWt flag to false
-                        objMonitor.monit({ case: 'LODFINWT', idsNo: IdsNo, data: { test: 'MOISTURE ANALYZER' } });
+                        await objMonitor.monit({ case: 'LODFINWT', idsNo: IdsNo, data: { test: 'MOISTURE ANALYZER' } });
                         tempLODdata.arr[0].flag = false;
                     }
                     //resolve(responseObj);
@@ -447,7 +447,7 @@ class LOD {
 
             await objBatchSummary.saveBatchSummaryLOD(productObj, productObj.Sys_IDSNo, tempLODdata, tempUserObject);
         }
-        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'MOISTURE ANALYZER', flag: 'COMPLETED' } });
+        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'MOISTURE ANALYZER', flag: 'COMPLETED' } });
         var resultRemark = `${protocolIncomingType}R3,,,,,`;
 
         var abort = tempLODdata.arr.filter(k => k.hasOwnProperty('abort'))

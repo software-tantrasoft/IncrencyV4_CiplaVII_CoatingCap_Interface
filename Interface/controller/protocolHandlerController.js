@@ -323,7 +323,7 @@ class ProtocolHandler {
                         // // If we get CR from IDS(calibration)
                         case "CR":
                             let tempObj = globalData.arrUsers.find(k => k.IdsNo == idsNo);
-                            objMonitor.monit({ case: 'ID', idsNo: idsNo, data: tempObj });
+                            await objMonitor.monit({ case: 'ID', idsNo: idsNo, data: tempObj });
 
 
                             var SIRCommand = await objSendSIR.prepareCommand(idsNo);
@@ -420,7 +420,7 @@ class ProtocolHandler {
                                     }
                                     let obj;
                                     if (strReturnProtocol.substring(0, 3) == `CR${calibDId}`) {
-                                        objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
+                                        await objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
                                         //strReturnProtocol = "CR0"; // to avoide calibraiton
                                     } else if (strReturnProtocol.substring(0, 3) == `CR${calibPId}`) {
                                         // objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Periodic' } });
@@ -660,7 +660,7 @@ class ProtocolHandler {
                             if (tempVerifyforfailed) {
                                 await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
                             } else {
-                                objMonitor.monit({ case: 'CP', idsNo: idsNo });
+                                await objMonitor.monit({ case: 'CP', idsNo: idsNo });
                                 await this.sendProtocol("SP10SIR,", str_IpAddress);
                                 let objFlagCalibWeigh = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
                                 if (objFlagCalibWeigh != undefined) {
@@ -673,7 +673,7 @@ class ProtocolHandler {
 
                         // if Caibration pending in granulation
                         case "CH":
-                            objMonitor.monit({ case: 'CP', idsNo: idsNo });
+                            await objMonitor.monit({ case: 'CP', idsNo: idsNo });
                             let objFlagCalibWeightinch = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
                             if (objFlagCalibWeightinch != undefined) {
                                 objFlagCalibWeightinch.alertFlag = true;
@@ -973,7 +973,7 @@ class ProtocolHandler {
                             if (tempVerify) {
                                 this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
                             } else {
-                                objMonitor.monit({ case: 'MP', idsNo: idsNo });
+                                await objMonitor.monit({ case: 'MP', idsNo: idsNo });
                                 let rightObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
                                 if (rightObj.rights.includes('Test')) {
                                     var tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
@@ -1052,7 +1052,7 @@ class ProtocolHandler {
                             var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == idsNo)
                             if (objOwner == undefined) { globalData.arrPreWeighCalibOwner.push({ idsNo: IdsIp, owner: 'analytical' }) }
                             else { objOwner.owner = 'analytical' }
-                            objMonitor.monit({ case: 'MR', idsNo: idsNo });
+                            await objMonitor.monit({ case: 'MR', idsNo: idsNo });
                             var result = await objIncompleteRemark.updateReportRemarkOnBalOF(idsNo);
                             // console.log(result);
                             var res = await objPreWeighmentCheck.validatePreWeighmentActivites(idsNo, true);
@@ -1146,7 +1146,7 @@ class ProtocolHandler {
                         case "VL":
                             var ObjCheckPoweBackUp = await clspowerbackup.fetchPowerBackupData(idsNo);
                             if (ObjCheckPoweBackUp.status && ObjCheckPoweBackUp.result.length > 0) {
-                                objMonitor.monit({ case: 'WS', idsNo: idsNo });
+                                await objMonitor.monit({ case: 'WS', idsNo: idsNo });
                                 var returnProtocol = await wtmodel.processWS(str_IpAddress.split('.')[3], str_Protocol);
                                 this.sendProtocol(returnProtocol, str_IpAddress);
                             }
@@ -1351,7 +1351,7 @@ class ProtocolHandler {
                             var testType = str_Protocol.substring(2, 3)
                             var ObjCheckPoweBackUp = await clspowerbackup.fetchPowerBackupData(idsNo);
                             if (ObjCheckPoweBackUp.status && ObjCheckPoweBackUp.result.length > 0) {
-                                objMonitor.monit({ case: 'WS', idsNo: idsNo });
+                                await objMonitor.monit({ case: 'WS', idsNo: idsNo });
                                 var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol, str_IpAddress);
                                await this.sendProtocol(returnProtocol, str_IpAddress);
                             }
@@ -1467,7 +1467,7 @@ class ProtocolHandler {
                                     this.sendProtocol(actualData, str_IpAddress);
 
                                 } else {
-                                    objMonitor.monit({ case: 'WS', idsNo: idsNo });
+                                    await objMonitor.monit({ case: 'WS', idsNo: idsNo });
                                     var returnProtocol = await processWTModel.processWS(str_IpAddress.split('.')[3], str_Protocol, str_IpAddress);
                                     this.sendProtocol(returnProtocol, str_IpAddress);
                                 }
@@ -1525,7 +1525,7 @@ class ProtocolHandler {
                         case "WC":
                             globalData.arrIdsInfo =await objFetchDetails.getIds();
                             var tempCubic = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
-                            objMonitor.monit({ case: 'WC', idsNo: idsNo });
+                            await objMonitor.monit({ case: 'WC', idsNo: idsNo });
                             if (serverConfig.ProjectName == "SunHalolGuj1" || tempCubic.Sys_Area == 'Dosa Dry Syrup') {
                                 this.sendProtocol('LO', str_IpAddress);
                             } else if (serverConfig.friabilityType == 'BFBT' && (tempCubic.Sys_Port1 == 'Friabilator' ||
@@ -1636,7 +1636,7 @@ class ProtocolHandler {
                             await objIncompleteRemark.updateReportRemarkOnLO(idsNo);
                             await handleLoginModal.logOut(str_IpAddress.split('.')[3], logOutType);
                             this.sendProtocol('+', str_IpAddress);
-                            objMonitor.monit({ case: 'LO', idsNo: idsNo });
+                            await objMonitor.monit({ case: 'LO', idsNo: idsNo });
                             // var strReturnProtocol = "+";
                             // this.sendProtocol(strReturnProtocol, str_IpAddress);
 
@@ -1991,7 +1991,7 @@ class ProtocolHandler {
                             }
                             break;
                         case "CL":
-                            objMonitor.monit({ case: 'CL', idsNo: idsNo });
+                            await objMonitor.monit({ case: 'CL', idsNo: idsNo });
                             await menuSelectModel.handleCLProtocol(idsNo);
                             var weightment_type = str_Protocol.substring(2, 3);
                             await objCommanFun.updateactivitylogfortesttermination(idsNo, weightment_type);
@@ -2019,7 +2019,7 @@ class ProtocolHandler {
                                     } else {
                                         globalData.arrcalibType.push({ idsNo: idsNo, calibType: 'periodic' })
                                     }
-                                    objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Linearity' } });
+                                    await objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Linearity' } });
                                     //this.sendProtocol(`CR${calibPId}0LINEARITY CALIB,PENDING FOR BALANCE,,,`,str_IpAddress);
                                     //this.sendProtocol(`CR${calibPId}0Linearity,Calibration Pending,,,`, str_IpAddress);
                                     this.sendProtocol(`CR${calibPId}1Linearity,Calibration Pending,,,`, str_IpAddress);
@@ -2248,7 +2248,7 @@ class ProtocolHandler {
                 if (instrument == 'DISINTEGRATION TESTER') {
                     //___DT______//
                     // instrument
-                    objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'DT', flag: 'STARTED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'DT', flag: 'STARTED' } });
                     let DTModel = await this.CheckDTModel(idsNo, str_Protocol);
                     if (DTModel == 'Labindia-1000' || DTModel == 'Labindia-1000P') {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentDTLabIndia(idsNo, str_Protocol);
@@ -2273,7 +2273,7 @@ class ProtocolHandler {
                         await objRemarkInComplete.updateEntry(idsNo, "Tablet Tester");
                     }
 
-                    objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'HARDNESS', flag: 'STARTED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'HARDNESS', flag: 'STARTED' } });
                     let hardnessModelData = await this.CheckHardnessModel(idsNo, str_Protocol);
                     let hardnessModel = hardnessModelData.Eqp_Make;
                     if (hardnessModel == 'Erweka TBH-425') {
@@ -2321,7 +2321,7 @@ class ProtocolHandler {
                     }
                 } else if (instrument == 'FRIABILATOR') {
                     //__Friability__//
-                    objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'FRIABILATOR', flag: 'STARTED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'FRIABILATOR', flag: 'STARTED' } });
                     if (serverConfig.friabilityType == 'OF') {
                         var returnProtocol = await bulkWeighment.insertBulkWeighmentFriability(idsNo, str_Protocol);
                     } else {
@@ -2330,13 +2330,13 @@ class ProtocolHandler {
                     this.sendProtocol(returnProtocol, str_IpAddress);
                 } else if (instrument == 'TAPPED DENSITY') {
                     //__TDT__//
-                    objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'TAPPED DENSITY', flag: 'STARTED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'TAPPED DENSITY', flag: 'STARTED' } });
                     var returnProtocol = await bulkWeighment.insertBulkWeighmentTDT(idsNo, str_Protocol);
                     this.sendProtocol(returnProtocol, str_IpAddress);
                 } else if (instrument == 'MOISTURE ANALYZER') {
                     // __LOD__//
                     let LODModel = await this.CheckLODModel(idsNo, str_Protocol);
-                    objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'MOISTURE ANALYZER', flag: 'STARTED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: idsNo, data: { test: 'MOISTURE ANALYZER', flag: 'STARTED' } });
                     if (LODModel.toUpperCase() == 'METTLER' || LODModel.toUpperCase() == 'METTLER TOLEDO') {
 
 

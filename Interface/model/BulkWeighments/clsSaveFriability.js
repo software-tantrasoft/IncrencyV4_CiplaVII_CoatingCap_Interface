@@ -47,7 +47,7 @@ class Friability {
                 // DM000INVALID STRING,FORMAT PLS TRY,AGAIN,,
                 var msg = "DM000Invalid String,FORMAT PLS TRY,AGAIN,,,";
                 Object.assign(responseObj, { status: 'fail', msg: msg });
-                objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
+                await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
                 var tempFriabilityObj = globalData.arrFriabilityData.find(td => td.idsNo == IdsNo);
                 if (tempFriabilityObj == undefined) {
                     globalData.arrFriabilityData.push({ idsNo: IdsNo, version: undefined, arr: [] })
@@ -57,7 +57,7 @@ class Friability {
                 return responseObj;
             }
             else if (objInvalid != undefined && objInvalid.Friabilitor.invalid == true) {
-                objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
+                await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
                 var msg = "DM000" + objInvalid.Friabilitor.invalidMsg + ",,,,";
                 var tempFriabilityObj = globalData.arrFriabilityData.find(td => td.idsNo == IdsNo);
                 if (tempFriabilityObj == undefined) {
@@ -78,7 +78,7 @@ class Friability {
                     } else {
                         tempFriabilityObj.arr = [];
                     }
-                    objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
                     return responseObj;
                 } else {
                     if (productObj.Sys_RotaryType == 'Single') {
@@ -242,7 +242,7 @@ class Friability {
 
                         await objBatch.saveBatchSummaryFriability(batchSummaryObject, IdsNo);
                     }
-                    objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'COMPLETED' } });
+                    await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'COMPLETED' } });
 
 
                     Object.assign(responseObj, { status: 'success', RepSerNo: lastInsertedId });

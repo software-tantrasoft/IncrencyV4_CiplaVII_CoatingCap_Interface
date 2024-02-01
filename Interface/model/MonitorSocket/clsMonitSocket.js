@@ -20,34 +20,39 @@ async monit(Mobj) {
         case 'LO':
              let tempMonitST;
             tempMonitST = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
-            tempMonitST.status = 'Online';
-            tempMonitST.userName = 'NA';
-            tempMonitST.selection1 = 'NA';
-            tempMonitST.selection2 = 'NA';
-            tempMonitST.selection3 = 'NA';
-            tempMonitST.selection4 = 'NA';
-            tempMonitST.weight = [];
-            tempMonitST.bulkData = '';
-            globalData.arrWebSocket.forEach(e => {
-                e.emit('data', {
-                    message: globalData.arrMonitCubic
-                });
-            })
+            if(tempMonitST != undefined){
+                tempMonitST.status = 'Online';
+                tempMonitST.userName = 'NA';
+                tempMonitST.selection1 = 'NA';
+                tempMonitST.selection2 = 'NA';
+                tempMonitST.selection3 = 'NA';
+                tempMonitST.selection4 = 'NA';
+                tempMonitST.weight = [];
+                tempMonitST.bulkData = '';
+                globalData.arrWebSocket.forEach(e => {
+                    e.emit('data', {
+                        message: globalData.arrMonitCubic
+                    });
+                })
+            }
             break;
         case 'ID':
             let tempMonitID;
             tempMonitID = globalData.arrMonitCubic.find(k=>k.idsNo == Mobj.idsNo);
-            tempMonitID.status = 'Online';
-            tempMonitID.userName = Mobj.data.UserName;
-            globalData.arrWebSocket.forEach(e => {
-                e.emit('data', {
-                    message: globalData.arrMonitCubic
-                });
-            })
+            if(tempMonitID != undefined){
+                tempMonitID.status = 'Online';
+                tempMonitID.userName = Mobj.data.UserName;
+                globalData.arrWebSocket.forEach(e => {
+                    e.emit('data', {
+                        message: globalData.arrMonitCubic
+                    });
+                })
+            }  
             break;
         case 'CR':
                 let tempMonitCR;
                 tempMonitCR = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitCR != undefined){
                 tempMonitCR.status = 'Online';
                 tempMonitCR.selection1 = 'Calibration';
                 tempMonitCR.selection2 = Mobj.data.calibType;
@@ -56,10 +61,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
           break;
           case 'CB':
                 let tempMonitCB;
                 tempMonitCB = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitCB != undefined){
                 tempMonitCB.status = 'Online';
                 tempMonitCB.weight.push({wt:Mobj.data.Weight, flag:'in'})
                 globalData.arrWebSocket.forEach(e => {
@@ -67,11 +74,13 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
           break;
         case 'CP':
         case 'WS':
                 let tempMonitCP;
                 tempMonitCP = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitCP != undefined){
                 tempMonitCP.status = 'Online';
                 tempMonitCP.weight = [];
                 tempMonitCP.bulkData = '';
@@ -80,12 +89,14 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'MP':
         case 'MR':
         case 'WC':
                 let tempMonitMP;
                 tempMonitMP = globalData.arrMonitCubic.find(k=>k.idsNo == Mobj.idsNo);
+                if(tempMonitMP != undefined){
                 tempMonitMP.status = 'Online';
                 tempMonitMP.weight = [];
                 tempMonitMP.selection1 = 'NA';
@@ -98,10 +109,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'MS':
                 let tempMonitMS;
                 tempMonitMS = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitMS != undefined){
                 tempMonitMS.status = 'Online';
                 tempMonitMS.selection1 = 'Test';
                 tempMonitMS.selection2 = Mobj.data.menu;
@@ -110,10 +123,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'WT':
                 let tempMonitWT;
                 tempMonitWT = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitWT != undefined){
                 tempMonitWT.status = 'Online';
                 tempMonitWT.weight.push({wt:Mobj.data.weight, flag:Mobj.data.flag})
                 globalData.arrWebSocket.forEach(e => {
@@ -121,10 +136,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'BL':
                     let tempMonitBL;
                     tempMonitBL = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                    if(tempMonitBL != undefined){
                     tempMonitBL.status = 'Online';
                     tempMonitBL.bulkData = `${Mobj.data.test} TEST ${Mobj.data.flag}`
                     globalData.arrWebSocket.forEach(e => {
@@ -143,10 +160,12 @@ async monit(Mobj) {
                             })
                         },2000)
                     }
+                }
                 break;
         case 'HDT':
                 let tempMonitHDT;
                 tempMonitHDT = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitHDT != undefined){
                 tempMonitHDT.status = 'Online';
                 tempMonitHDT.bulkData = `${Mobj.data.sample} TEST SAMPLE RECIVED`;
                 globalData.arrWebSocket.forEach(e => {
@@ -154,10 +173,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'LODFINWT':
                 let tempMonitLODFINWT;
                 tempMonitLODFINWT = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitLODFINWT != undefined){
                 tempMonitLODFINWT.status = 'Online';
                 tempMonitLODFINWT.bulkData = `${Mobj.data.test} TEST IN PROCESS, WAITING FOR FINAL WT.`;
                 globalData.arrWebSocket.forEach(e => {
@@ -165,10 +186,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'FRIFINWT':
             let tempMonitFriFINWT;
             tempMonitFriFINWT = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+            if(tempMonitFriFINWT != undefined){
             tempMonitFriFINWT.status = 'Online';
             tempMonitFriFINWT.bulkData = `${Mobj.data.test} TEST IN PROCESS, WAITING FOR AFTER WT.`;
             globalData.arrWebSocket.forEach(e => {
@@ -176,10 +199,12 @@ async monit(Mobj) {
                     message: globalData.arrMonitCubic
                 });
             })
+        }
         break;
         case 'CL':
                 let tempMonitCL;
                 tempMonitCL = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+                if(tempMonitCL != undefined){
                 tempMonitCL.status = 'Online';
                 tempMonitCL.bulkData = '';
                 tempMonitCL.weight = [];
@@ -188,10 +213,12 @@ async monit(Mobj) {
                         message: globalData.arrMonitCubic
                     });
                 })
+            }
             break;
         case 'LE':
             let tempMonitLE;
             tempMonitLE = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+            if(tempMonitLE != undefined){
             var msg = '';
             if(Mobj.data == 'LE0'){
                 msg = 'Report Generated Within Limit';
@@ -206,10 +233,12 @@ async monit(Mobj) {
                     message: globalData.arrMonitCubic
                 });
             })
+        }
             break;
         case 'DF':
             let tempMonitDF;
             tempMonitDF = globalData.arrMonitCubic.find(k=>k.idsNo ==Mobj.idsNo);
+            if(tempMonitDF != undefined){
             let tempDiffObj = globalData.arrdifferential.find(k=>k.idsNo == Mobj.idsNo);
             tempMonitDF.status = 'Online';
             tempMonitDF.bulkData = '';
@@ -235,6 +264,7 @@ async monit(Mobj) {
                     message: globalData.arrMonitCubic
                 });
             })
+        }
             break;
         
     }

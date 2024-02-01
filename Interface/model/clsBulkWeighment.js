@@ -172,7 +172,7 @@ class BulkWeighment {
                         // objBulkInvalid.invalidObj.DT.invalid = true;
                         // objBulkInvalid.invalidObj.DT.invalidMsg = `DATA RECEIVED from ${{ strModel_name }} INSTED OF  ${{ DTModel }}`;
                         // Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         return `${protocolIncomingType}R40Invalid String,,,,`
                     }
 
@@ -1000,7 +1000,7 @@ class BulkWeighment {
 
 
                         }
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', '', 'ended');
                         return `${protocolIncomingType}R40Invalid String,,,,`
                         //return `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
@@ -1008,7 +1008,7 @@ class BulkWeighment {
                     }
                     else {
 
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
                         let now = new Date();
                         let tempDTObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
                         var productlimits = globalData.arr_limits.find(k => k.idsNo == IdsNo);
@@ -1806,7 +1806,7 @@ class BulkWeighment {
                         // objBulkInvalid.invalidObj.DT.invalid = true;
                         // objBulkInvalid.invalidObj.DT.invalidMsg = `DATA RECEIVED from ${{ strModel_name }} INSTED OF  ${{ DTModel }}`;
                         // Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         return `${protocolIncomingType}R40Invalid String,,,,`
                     }
 
@@ -2679,7 +2679,7 @@ class BulkWeighment {
 
 
                         }
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', '', 'ended');
                         return `${protocolIncomingType}R40Invalid String,,,,`
                         //return `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
@@ -2687,7 +2687,7 @@ class BulkWeighment {
                     }
                     else {
 
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
                         let now = new Date();
                         let tempDTObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
                         var productlimits = globalData.arr_limits.find(k => k.idsNo == IdsNo);
@@ -3484,7 +3484,7 @@ class BulkWeighment {
                         // objBulkInvalid.invalidObj.DT.invalid = true;
                         // objBulkInvalid.invalidObj.DT.invalidMsg = `DATA RECEIVED from ${{ strModel_name }} INSTED OF  ${{ DTModel }}`;
                         // Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         return `${protocolIncomingType}R40Invalid String,,,,`
                     }
 
@@ -4379,7 +4379,7 @@ class BulkWeighment {
 
 
                         }
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', '', 'ended');
                         return `${protocolIncomingType}R40Invalid String,,,,`
                         //return `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
@@ -4387,7 +4387,7 @@ class BulkWeighment {
                     }
                     else {
 
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
                         let now = new Date();
                         let tempDTObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
                         var productlimits = globalData.arr_limits.find(k => k.idsNo == IdsNo);
@@ -5397,13 +5397,13 @@ class BulkWeighment {
                             globalData.arrJARTypeDT = globalData.arrJARTypeDT.filter(k => k.idsNo != IdsNo)
                         }
 
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
                         objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', '', 'ended');
                         return `${protocolIncomingType}R40Invalid String,,,,`
                         //return `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
 
                     } else {
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
                         var now = new Date();
                         var tempDTObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
                         var newDTData = tempDTObj.arr_heading;
@@ -5991,12 +5991,12 @@ class BulkWeighment {
                             tempTDObj.arr_reading = [];
                             tempTDObj.arr_info = [];
                         }
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'ABORTED' } });
 
                         return `${protocolIncomingType}R40Invalid String,,,,`
                         //return `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
                     } else {
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'DT', flag: 'COMPLETED' } });
                         let now = new Date();
                         var tempDTObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
                         var newDTData = tempDTObj.arr_heading;
@@ -7732,10 +7732,10 @@ class BulkWeighment {
                                 // Instrument usage for Friability completed
                                 objInstrumentUsage.InstrumentUsage('Friability', IdsNo, 'tbl_instrumentlog_friability', '', 'completed')
                                 resolve(response);
-                            }).catch(err => {
+                            }).catch(async (err) => {
                                 var msg = `${protocolIncomingType}R40Invalid String,,,,`;
                                 //var msg = `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
-                                objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
+                                await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
                                 objInstrumentUsage.InstrumentUsage('Friability', IdsNo, 'tbl_instrumentlog_friability', '', 'ended')
                                 resolve(msg);
                             })
@@ -7743,12 +7743,12 @@ class BulkWeighment {
                         }
 
 
-                    }).catch(err => {
+                    }).catch(async (err) => {
                         var msg = `${protocolIncomingType}R40Invalid String,,,,`;
                         //var msg = `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
                         // let responseObj;
                         // Object.assign(responseObj, { status: 'fail', msg: msg });
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'ABORTED' } });
                         objInstrumentUsage.InstrumentUsage('Friability', IdsNo, 'tbl_instrumentlog_friability', '', 'ended')
                         resolve(msg);
                     })
@@ -8704,7 +8704,7 @@ class BulkWeighment {
                                 "",
                                 "completed"
                             );
-                            objMonitor.monit({
+                            await objMonitor.monit({
                                 case: "BL",
                                 idsNo: IdsNo,
                                 data: { test: "HARDNESS", flag: "COMPLETED" },
@@ -8714,7 +8714,7 @@ class BulkWeighment {
                             // var response = `${protocolIncomingType}R3,,,,,`;
                             // resolve(response);
                             //HR0<>,<>,<>,<>,<>,
-                            objMonitor.monit({
+                            await objMonitor.monit({
                                 case: "HDT",
                                 idsNo: IdsNo,
                                 data: { sample: objHardness.sampleNo, flag: "start" },
@@ -9345,7 +9345,7 @@ class BulkWeighment {
                                 objHardness.sampleNo = 0;
                                 var response = `${protocolIncomingType}R3,,,,,`;
                                 objInstrumentUsage.InstrumentUsage("Hardness", IdsNo, "tbl_instrumentlog_hardness", "", "completed");
-                                objMonitor.monit({
+                                await objMonitor.monit({
                                     case: "BL",
                                     idsNo: IdsNo,
                                     data: { test: "HARDNESS", flag: "COMPLETED" },
@@ -9713,7 +9713,7 @@ class BulkWeighment {
                                         "",
                                         "completed"
                                     );
-                                    objMonitor.monit({
+                                    await objMonitor.monit({
                                         case: "BL",
                                         idsNo: IdsNo,
                                         data: { test: "HARDNESS", flag: "COMPLETED" },
@@ -10103,7 +10103,7 @@ class BulkWeighment {
                                     "",
                                     "completed"
                                 );
-                                objMonitor.monit({
+                                await objMonitor.monit({
                                     case: "BL",
                                     idsNo: IdsNo,
                                     data: { test: "HARDNESS", flag: "COMPLETED" },
@@ -10540,7 +10540,7 @@ class BulkWeighment {
                                         "",
                                         "completed"
                                     );
-                                    objMonitor.monit({
+                                    await objMonitor.monit({
                                         case: "BL",
                                         idsNo: IdsNo,
                                         data: { test: "HARDNESS", flag: "COMPLETED" },
@@ -11501,7 +11501,7 @@ class BulkWeighment {
                                 "",
                                 "completed"
                             );
-                            objMonitor.monit({
+                            await objMonitor.monit({
                                 case: "BL",
                                 idsNo: IdsNo,
                                 data: { test: "HARDNESS", flag: "COMPLETED" },
@@ -11511,7 +11511,7 @@ class BulkWeighment {
                             // var response = `${ protocolIncomingType } R3,,,,, `;
                             // resolve(response);
                             //HR0<>,<>,<>,<>,<>,
-                            objMonitor.monit({
+                            await objMonitor.monit({
                                 case: "HDT",
                                 idsNo: IdsNo,
                                 data: { sample: objHardness.sampleNo, flag: "start" },
@@ -12059,7 +12059,7 @@ class BulkWeighment {
 
                             var response = `${protocolIncomingType}R3,,,,,`;
                             await objInstrumentUsage.InstrumentUsage('Hardness', IdsNo, 'tbl_instrumentlog_hardness', 'completed');
-                            objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
+                            await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
                             return response;
                         } else {
                             // var response = `${protocolIncomingType}R3,,,,,`;
@@ -12067,7 +12067,7 @@ class BulkWeighment {
                             //HR0<>,<>,<>,<>,<>,
                             if (objHardness.sampleNo != 0) {
                                 var HRDProtocol = `${protocolIncomingType}R0` + objHardness.sampleNo + " Samples Recived.,,,,,";
-                                objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
+                                await objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.HD125.invalid = true;
@@ -13367,7 +13367,7 @@ class BulkWeighment {
                     if (objHardness.arr.length < productlimits.Hardness.noOfSamples) {
                         var remSample = objHardness.arr.length;
                         var HRDProtocol = `${protocolIncomingType}R0` + remSample + " Samples Recived,,,,,";
-                        objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
+                        await objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
                         objHardness.capacityFlag = true;
                         objHardness.hardnessFlag = false;
                         objHardness.oc = 0
@@ -13375,7 +13375,7 @@ class BulkWeighment {
                     } else {
                         var remarkRes = await hardnessData.saveHardnessDataKraemer(objHardness.masterId, IdsNo);
                         let objActivity = {};
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
                         await objInstrumentUsage.InstrumentUsage('Hardness', IdsNo, 'tbl_instrumentlog_hardness', '', 'completed');
                         Object.assign(objActivity,
                             { strUserId: tempUserObject.UserId },
@@ -13493,7 +13493,7 @@ class BulkWeighment {
                         let objclearHardnesVariable = this.clearHardnesVariable(IdsNo)
 
                         let objActivity = {};
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
                         await objInstrumentUsage.InstrumentUsage('Hardness', IdsNo, 'tbl_instrumentlog_hardness', '', 'completed');
                         Object.assign(objActivity,
                             { strUserId: tempUserObject.UserId },
@@ -13547,7 +13547,7 @@ class BulkWeighment {
                     objHardness.sampleNo = objarrHardnessMT50Reading.localSampleCounter
                     console.log('local counter =' + objarrHardnessMT50Reading.localSampleCounter)
                     var HRDProtocol = `${protocolIncomingType}R0` + objHardness.sampleNo + " Samples Recived,,,,,";
-                    objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
+                    await objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
                     objHardness.capacityFlag = true;
                     objHardness.hardnessFlag = false;
                     objHardness.oc = 0
@@ -14057,7 +14057,7 @@ class BulkWeighment {
                         let objclearHardnesVariable = this.clearHardnesVariable(IdsNo)
 
                         let objActivity = {};
-                        objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
+                        await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'HARDNESS', flag: 'COMPLETED' } });
                         await objInstrumentUsage.InstrumentUsage('Hardness', IdsNo, 'tbl_instrumentlog_hardness', '', 'completed');
                         Object.assign(objActivity,
                             { strUserId: tempUserObject.UserId },
@@ -14111,7 +14111,7 @@ class BulkWeighment {
                     objHardness.sampleNo = objarrHardnessMT50Reading.localSampleCounter
                     console.log('local counter =' + objarrHardnessMT50Reading.localSampleCounter)
                     var HRDProtocol = `${protocolIncomingType}R0` + objHardness.sampleNo + " Samples Recived,,,,,";
-                    objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
+                    await objMonitor.monit({ case: 'HDT', idsNo: IdsNo, data: { sample: objHardness.sampleNo, flag: 'start' } });
                     objHardness.capacityFlag = true;
                     objHardness.hardnessFlag = false;
                     objHardness.oc = 0
@@ -15361,7 +15361,7 @@ class BulkWeighment {
                     ]
                 }
                 await database.update(objUpdateValidation);
-                objMonitor.monit({ case: 'FRIFINWT', idsNo: IdsNo, data: { test: 'FRIABILITY' } });
+                await objMonitor.monit({ case: 'FRIFINWT', idsNo: IdsNo, data: { test: 'FRIABILITY' } });
                 // As soon as Before weight is taken the we have to hide menu for specific time
                 var objActivity = {};
                 Object.assign(objActivity,
@@ -15475,7 +15475,7 @@ class BulkWeighment {
                     { strUserName: tempUserObject.UserName },
                     { activity: 'Friability Weighment Completed on IDS' + IdsNo });
                 await objActivityLog.ActivityLogEntry(objActivity);
-                objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'COMPLETED' } });
+                await objMonitor.monit({ case: 'BL', idsNo: IdsNo, data: { test: 'FRIABILATOR', flag: 'COMPLETED' } });
                 // Instrument usage for Friability completed
                 await objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', '', 'completed')
                 var response = await objSP.getRemarkForFriability(retuRes.sqNo);
@@ -15760,7 +15760,7 @@ class BulkWeighment {
 
                             // await objIncompleteGran.saveIncompleteData(cubicalObj, data, intNos, typeValue, tempUserObject, IdsNo);
                             await objIncompleteGran.saveIncompleteData(cubicalObj, data, actualSampleValue, intNos, typeValue, tempUserObject, IdsNo);
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                             var particleMenu = globalData.arr_limits.find(k => k.idsNo == IdsNo);
                             data.actualSampleValue = actualSampleValue + 1;
                             let count = actualSampleValue + 1;
@@ -15819,7 +15819,7 @@ class BulkWeighment {
                                 }
                             }
 
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                             switch (testFlag) {
                                 case "aTestSample":
                                     message = "TEST SAMPLE";
@@ -16024,7 +16024,7 @@ class BulkWeighment {
 
                             // await objIncompleteGran.saveIncompleteData(cubicalObj, data, intNos, typeValue, tempUserObject, IdsNo);
                             await objIncompleteGran.saveIncompleteData(cubicalObj, data, actualSampleValue, intNos, typeValue, tempUserObject, IdsNo);
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                             data.actualSampleValue = actualSampleValue + 1;
                             let count = actualSampleValue + 1;
                             let message;
@@ -16064,7 +16064,7 @@ class BulkWeighment {
                                     break;
                                 }
                             }
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                             switch (testFlag) {
                                 case "aTestSample":
                                     message = "TEST SAMPLE";

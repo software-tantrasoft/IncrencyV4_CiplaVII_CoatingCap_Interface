@@ -677,7 +677,7 @@ class CalibrationModel {
                     /* 
                        */
                     var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                     // Updating RepSrNo if this calibration is first
                     // if (globalData.arrSortedCalib[0] == 'P') {
                     //     await comman.updateRepSrNo('periodic', strBalId,IDSSrNo);
@@ -742,7 +742,7 @@ class CalibrationModel {
                     }
                     await database.save(inserDetailObj);
                     var wt1 = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
 
                 }
 
@@ -1091,7 +1091,7 @@ class CalibrationModel {
 
                             await objActivityLog.ActivityLogEntry(objActivity);
 
-                            objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
+                            await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
 
                         } else {
                             var int_periodic_RecNo1;
@@ -1150,7 +1150,7 @@ class CalibrationModel {
                                 ]
                             }
                             await database.save(inserDetailObj);
-                            objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
+                            await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
                         }
                     }
                     if (parseFloat(objSentWt.Bal_NegTol) <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= parseFloat(objSentWt.Bal_PosTol))) {

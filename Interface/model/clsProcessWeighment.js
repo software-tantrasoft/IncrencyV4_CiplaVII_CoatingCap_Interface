@@ -419,25 +419,25 @@ class ProcessWeighment {
                     //for Below limit
                     if (serverConfig.ProjectName == "RBH") {// this block is only for indEmpty "RBH" project
                         var withinlimit = `${protocolType}${typeValue}010${sample}Within Limit,,,0,${tareCmd}`;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                         return withinlimit
                     }
                     else {
                         if (parseFloat(weightValue) < parseFloat(minLimit)) {
                             var belowlimit = `${protocolType}${typeValue}0B0${sample}Below Limit,,,0,${tareCmd}`;
                             vernierObj.flag = true;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } })
                             return belowlimit
                         }
                         else if (parseFloat(weightValue) > parseFloat(maxLimit)) {//for Above limit
                             var abovelimit = `${protocolType}${typeValue}0A0${sample}Above Limit,,,0,${tareCmd}`;
                             vernierObj.flag = true;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } })
                             return abovelimit
                         }
                         else {//for Within limit
                             var withinlimit = `${protocolType}${typeValue}010${sample}Within Limit,,,0,${tareCmd}`;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                             return withinlimit
                         }
                     }
@@ -450,25 +450,25 @@ class ProcessWeighment {
                     if (serverConfig.ProjectName == "RBH") {
                         sendLastLimitMsg = `${protocolType}${typeValue}010${sample}Within Limit,,,1,${tareCmd}`;
 
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } });
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } });
                         // return sendLastLimitMsg
                     }
                     else {
                         if (parseFloat(weightValue) < parseFloat(minLimit)) {//for below limit
                             var sendLastLimitMsg = `${protocolType}${typeValue}0B0${sample}Below Limit,,,1,${tareCmd}`;
                             vernierObj.flag = true;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } });
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } });
                             // return belowlimit
                         }
                         else if (parseFloat(weightValue) > parseFloat(maxLimit)) {//for Above limit
                             var sendLastLimitMsg = `${protocolType}${typeValue}0A0${sample}Above Limit,,,1,${tareCmd}`;
                             vernierObj.flag = true;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } });
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' } });
                             // return abovelimit
                         }
                         else {//for within limit
                             var sendLastLimitMsg = `${protocolType}${typeValue}010${sample}Within Limit,,,1,${tareCmd}`;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } });
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } });
                             // return withinlimit
                         }
                     }
@@ -576,17 +576,17 @@ class ProcessWeighment {
                     }
                 }
                 var objresSaveGrpDatacomp = await groupOperation.saveCompleteData(cubicalObj, protocol, intNos, typeValue, tempUserObject, IdsNo, groupWeightVal);
-                objMonitor.monit({ case: 'LE', idsNo: IdsNo, data: objresSaveGrpDatacomp });
+                await objMonitor.monit({ case: 'LE', idsNo: IdsNo, data: objresSaveGrpDatacomp });
                 if (parseFloat(groupWeightVal) < parseFloat(minLimit)) {
                     le = objresSaveGrpDatacomp
-                    objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
+                    await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
                 } else if (parseFloat(groupWeightVal) > parseFloat(maxLimit)) {
                     le = objresSaveGrpDatacomp
-                    objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
+                    await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
                 }
                 else {
                     le = objresSaveGrpDatacomp
-                    objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'in' } })
+                    await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'in' } })
                 }
                 // Activity Log for completion of weigghment
 
@@ -697,18 +697,18 @@ class ProcessWeighment {
                     if (parseFloat(vernierWeightValue) < parseFloat(minLimit)) {
                         var belowlimit = `${protocolType}${typeValue}0B0${sample}Below Limit,,,0,${tareCmd}`;
                         vernierObj.flag = true;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
                         return belowlimit;
                     }
                     else if (parseFloat(vernierWeightValue) > parseFloat(maxLimit)) {
                         var abovelimit = `${protocolType}${typeValue}0A0${sample}Above Limit,,,0,${tareCmd}`;
                         vernierObj.flag = true;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
                         return abovelimit;
                     }
                     else {
                         var withinlimit = `${protocolType}${typeValue}010${sample}Within Limit,,,0,${tareCmd}`;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'in' } })
                         return withinlimit;
                     }
 
@@ -718,16 +718,16 @@ class ProcessWeighment {
                     if (parseFloat(vernierWeightValue) < parseFloat(minLimit)) {
                         sendLastLimitMsg = `${protocolType}${typeValue}0B0${sample}Below Limit,,,1,${tareCmd}`;
                         vernierObj.flag = true;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
                     }
                     else if (parseFloat(vernierWeightValue) > parseFloat(maxLimit)) {
                         var sendLastLimitMsg = `${protocolType}${typeValue}0A0${sample}Above Limit,,,1,${tareCmd}`;
                         vernierObj.flag = true;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'out' } })
                     }
                     else {
                         var sendLastLimitMsg = `${protocolType}${typeValue}010${sample}Within Limit,,,1,${tareCmd}`;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: vernierWeightValue, flag: 'in' } })
                     }
                     var objresSaveVerDataComp = await this.saveToComplete(typeValue, cubicalObj, typeValue, tempUserObject, IdsNo, vernierObj, "Vernier");
                     var objRemark = globalData.arrLLsampleRemark.find(k => k.idsNo == IdsNo);
@@ -784,7 +784,7 @@ class ProcessWeighment {
                 if (actualSampleValue <= intNos) {
                     if (actualSampleValue != 1) {
                         await objIncompleteGran.saveIncompleteData(cubicalObj, protocol, intNos, typeValue, tempUserObject, IdsNo);
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                         let count = actualSampleValue + 1;
                         let message;
                         switch (count) {
@@ -835,7 +835,7 @@ class ProcessWeighment {
 
                         let count = actualSampleValue + 1;
                         let message;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                         switch (count) {
                             case 2:
                                 message = "ABOVE 20 MESH";
@@ -915,7 +915,7 @@ class ProcessWeighment {
                     if (actualSampleValue != 1) {
 
                         var objresSaveDataInCompPFine = await objIncompleteGran.saveIncompleteData(cubicalObj, protocol, intNos, typeValue, tempUserObject, IdsNo);
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                         let count = actualSampleValue + 1;
                         let message;
                         switch (count) {
@@ -936,7 +936,7 @@ class ProcessWeighment {
                         var objresSaveDataInCompPFine = await objIncompleteGran.saveIncompleteData(cubicalObj, protocol, intNos, typeValue, tempUserObject, IdsNo);
                         let count = actualSampleValue + 1;
                         let message;
-                        objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
+                        await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' } })
                         switch (count) {
                             case 2:
                                 message = "BELOW 60 MESH";
@@ -995,14 +995,14 @@ class ProcessWeighment {
                         await objMultihaler.saveSealedCartriage(cubicalObj, protocol, intNos, typeValue, tempUserObject, IdsNo, maxLimit, minLimit, groupWeightVal);
                         if (parseFloat(groupWeightVal) < parseFloat(minLimit)) {
                             le = `LE1`;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
                         } else if (parseFloat(groupWeightVal) > parseFloat(maxLimit)) {
                             le = `LE1`;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'out' } })
                         }
                         else {
                             le = `LE0`;
-                            objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'in' } })
+                            await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: groupWeightVal, flag: 'in' } })
                         }
                         // Activity Log for completion of weigghment
 
@@ -1083,18 +1083,18 @@ class ProcessWeighment {
                             if (parseFloat(netValue) < parseFloat(minLimit)) {
                                 var belowlimit = `${protocolType}${typeValue}0B0${sample}${WTGORT},Below Limit,,${tareCmd},`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
+                                await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
                                 return belowlimit
                             }
                             else if (parseFloat(netValue) > parseFloat(maxLimit)) {//for Above limit
                                 var abovelimit = `${protocolType}${typeValue}0A0${sample}${WTGORT},Above Limit,,${tareCmd},`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
+                                await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
                                 return abovelimit
                             }
                             else {//for Within limit
                                 var withinlimit = `${protocolType}${typeValue}010${sample}${WTGORT},Within Limit,,${tareCmd}`;
-                                objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'in' } })
+                                await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'in' } })
                                 return withinlimit
                             }
                         } else {//storing last sample incomplete data****************************************************************************
@@ -1106,14 +1106,14 @@ class ProcessWeighment {
 
                             if (parseFloat(netValue) < parseFloat(minLimit)) {//for below limit
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
+                                await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
                             }
                             else if (parseFloat(netValue) > parseFloat(maxLimit)) {//for Above limit
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
+                                await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'out' } })
                             }
                             else {//for within limit
-                                objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'in' } })
+                                await objMonitor.monit({ case: 'WT', idsNo: IdsNo, data: { weight: netValue, flag: 'in' } })
                             }
                             //storing final Data*****************************************************************************************
                             var objresIndComp = await objMultihaler.saveCompleteData(intWeighmentNo, cubicalObj, typeValue, tempUserObject, IdsNo, tempLimObj);
@@ -1267,19 +1267,19 @@ class ProcessWeighment {
                             //WTDF10002 -> 6th bit is for 1,2,3 for content (multiContent diff) as well as blinking for
                             // msg value will be 9 for blinking
                             limitMsg = `${protocolType}${typeValue}F10${sample}Within Limit,,,0,${tareCmd}`;
-                            objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
+                            await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
                         } else {
                             if (parseFloat(weightValue) < parseFloat(minLimitFill)) {
                                 limitMsg = `${protocolType}${typeValue}FB0${sample}Below Limit,,,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
                             } else if (parseFloat(weightValue) > parseFloat(maxLimitFill)) {
                                 limitMsg = `${protocolType}${typeValue}FA0${sample}Above Limit,,,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
                             } else {
                                 limitMsg = `${protocolType}${typeValue}F10${sample}Within Limit,,,0,${tareCmd}`;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
                             }
                         }
                         return limitMsg;
@@ -1305,23 +1305,23 @@ class ProcessWeighment {
                         }
                         if (serverConfig.ProjectName == 'SunHalolGuj1') {
                             limitMsg = `${protocolType}${typeValue}${shellType}1${count}${sample}Within Limit,${replaceString},,0,${tareCmd}`;
-                            objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
+                            await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
                         }
                         else if (serverConfig.ProjectName == 'CIPLA_INDORE' || serverConfig.ProjectName == 'CIPLA_KurkumbhU1' || serverConfig.ProjectName == 'CIPLA_Baddi') {
                             limitMsg = `${protocolType}${typeValue}${shellType}1${count}${sample}Within Limit,${replaceString},,0,${tareCmd}`;
-                            objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
+                            await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
                         } else {
                             if (parseFloat(weightValue) < parseFloat(minLimitEmpty)) {
                                 limitMsg = `${protocolType}${typeValue}${shellType}B${count}${sample}Below Limit,${replaceString},,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
                             } else if (parseFloat(weightValue) > parseFloat(maxLimitEmpty)) {
                                 limitMsg = `${protocolType}${typeValue}${shellType}A${count}${sample}Above Limit,${replaceString},,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
                             } else {
                                 limitMsg = `${protocolType}${typeValue}${shellType}1${count}${sample}Within Limit,${replaceString},,0,${tareCmd}`;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
                             }
 
                         }
@@ -1398,20 +1398,20 @@ class ProcessWeighment {
                     if (DiffType == "F") {
                         if (serverConfig.ProjectName == 'SunHalolGuj1') {
                             limitMsg = `${protocolType}${typeValue}F10${sample}Within Limit,,,0,${tareCmd}`;
-                            objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
+                            await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
                         }
                         else {
                             if (parseFloat(weightValue) < parseFloat(minLimitFill)) {
                                 limitMsg = `${protocolType}${typeValue}FB0${sample}Below Limit,,,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
                             } else if (parseFloat(weightValue) > parseFloat(maxLimitFill)) {
                                 limitMsg = `${protocolType}${typeValue}FA0${sample}Above Limit,,,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'F' })
                             } else {
                                 limitMsg = `${protocolType}${typeValue}F10${sample}Within Limit,,,0,${tareCmd}`;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'F' })
                             }
                         }
                         if (serverConfig.ProjectName == "CIPLA_INDORE" || serverConfig.ProjectName == "SunHalolGuj1" || serverConfig.ProjectName == 'CIPLA_KurkumbhU1' || serverConfig.ProjectName == 'CIPLA_Baddi') {//this if block is added by vivek 
@@ -1447,21 +1447,21 @@ class ProcessWeighment {
                         if (serverConfig.ProjectName == 'CIPLA_INDORE' || serverConfig.ProjectName == 'CIPLA_KurkumbhU1' || serverConfig.ProjectName == 'CIPLA_Baddi') {
                             limitMsg = `${protocolType}${typeValue}${shellType}1${count}${sample}Within Limit,${replaceString},,0,${tareCmd}`;
                             vernierObj.flag = true;
-                            objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
+                            await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
                         }
                         else {
 
                             if (parseFloat(weightValue) < parseFloat(minLimitEmpty)) {
                                 limitMsg = `${protocolType}${typeValue}${shellType}B${count}${sample}Below Limit,${replaceString},,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
                             } else if (parseFloat(weightValue) > parseFloat(maxLimitEmpty)) {
                                 limitMsg = `${protocolType}${typeValue}${shellType}A${count}${sample}Above Limit,${replaceString},,0,${tareCmd}`;
                                 vernierObj.flag = true;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'E' })
                             } else {
                                 limitMsg = `${protocolType}${typeValue}${shellType}1${count}${sample}Within Limit,${replaceString},,0,${tareCmd}`;
-                                objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
+                                await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'E' })
                             }
                         }
 
@@ -1865,14 +1865,14 @@ class ProcessWeighment {
                 if (parseFloat(weightValue) < parseFloat(minLimitNet)) {
                     limitMsg = `WTDNB0${sample}Below Limit,,,${ll},${tareCmd}`;
                     vernierObj.flag = true;
-                    objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'N' })
+                    await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'N' })
                 } else if (parseFloat(weightValue) > parseFloat(maxLimitNet)) {
                     limitMsg = `WTDNA0${sample}Above Limit,,,${ll},${tareCmd}`;
                     vernierObj.flag = true;
-                    objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'N' })
+                    await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'out' }, type: 'N' })
                 } else {
                     limitMsg = `WTDN10${sample}Within Limit,,,${ll},${tareCmd}`;
-                    objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'N' })
+                    await objMonitor.monit({ case: 'DF', idsNo: IdsNo, data: { weight: weightValue, flag: 'in' }, type: 'N' })
                     vernierObj.flag = false;
                 }
 
@@ -1998,7 +1998,7 @@ class ProcessWeighment {
             successResult = 'LE0'// 
         }
 
-        objMonitor.monit({ case: 'LE', idsNo: IdsNo, data: successResult });
+        await objMonitor.monit({ case: 'LE', idsNo: IdsNo, data: successResult });
         // Clear flag for Incomplete remark like (test aborted, balance off, Auto logout);
         if (globalData.arrIncompleteRemark != undefined) {
             globalData.arrIncompleteRemark = globalData.arrIncompleteRemark.filter(k => k.IdsNo != IdsNo);

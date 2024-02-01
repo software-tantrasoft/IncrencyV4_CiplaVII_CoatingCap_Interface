@@ -90,7 +90,7 @@ class MenuSelect {
             // check for port 4
             var portInstrument = currentCubicObject.Sys_Port4.toUpperCase();
             if (portInstrument == "DISINTEGRATION TESTER") {
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "DT" },
@@ -152,7 +152,7 @@ class MenuSelect {
             // check for port 1
             var portInstrument = currentCubicObject.Sys_Port1.toUpperCase();
             if (portInstrument == "DISINTEGRATION TESTER") {
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "DT" },
@@ -217,7 +217,7 @@ class MenuSelect {
             // check for port 4
             var portInstrument = currentCubicObject.Sys_Port2.toUpperCase();
             if (portInstrument == "DISINTEGRATION TESTER") {
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "DT" },
@@ -281,7 +281,7 @@ class MenuSelect {
             // check for port 3
             var portInstrument = currentCubicObject.Sys_Port3.toUpperCase();
             if (portInstrument == "DISINTEGRATION TESTER") {
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "DT" },
@@ -342,7 +342,7 @@ class MenuSelect {
             // check for port 2
             var portInstrument = currentCubicObject.Sys_Port2.toUpperCase();
             if (portInstrument == "DISINTEGRATION TESTER") {
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "DT" },
@@ -404,7 +404,7 @@ class MenuSelect {
             productTypeObj.productType == 4 &&
             serverConfig.ProjectName == "SunHalolGuj1"
           ) {
-            objMonitor.monit({
+            await objMonitor.monit({
               case: "MS",
               idsNo: IdsNo,
               data: { menu: "Differential" },
@@ -444,7 +444,7 @@ class MenuSelect {
             serverConfig.ProjectName == "CIPLA_Baddi"
           ) {
             //added by vivek on 24-03-2020
-            objMonitor.monit({
+            await objMonitor.monit({
               case: "MS",
               idsNo: IdsNo,
               data: { menu: "Differential" },
@@ -485,7 +485,7 @@ class MenuSelect {
 
             //************************************************************************* *****************************************************/
           } else {
-            objMonitor.monit({
+            await objMonitor.monit({
               case: "MS",
               idsNo: IdsNo,
               data: { menu: "Differential" },
@@ -513,7 +513,7 @@ class MenuSelect {
           await this.activityLogEntryForMs("Differential", IdsNo);
           return strReturnProtocol;
         } else if (MenuType == "R") {
-          objMonitor.monit({
+          await objMonitor.monit({
             case: "MS",
             idsNo: IdsNo,
             data: { menu: "FRIABILATOR" },
@@ -571,7 +571,7 @@ class MenuSelect {
           switch (MenuType) {
             case "1":
               if (tempCubicleObject.Sys_Area == "Dosa Dry Syrup") {
-                objMonitor.monit({
+                await objMonitor.monit({
                   case: "MS",
                   idsNo: IdsNo,
                   data: { menu: "Dosa Dry Syrup" },
@@ -603,7 +603,7 @@ class MenuSelect {
                 await this.activityLogEntryForMs("Dosa Dry Syrup", IdsNo);
                 return strReturnProtocol;
               } else {
-                objMonitor.monit({
+                await objMonitor.monit({
                   case: "MS",
                   idsNo: IdsNo,
                   data: { menu: "Individual" },
@@ -639,7 +639,7 @@ class MenuSelect {
               }
               break;
             case "2":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Group" },
@@ -711,7 +711,7 @@ class MenuSelect {
               return strReturnProtocol;
               break;
             case "3":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Thickness" },
@@ -773,7 +773,7 @@ class MenuSelect {
             case "4":
               if (productTypeObj.productType == 2) {
                 //capsule
-                objMonitor.monit({
+                await objMonitor.monit({
                   case: "MS",
                   idsNo: IdsNo,
                   data: { menu: "Diameter" },
@@ -810,7 +810,7 @@ class MenuSelect {
                 break;
               } else {
                 //tablet
-                objMonitor.monit({
+                await objMonitor.monit({
                   case: "MS",
                   idsNo: IdsNo,
                   data: { menu: "Breadth" },
@@ -849,7 +849,7 @@ class MenuSelect {
               }
 
             case "5":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Length" },
@@ -892,7 +892,7 @@ class MenuSelect {
 
               break;
             case "6":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Diameter" },
@@ -930,7 +930,7 @@ class MenuSelect {
               break;
             case "8":
               if (serverConfig.ProjectName == "RBH") {
-                objMonitor.monit({
+                await objMonitor.monit({
                   case: "MS",
                   idsNo: IdsNo,
                   data: { menu: "Ind Empty" },
@@ -949,7 +949,7 @@ class MenuSelect {
                 await this.activityLogEntryForMs("Individual Empty", IdsNo);
                 return strReturnProtocol;
               } else {
-                objMonitor.monit({
+                await objMonitor.monit({
                   case: "MS",
                   idsNo: IdsNo,
                   data: { menu: "Ind Layer 1" },
@@ -970,7 +970,7 @@ class MenuSelect {
               }
               break;
             case "9":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Grp Layer 1" },
@@ -991,7 +991,7 @@ class MenuSelect {
 
               break;
             case "L":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Ind Layer2" },
@@ -1013,7 +1013,7 @@ class MenuSelect {
 
               break;
             case "K":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Group Layer2" },
@@ -1034,7 +1034,7 @@ class MenuSelect {
               return strReturnProtocol;
               break;
             case "P":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Particle Size" },
@@ -1064,7 +1064,7 @@ class MenuSelect {
               return strReturnProtocol;
               break;
             case "F":
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "% Fine" },
@@ -1148,7 +1148,7 @@ class MenuSelect {
               break;
             case "Y":
               // CASE FOR SEALED CARTRIAGE
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Sealed Cartridge" },
@@ -1181,7 +1181,7 @@ class MenuSelect {
               break;
             case "Z":
               // CASE FOR NET CONTENT
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Net Content" },
@@ -1214,7 +1214,7 @@ class MenuSelect {
               break;
             case "W":
               // CASE FOR Dry Cartridge
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Dry Cartridge" },
@@ -1247,7 +1247,7 @@ class MenuSelect {
               break;
             case "X":
               // CASE FOR Dry Cartridge
-              objMonitor.monit({
+              await objMonitor.monit({
                 case: "MS",
                 idsNo: IdsNo,
                 data: { menu: "Dry Powder" },
@@ -1658,7 +1658,7 @@ class MenuSelect {
           break;
         case "TABLET TESTER":
         case "HARDNESS":
-          objMonitor.monit({
+          await objMonitor.monit({
             case: "MS",
             idsNo: IdsNo,
             data: { menu: "HARDNESS" },
@@ -2104,7 +2104,7 @@ class MenuSelect {
           return strReturnProtocol;
           break;
         case "FRIABILATOR":
-          objMonitor.monit({
+          await objMonitor.monit({
             case: "MS",
             idsNo: IdsNo,
             data: { menu: "FRIABILATOR" },
@@ -2165,7 +2165,7 @@ class MenuSelect {
           return strReturnProtocol;
           break;
         case "TAPPED DENSITY":
-          objMonitor.monit({
+          await objMonitor.monit({
             case: "MS",
             idsNo: IdsNo,
             data: { menu: "TapDensity" },
@@ -2192,7 +2192,7 @@ class MenuSelect {
           return strReturnProtocol;
           break;
         case "MOISTURE ANALYZER":
-          objMonitor.monit({ case: "MS", idsNo: IdsNo, data: { menu: "LOD" } });
+          await objMonitor.monit({ case: "MS", idsNo: IdsNo, data: { menu: "LOD" } });
           var objLodData = globalData.arrLodData.find(
             (LD) => LD.idsNo == IdsNo
           );

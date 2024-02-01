@@ -832,7 +832,7 @@ class PowerBackup {
                         case "CR":
                             //this.sendProtocol("CR0", str_IpAddress);
                             let tempObj = globalData.arrUsers.find(k => k.IdsNo == idsNo);
-                            objMonitor.monit({ case: 'ID', idsNo: idsNo, data: tempObj });
+                            await objMonitor.monit({ case: 'ID', idsNo: idsNo, data: tempObj });
 
 
                             var SIRCommand = await objSendSIR.prepareCommand(idsNo);

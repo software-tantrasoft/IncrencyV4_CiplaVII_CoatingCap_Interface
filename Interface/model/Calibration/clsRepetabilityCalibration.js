@@ -594,7 +594,7 @@ class Repetabilty {
                 }
                 // monit send messages 
                 var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                 await database.save(insertObj)
                 await database.save(insertIncompleteDetailsObj)
 
@@ -665,7 +665,7 @@ class Repetabilty {
                 // console.log(inserDetailObj)
                 await database.save(inserDetailObj);
                 var wt1 = str_Protocol.split(',')[1].trim().split(' ')[0];
-                objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
+                await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
             }
 
         }

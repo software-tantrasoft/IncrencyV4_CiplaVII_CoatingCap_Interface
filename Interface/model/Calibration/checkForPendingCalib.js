@@ -139,12 +139,12 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                             if (systemHours >= 7) {
                                 // return "CR20PERIODIC CALIB,PENDING FOR BALANCE,,,";
                                 if (serverConfig.ProjectName == "RBH" || serverConfig.ProjectName == 'SunHalolGuj1') { // Set in serverconfig file
-                                    objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Linearity' } });
+                                    await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Linearity' } });
                                     //return `CR${calibPId}0LINEARITY CALIB,PENDING FOR BALANCE,,,`;
                                     //return `CR${calibPId}0Linearity,Calibration Pending,,,`;
                                     return `CR${calibPId}1Linearity,Calibration Pending,,,`;
                                 } else {
-                                    objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Periodic' } });
+                                    await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Periodic' } });
                                     //return `CR${calibPId}0PERIODIC CALIB,PENDING FOR BALANCE,,,`;
                                     //return `CR${calibPId}0Periodic Calibration,Pending,,,`;
                                     //if (serverConfig.ProjectName == 'MLVeer') {
@@ -172,7 +172,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         } else {
                             globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'uncertinity' })
                         }
-                        objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'uncertinity' } });
+                        await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'uncertinity' } });
                         //return `CR${calibUId}0UNCERTINITY CALIB,PENDING FOR BALANCE,,,`;
                         //return `CR${calibUId}0Uncertinity,Calibration Pending,,,`;
                         //if (serverConfig.ProjectName == 'MLVeer') {
@@ -190,7 +190,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         } else {
                             globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'repeatability' })
                         }
-                        objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'repeatability' } });
+                        await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'repeatability' } });
                         //return `CR${calibRId}0REPETABILITY CALIB,PENDING FOR BALANCE,,,`;
                         //return `CR${calibRId}0Repetability,Calibration Pending,,,`;
                         //if (serverConfig.ProjectName == 'MLVeer') {
@@ -208,7 +208,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         } else {
                             globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'linearity' })
                         }
-                        objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'linearity' } });
+                        await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'linearity' } });
                         //return `CR${calibLId}1LINEARITY CALIB,PENDING FOR BALANCE,,,`;
                         //if (serverConfig.ProjectName == 'MLVeer') {
                         //    return `CR${calibLId}0Linearity,Calibration Pending,,,`;
@@ -224,7 +224,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         } else {
                             globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'eccentricity' })
                         }
-                        objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'eccentricity' } });
+                        await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'eccentricity' } });
                         //return `CR${calibEId}0ECCENTRICITY CALIB,PENDING FOR BALANCE,,,`;
                         //return `CR${calibEId}0Eccentricity,Calibration Pending,,,`;
                         //if (serverConfig.ProjectName == 'MLVeer') {
@@ -241,7 +241,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         } else {
                             globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'positional' })
                         }
-                        objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'positional' } });
+                        await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'positional' } });
                         return `CR0`;
                         next();
                         break;

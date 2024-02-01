@@ -266,7 +266,7 @@ class CalibrationModel {
                     /* 
                        */
                     var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                     // Updating RepSrNo if this calibration is first
                     // if (globalData.arrSortedCalib[0] == 'P') {
                     //     await comman.updateRepSrNo('periodic', strBalId,IDSSrNo);
@@ -331,7 +331,7 @@ class CalibrationModel {
                     }
                     await database.save(inserDetailObj);
                     var wt1 = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
 
                 }
 

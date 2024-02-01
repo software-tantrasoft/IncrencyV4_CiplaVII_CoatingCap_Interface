@@ -589,7 +589,7 @@ class Eccentricity {
                     await database.save(insertObj)
                     await database.save(insertIncompleteDetailsObj)
                     var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                     // activity Entry for Eccentricity Calibration Completion
 
                     var objActivity = {}
@@ -660,7 +660,7 @@ class Eccentricity {
                     await database.save(inserDetailObj)
 
                     var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                    objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
 
                 }
 

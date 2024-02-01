@@ -997,7 +997,7 @@ class CalibrationModel {
           //
 
           var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-          objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+          await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
 
           var objActivity = {};
           objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
@@ -1076,7 +1076,7 @@ class CalibrationModel {
           // console.log(updateObj)
           await database.update(updateObj)
           var wt1 = str_Protocol.split(',')[1].trim().split(' ')[0];
-          objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
+          await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt1 } });
 
 
 
@@ -1400,7 +1400,7 @@ class CalibrationModel {
                 ]
               }
               var res = await database.save(insertDetailObj);
-              objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: tempcalibObj.Daily.WT } });
+              await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: tempcalibObj.Daily.WT } });
 
               var objActivity = {};
               objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
@@ -1471,7 +1471,7 @@ class CalibrationModel {
                 ]
               }
               await database.update(updateObj)
-              objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: tempcalibObj.Daily.WT } });
+              await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: tempcalibObj.Daily.WT } });
             }
             if (parseInt(srNo) == objBalRelWt.calibWt.length) {
               if (objSendWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSendWt.Bal_PosTol)) {

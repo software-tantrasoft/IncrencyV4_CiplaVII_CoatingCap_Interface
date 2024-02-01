@@ -296,7 +296,7 @@ class LinearityModel {
                         }
                         await database.save(insertIncompleteLinearityDetailsObj);
                         var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                        objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                        await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                         // Updating RepSrNo if this calibration is first
                         // activity Entry for Linearity Calibration Start
                         const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
@@ -372,7 +372,7 @@ class LinearityModel {
                         }
                         await database.save(inserDetailObj);
                         var wt = str_Protocol.split(',')[1].trim().split(' ')[0];
-                        objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
+                        await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: wt } });
                         // if (parseInt(srNo) == objBalRelWt.calibWt.length) {
                         //     // If this calibration is last calibration then we have to move all caibration records
                         //     // to complete tables
