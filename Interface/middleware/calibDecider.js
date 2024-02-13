@@ -116,9 +116,27 @@ async function calibDeciderforhardness(str_Protocol, IDSSrNo) {
         case 'periodic':
             var result = await periodiccalibrationModel.newverifyWeights(str_Protocol, IDSSrNo); 
             return result;
-        default:
-            console.log('Cal Decider not set');
-            break;
+            case 'vernierPeriodic':
+                var result = await  periodicCalibrationVernierModel.newverifyWeights(str_Protocol, IDSSrNo)
+                return result;
+                break;
+            case 'uncertinity':
+                var result = await uncertinityCalibModel.newverifyWeights(str_Protocol, IDSSrNo)
+                return result;
+            case 'repeatability':
+                var result = await repetabilityCalibration.newverifyWeights(str_Protocol, IDSSrNo);
+                return result;
+            case 'eccentricity':
+                var result = await eccentricityCaibration.newverifyWeights(str_Protocol, IDSSrNo);
+                return result;
+            case 'linearity':
+                var result = await linearityCalibration.newverifyWeights(str_Protocol, IDSSrNo);
+                return result;
+            case 'positional':
+                break;
+            default:
+                console.log('Cal Decider not set');
+                break;
     }
 } catch (err) {
     throw new Error(err);

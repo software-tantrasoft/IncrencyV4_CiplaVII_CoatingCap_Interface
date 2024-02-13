@@ -392,7 +392,7 @@ class CalibrationModel {
           if (objTareCmd == undefined) {
             appendVal = jsonTareCmd.Mettler.find(
               (mod) => mod.Model == "Default"
-            );
+            ).TareCmd;
           } else {
             appendVal = objTareCmd.TareCmd;
           }
@@ -406,7 +406,7 @@ class CalibrationModel {
           if (objTareCmd == undefined) {
             appendVal = jsonTareCmd.Satorious.find(
               (mod) => mod.Model == "Default"
-            );
+            ).TareCmd;
           } else {
             appendVal = objTareCmd.TareCmd;
           }
@@ -634,7 +634,7 @@ class CalibrationModel {
           if (tempBalace.balance_info[0].Bal_Make.includes('Mettler') || tempBalace.balance_info[0].Bal_Make.includes('METTLER')) {
             var objTareCmd = jsonTareCmd.Mettler.find(mod => tempBalace.balance_info[0].Bal_Model.includes(mod.Model));
             if (objTareCmd == undefined) {
-              appendVal = jsonTareCmd.Mettler.find(mod => mod.Model == "Default");
+              appendVal = jsonTareCmd.Mettler.find(mod => mod.Model == "Default").TareCmd;
             }
             else {
               appendVal = objTareCmd.TareCmd;
@@ -643,7 +643,7 @@ class CalibrationModel {
           else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
             var objTareCmd = jsonTareCmd.Satorious.find(mod => tempBalace.balance_info[0].Bal_Model.includes(mod.Model));
             if (objTareCmd == undefined) {
-              appendVal = jsonTareCmd.Satorious.find(mod => mod.Model == "Default");
+              appendVal = jsonTareCmd.Satorious.find(mod => mod.Model == "Default").TareCmd;
             }
             else {
               appendVal = objTareCmd.TareCmd;

@@ -305,7 +305,7 @@ class CalibrationModel {
                     if (tempBalace.balance_info[0].Bal_Make.includes('Mettler') || tempBalace.balance_info[0].Bal_Make.includes('METTLER')) {
                         var objTareCmd = jsonTareCmd.Mettler.find(mod => tempBalace.balance_info[0].Bal_Model.includes(mod.Model));
                         if (objTareCmd == undefined) {
-                            appendVal = jsonTareCmd.Mettler.find(mod => mod.Model == "Default");
+                            appendVal = jsonTareCmd.Mettler.find(mod => mod.Model == "Default").TareCmd;
                         }
                         else {
                             appendVal = objTareCmd.TareCmd;
@@ -314,7 +314,7 @@ class CalibrationModel {
                     else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
                         var objTareCmd = jsonTareCmd.Satorious.find(mod => tempBalace.balance_info[0].Bal_Model.includes(mod.Model));
                         if (objTareCmd == undefined) {
-                            appendVal = jsonTareCmd.Satorious.find(mod => mod.Model == "Default");
+                            appendVal = jsonTareCmd.Satorious.find(mod => mod.Model == "Default").TareCmd;
                         }
                         else {
                             appendVal = objTareCmd.TareCmd;
@@ -1157,7 +1157,9 @@ class CalibrationModel {
                         if (parseInt(srNo) == objBalRelWt.calibWt.length) {
                             console.log('done');
                             objFailedFlag.failFlagPeriodic = false;
-                            let lastCalibration = "P";
+                            var arr_sortedCalibArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
+                            let lastCalibration = arr_sortedCalibArray[arr_sortedCalibArray.length - 1];
+                            // let lastCalibration = "P";
                             var calibType = 'P';
                             for (var i in globalData.calibrationStatus) {
                                 if (globalData.calibrationStatus[i].BalId == strBalId) {
@@ -1166,7 +1168,7 @@ class CalibrationModel {
                                 }
                             }
                             await comman.updateCalibStatus('P', strBalId, IDSSrNo)
-                            await comman.incompleteToComplete('P', strBalId, IDSSrNo, true);
+                            await comman.incompleteToComplete('P', strBalId, IDSSrNo);
                             if (lastCalibration == 'P') {
                                 await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
                                 BalanceRecalibStatusObject.PeriodicBalRecalib = 0;

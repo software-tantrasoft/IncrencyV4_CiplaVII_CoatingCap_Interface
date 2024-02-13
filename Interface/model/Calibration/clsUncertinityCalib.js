@@ -258,7 +258,11 @@ class Uncertinity {
                 // If any parameter fails the caibration fails
                 // console.log(str_Protocol)
                 if (generalCare == '1' || zeroError == '1' || spiritLevel == '1') {
-                    return "CF";
+                    if (tempCubicInfo.Sys_Area == 'Granulation') {
+                        return "HRcF";
+                    } else {
+                        return "CF";
+                    };
                 } else {
                     // Storing all the balance details for 'tbl_balance' in global array
                     const selectBalInfoObj = {
@@ -379,8 +383,14 @@ class Uncertinity {
                     }
                     var strUnit = tempBalace.balance_info[0].Bal_Unit
                     await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', 'Uncertainty Calibration', 'started');
+                   
+                   
+                    if (tempCubicInfo.Sys_Area == 'Granulation') {
+                        return "HRC" +
+                            "Uncertainty Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + "," + "STD. 001 :" + ",";
+                    } else {
                     return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + `, 0.000,Uncertainty Calib,${TareCmd}`;
-
+                    }
                 }
             }
         } catch (err) {
@@ -419,8 +429,8 @@ class Uncertinity {
                         { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
                     ]
                 }
-                 resultBal = await database.select(selectBalObj);
-              }
+                resultBal = await database.select(selectBalObj);
+            }
             // calculating below parameted from string 
             var srNo = str_Protocol.split(',')[0].substring(2, 4); // Weight Sr Number
             var sendWt = str_Protocol.split(',')[0].substring(4).slice(0, -1); // Weight send for calibration
@@ -435,10 +445,10 @@ class Uncertinity {
                 var weightVal = recieveWt.split(".");
                 decimalValue = weightVal[1].length;
             }
-            if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2 ) {
+            if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2) {
                 var strprotocol = `EMPC00INVALID SAMPLE,RECIEVED,,,`
                 return strprotocol;
-                }
+            }
             // getting weight for previously weight which we sent
             //commented by vivek on 28012020 as per new change*************************************************/ 
             //user can add balance haviing same weigths with different/same tollerence's
@@ -763,6 +773,461 @@ class Uncertinity {
             console.log("error from verifyWeights of Uncertinity", err);
             return err;
         }
+
+    }
+
+    async newverifyWeights(str_Protocol, IDSSrNo) {
+        try {
+            let now = new Date();
+            // calculating Balance Id related to that Ids
+            const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IDSSrNo));
+            var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == parseInt(IDSSrNo));
+            if (objOwner.owner == 'analytical') {
+                var strBalId = tempCubicInfo.Sys_BalID;
+            } else {
+                var strBalId = tempCubicInfo.Sys_BinBalID;
+            }
+
+            var resultBal;
+            if (strBalId != "None") {
+
+                if (objOwner.owner == 'analytical') {
+                    strBalId = tempCubicInfo.Sys_BalID;
+                } else {
+                    strBalId = tempCubicInfo.Sys_BinBalID;
+                }
+                var selectBalObj = {
+                    str_tableName: 'tbl_balance',
+                    data: '*',
+                    condition: [
+                        { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
+                    ]
+                }
+                resultBal = await database.select(selectBalObj);
+            }
+            // // calculating below parameted from string 
+            // var srNo = str_Protocol.split(',')[0].substring(2, 4); // Weight Sr Number
+            // var sendWt = str_Protocol.split(',')[0].substring(4).slice(0, -1); // Weight send for calibration
+            // var recieveWt = str_Protocol.split(',')[1].split(' ')[0]; // recived weight after calibration
+            // var objBalRelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
+
+            // var decimalValue;
+            // if (recieveWt.match(/^\d+$/)) {
+            //     decimalValue = 0;
+            // }
+            // else {
+            //     var weightVal = recieveWt.split(".");
+            //     decimalValue = weightVal[1].length;
+            // }
+            // if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2) {
+            //     var strprotocol = `EMPC00INVALID SAMPLE,RECIEVED,,,`
+            //     return strprotocol;
+            // }
+            // getting weight for previously weight which we sent
+            //commented by vivek on 28012020 as per new change*************************************************/ 
+            //user can add balance haviing same weigths with different/same tollerence's
+            //so we will fetch weight according to thier serial number 
+            //const objSentWt = objBalRelWt.calibWt.find(j => j.Bal_StdWt == parseFloat(sendWt));
+
+            var Bal_DP = globalData.arrBalance.filter((k) => k.idsNo == IDSSrNo)[0].balance_info.find(k => k.Bal_ID == strBalId).Bal_DP
+
+            var protocolValue = str_Protocol.substring(0, 5); // starting 5 character
+            var protocolValueData = str_Protocol.substring(5); // starting 5 character
+            var protocolIncomingType = str_Protocol.substring(0, 1); //Check incoming Protocol is from "T" or "H"
+            var tempcalibObj = globalData.calibrationforhard.find(td => td.idsNo == IDSSrNo);
+
+            var objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
+            const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
+            const balanceInfo = tempBalObject.balance_info[0];
+            if (objFailedFlag == undefined) {
+                globalData.arrFlagForFailCalib.push({
+                    idsNo: IDSSrNo,
+                    failFlagDaily: false,
+                    failFlagPeriodic: false
+                });
+                objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
+            }
+
+            if (protocolValue != protocolIncomingType + "C000") {
+                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await containsNumber(protocolValueData))) {
+                    if (tempcalibObj.sampleNoforUncertainty != 0) {
+                        tempcalibObj.sampleNoforUncertainty -= 1;
+                    }
+                    tempcalibObj.Uncertainty = {};
+                    tempcalibObj.datetimecount = 0;
+                    return `HR40Invalid String,,,,`
+                }
+                if (protocolValueData != '' && protocolValueData.includes('Date') == true) {
+                    tempcalibObj.datetimecount = 1;
+                    // var date ;
+                    // if (str_Protocol.split('Date')[1].includes('N')) {
+                    //     date = str_Protocol.split('Date')[1].split('N')[0].trim(" ");;
+                    // } else if (str_Protocol.split('Date')[1].includes('n')) {
+                    //     date = str_Protocol.split('Date')[1].split('n')[0].trim(" ");
+                    // } else {
+                    //     date = str_Protocol.split('Date')[1].split('R')[0].trim(" ");
+                    // }
+                    //   tempcalibObj.periodic.date = date;
+                } else if (protocolValueData != '' && protocolValueData.includes('Time') == true) {
+                    // var time;
+                    tempcalibObj.datetimecount = 2;
+                    // if (str_Protocol.split('Time')[1].includes('N')) {
+                    //     time = str_Protocol.split('Time')[1].split('N')[0].trim(" ");;
+                    // } else if (str_Protocol.split('Time')[1].includes('n')) {
+                    //     time = str_Protocol.split('Time')[1].split('n')[0].trim(" ");
+                    // } else {
+                    //     time = str_Protocol.split('Time')[1].split('R')[0].trim(" ");
+                    // }
+                    // tempcalibObj.periodic.time = time;
+                } else if (protocolValueData != '' && tempcalibObj.datetimecount == 2 && (protocolValueData.includes('MG') == true || protocolValueData.includes('mg') == true || protocolValueData.includes('GM') == true || protocolValueData.includes('gm') == true || protocolValueData.includes('kg') == true || protocolValueData.includes('KG') == true)) {
+                    tempcalibObj.datetimecount = 3;
+                    var unitarr = ["gm", "GM", "MG", "mg", "KG", "kg"];
+                    var unit;
+                    var resultofunit = unitarr.some(i => {
+                        if (protocolValueData.includes(i)) {
+                            unit = i;
+                            return true
+                        }
+                    });
+                    if (resultofunit == false) {
+                        tempcalibObj.Uncertainty = {};
+                        tempcalibObj.datetimecount = 0;
+                        return `HR40Invalid String,,,,`
+                    } else {
+                        tempcalibObj.Uncertainty.WT = protocolValueData.split(/mg|MG|GM|gm|KG|kg/)[0].trim();
+                        tempcalibObj.Uncertainty.unit = unit;
+                        if (await this.calibstringiswrong(tempcalibObj.Uncertainty.WT, tempcalibObj.Uncertainty.unit, balanceInfo.Bal_Unit)) {
+                            tempcalibObj.Uncertainty = {};
+                            tempcalibObj.datetimecount = 0;
+                            return `HR40Invalid String,,,,`
+                        } else {
+                            tempcalibObj.sampleNoforUncertainty += 1;
+                        }
+                    }
+                }
+                return protocolValue;
+            }
+            else {
+                if (tempcalibObj.datetimecount == 3) {
+                    var srNo = tempcalibObj.sampleNoforUncertainty;
+                    var recieveWt = tempcalibObj.Uncertainty.WT;
+                    var objBalRelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
+                    const objSentWt = objBalRelWt.calibWt[0];
+
+                    const selectpreCalibWtObj = {
+                        str_tableName: 'tbl_precalibration_uncertainty',
+                        data: '*',
+                        condition: [
+                            { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
+                            { str_colName: 'UID', value: objSentWt.Id, comp: 'eq' },
+                            // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
+                        ]
+                    }
+                    var result = await database.select(selectpreCalibWtObj)
+                    var uncertinity_precalib_weights = result[0][0];
+                    var counter = uncertinity_precalib_weights.Repeat_Count;
+                    if (parseInt(srNo) <= counter) {
+                        var srNotobepalced = parseInt(srNo) + 1;
+                        var int_RepSrNo;
+                        // const tempBalObject = globalData.arrBalance.find(k => k.idsNo === IDSSrNo);
+                        const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
+                        // getting only balanceInfo
+                        const balanceInfo = tempBalObject.balance_info[0];
+                        // getting userIfo logged in for that cubicle
+
+                        if (objOwner.owner == 'analytical') {
+                            var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatus.find(k => k.Bal_ID == strBalId);
+                        } else {
+                            var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatusBin.find(k => k.Bal_ID == strBalId);
+                        }
+                        const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+                        if (parseInt(srNo) == 1) {
+
+                            /** code for storing all the wgt in column of std wgt ,neg tol and pos tol */
+                            var combineStdWt = "";
+                            var combineLowerLimit = "";
+                            var combineUpperLimit = "";
+                            for (let i of objBalRelWt.calibWt) {
+                                combineStdWt = combineStdWt + i.Bal_StdWt + ",";
+                                combineLowerLimit = combineLowerLimit + i.Bal_NegTol + ",";
+                                combineUpperLimit = combineUpperLimit + i.Bal_PosTol + ",";
+                            }
+                            combineStdWt = combineStdWt.slice(0, -1)
+                            combineLowerLimit = combineLowerLimit.slice(0, -1)
+                            combineUpperLimit = combineUpperLimit.slice(0, -1);
+                            // Inserting entries in master table for daily/Periodic calibration
+                            // Object for inserting data for Incommplete master
+                            // for sun halol we want precalibration details in report
+
+                            var RepNo = await obj_getRepSrNo.getReportSerialNumber('U', strBalId, IDSSrNo)
+                            const insertObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                                data: [
+                                    { str_colName: 'Uncertinity_RepNo', value: RepNo },
+                                    { str_colName: 'Uncertinity_CalbDate', value: date.format(now, 'YYYY-MM-DD') },
+                                    { str_colName: 'Uncertinity_CalbTime', value: date.format(now, 'HH:mm:ss') },
+                                    { str_colName: 'Uncertinity_BalID', value: balanceInfo.Bal_ID, },
+                                    { str_colName: 'Uncertinity_BalSrNo', value: balanceInfo.Bal_SrNo },
+                                    { str_colName: 'Uncertinity_Make', value: balanceInfo.Bal_Make },
+                                    { str_colName: 'Uncertinity_Model', value: balanceInfo.Bal_Model },
+                                    { str_colName: 'Uncertinity_Unit', value: balanceInfo.Bal_Unit },
+                                    { str_colName: 'Uncertinity_Dept', value: balanceInfo.Bal_Dept },
+                                    { str_colName: 'Uncertinity_LeastCnt', value: balanceInfo.Bal_LeastCnt },
+                                    { str_colName: 'Uncertinity_MaxCap', value: balanceInfo.Bal_MaxCap },
+                                    { str_colName: 'Uncertinity_MinCap', value: balanceInfo.Bal_MinCap },
+                                    { str_colName: 'Uncertinity_ZeroError', value: 0 },
+                                    { str_colName: 'Uncertinity_SpritLevel', value: 0 },
+                                    { str_colName: 'Uncertinity_GerneralCare', value: 0 },
+                                    { str_colName: 'Uncertinity_UserID', value: tempUserObject.UserId },
+                                    { str_colName: 'Uncertinity_UserName', value: tempUserObject.UserName },
+                                    { str_colName: 'Uncertinity_Location', value: serverConfig.ProjectName == 'SunHalolGuj1' ? tempCubicInfo.Sys_Location : tempCubicInfo.Sys_Area },
+                                    { str_colName: 'Uncertinity_PrintNo', value: 0 },
+                                    { str_colName: 'Uncertinity_StdWeight', value: combineStdWt },
+                                    { str_colName: 'Uncertinity_NegTol', value: combineLowerLimit },
+                                    { str_colName: 'Uncertinity_PosTol', value: combineUpperLimit },
+                                    { str_colName: 'Decimal_Point', value: Bal_DP },
+                                    { str_colName: 'Uncertinity_IsBinBalance', value: balanceInfo.IsBinBalance }
+
+                                ]
+                            }
+                            await database.save(insertObj)
+
+                            const selectpreCalibWtObj = {
+                                str_tableName: 'tbl_precalibration_uncertainty',
+                                data: '*',
+                                condition: [
+                                    { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
+                                    { str_colName: 'UID', value: objSentWt.Id, comp: 'eq' },
+                                    // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
+                                ]
+                            }
+                            var result = await database.select(selectpreCalibWtObj)
+                            var uncertinity_precalib_weights = result[0][0];
+                            const insertIncompleteDetailsObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_detail_incomplete',
+                                data: [
+                                    { str_colName: 'Uncertinity_RecNo', value: 1 },
+                                    { str_colName: 'Uncertinity_RepNo', value: RepNo },
+                                    { str_colName: 'Uncertinity_BalStdWt', value: objSentWt.Bal_StdWt },
+                                    { str_colName: 'Uncertinity_BalNegTol', value: objSentWt.Bal_NegTol },
+                                    { str_colName: 'Uncertinity_BalPosTol', value: objSentWt.Bal_PosTol },
+                                    { str_colName: 'Uncertinity_ActualWt', value: recieveWt },
+                                    { str_colName: 'Uncertinity_StdWtID', value: uncertinity_precalib_weights.CalibrationBox_ID },
+                                    { str_colName: 'Uncertinity_StdWt', value: uncertinity_precalib_weights.CalibrationBox_Selected_Elements },
+                                    { str_colName: 'Uncertinity_WtIdentification', value: '' },
+                                    { str_colName: 'Uncertinity_WeightBox_certfctNo', value: uncertinity_precalib_weights.CalibrationBox_Calibration_CertificateNo },
+                                    { str_colName: 'PercentofCapacity', value: uncertinity_precalib_weights.Percent_of_Capacity },
+                                    { str_colName: 'Uncertinity_ValDate', value: uncertinity_precalib_weights.CalibrationBox_Validity_Date },
+                                ]
+                            }
+
+                            await database.save(insertIncompleteDetailsObj)
+                          
+                            // activity Entry for Uncerinity Calibration Start
+
+                            var objActivity = {}
+                            Object.assign(objActivity,
+                                { strUserId: tempUserObject.UserId },
+                                { strUserName: tempUserObject.UserName },
+                            );
+
+
+                            if (objFailedFlag.failFlagPeriodic == true) {
+                                var CalibName = "Uncertinity";
+                                Object.assign(objActivity,
+                                    { activity: `${CalibName} Calibration Started on IDS ${IDSSrNo} after Failure` }
+                                );
+                            }
+                            else {
+                                var CalibName = "Uncertinity";
+                                Object.assign(objActivity,
+                                    { activity: `${CalibName} Calibration Started on IDS` + IDSSrNo }
+                                );
+                            }
+
+                            await objActivityLog.ActivityLogEntry(objActivity);
+
+                            await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
+                            //
+                            // Updating RepSrNo if this calibration is first
+                            var sortedArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
+                            if (sortedArray[0] == 'U') {
+                                await comman.updateRepSrNo('uncertanity', strBalId, IDSSrNo);
+                            }
+
+
+                        } else {
+                            var int_Uncertinity_RecNo1;
+                            // Selecting data from tbl_calibration_uncertinity_master_incomplete based on 'strBalId'
+                            const selectRepSrNoObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                                data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
+                                condition: [
+                                    { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
+                                ]
+                            }
+                            result = await database.select(selectRepSrNoObj)
+                            let int_Uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+                            // Selecting Periodic_RecNo from tbl_calibration_uncertinity_detail_incomplete based on 'int_periodic_RepNo'
+                            const selectRecNoObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_detail_incomplete',
+                                data: 'MAX(Uncertinity_RecNo) AS Uncertinity_RecNo',
+                                condition: [
+                                    { str_colName: 'Uncertinity_RepNo', value: int_Uncertinity_RepNo, comp: 'eq' },
+                                ]
+                            }
+                            var resultRecNo = await database.select(selectRecNoObj);
+                            const Uncertinity_RecNo = resultRecNo[0][0].Uncertinity_RecNo;
+                            int_Uncertinity_RecNo1 = Uncertinity_RecNo + 1;
+                            const inserDetailObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_detail_incomplete',
+                                data: [
+                                    { str_colName: 'Uncertinity_RecNo', value: int_Uncertinity_RecNo1 },
+                                    { str_colName: 'Uncertinity_RepNo', value: int_Uncertinity_RepNo },
+                                    { str_colName: 'Uncertinity_BalStdWt', value: objSentWt.Bal_StdWt },
+                                    { str_colName: 'Uncertinity_BalNegTol', value: objSentWt.Bal_NegTol },
+                                    { str_colName: 'Uncertinity_BalPosTol', value: objSentWt.Bal_PosTol },
+                                    { str_colName: 'Uncertinity_ActualWt', value: recieveWt },
+                                    { str_colName: 'Uncertinity_StdWtID', value: uncertinity_precalib_weights.CalibrationBox_ID },
+                                    { str_colName: 'Uncertinity_StdWt', value: uncertinity_precalib_weights.CalibrationBox_Selected_Elements },
+                                    { str_colName: 'Uncertinity_WtIdentification', value: '' },
+                                    { str_colName: 'Uncertinity_WeightBox_certfctNo', value: uncertinity_precalib_weights.CalibrationBox_Calibration_CertificateNo },
+                                    { str_colName: 'PercentofCapacity', value: uncertinity_precalib_weights.Percent_of_Capacity },
+                                    { str_colName: 'Uncertinity_ValDate', value: uncertinity_precalib_weights.CalibrationBox_Validity_Date },
+                                ]
+                            }
+                            await database.save(inserDetailObj);
+                            await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
+                        }
+                    }
+
+                    if (parseFloat(objSentWt.Bal_NegTol) <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= parseFloat(objSentWt.Bal_PosTol))) {
+
+                        if (parseInt(srNo) == counter) {
+                            console.log('done');
+
+                            await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
+                            const selectRepSrNoObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                                data: 'Uncertinity_RepNo',
+                                condition: [
+                                    { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
+                                ]
+                            }
+                            let result = await database.select(selectRepSrNoObj)
+                            let int_Uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+                            // const selectRecNoObj = {
+                            //     str_tableName: 'tbl_calibration_uncertinity_detail_incomplete',
+                            //     data: 'Uncertinity_ActualWt',
+                            //     condition: [
+                            //         { str_colName: 'Uncertinity_RepNo', value: int_Uncertinity_RepNo, comp: 'eq' },
+                            //     ]
+                            // }
+                            //var resultRecNo = await database.select(selectRecNoObj);
+                            let remark = await comman.calibrationCalculation('U', int_Uncertinity_RepNo);
+                            if (remark == "Complies") {
+
+
+                                // Updating Periodic status from 0 -> 1 in calibration_status table as well as our global array
+                                // which holding calibration status
+                                await comman.updateCalibStatus('U', strBalId, IDSSrNo);
+                                var calibType = 'U';
+                                for (var i in globalData.calibrationStatus) {
+                                    if (globalData.calibrationStatus[i].BalId == strBalId) {
+                                        globalData.calibrationStatus[i].status[calibType] = 1;
+                                        break; //Stop this loop, we found it!
+                                    }
+                                }
+                                // If this calibration is last calibration then we have to move all caibration records
+                                // to complete tables
+                                var arr_sortedCalibArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
+                                let lastCalibration = arr_sortedCalibArray[arr_sortedCalibArray.length - 1];
+
+                                await comman.incompleteToComplete('U', strBalId, IDSSrNo);
+                                if (lastCalibration == 'U') {
+                                    await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
+                                    BalanceRecalibStatusObject.PeriodicBalRecalib = 0;
+                                }
+                                objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                                // activity Entry for Uncertanity Calibration Completion
+                                const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+                                var objActivity = {}
+                                Object.assign(objActivity,
+                                    { strUserId: tempUserObject.UserId },
+                                    { strUserName: tempUserObject.UserName },
+                                    { activity: 'Uncertainty Calibration Completed on IDS' + IDSSrNo });
+                                objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
+
+                                result = await checkForPenCal.checkForPendingCalib(strBalId, IDSSrNo)
+                                return "HRc0";
+                            }
+                            else {
+                                const selectRepSrNoObj = {
+                                    str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                                    data: 'Uncertinity_RepNo',
+                                    condition: [
+                                        { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
+                                    ]
+                                }
+                                result = await database.select(selectRepSrNoObj)
+                                let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+                                await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
+                                objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                                return 'HRcF';
+                            }
+                        } else {
+
+                            if (srNotobepalced < 10) {
+
+                                tempcalibObj.Uncertinity = {};
+                                tempcalibObj.datetimecount = 0;
+                                return "HRC" + "Uncertainty Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+                            } else {
+                                tempcalibObj.Uncertinity = {};
+                                tempcalibObj.datetimecount = 0;
+
+                                return "HRC" + "Uncertainty Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+                            }
+
+                        }
+
+                    } else {
+                        // We have to move records to failed tables
+                        const selectRepSrNoObj = {
+                            str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                            data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
+                            condition: [
+                                { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
+                            ]
+                        }
+                        result = await database.select(selectRepSrNoObj)
+                        let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+                        await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
+                        await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
+                        objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                        return 'HRcF';
+
+                    }
+                } else {
+                    tempcalibObj.Uncertainty = {};
+                    tempcalibObj.datetimecount = 0;
+                    return `+,`
+                }
+            }
+        } catch (err) {
+            console.log("error from verifyWeights of Uncertinity", err);
+            return err;
+        }
+
+    }
+
+    async calibstringiswrong(weight, unit, productunit) {
+        if (isNaN(weight) || weight == '') {
+            return true;
+        } else if (unit.toUpperCase() != productunit.toUpperCase()) {
+            return true;
+        }
+        return false;
 
     }
     //**************************************************************************************************************** */
