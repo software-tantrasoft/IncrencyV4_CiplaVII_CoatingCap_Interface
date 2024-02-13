@@ -169,7 +169,7 @@ class StoredProcedure {
 
     async CalrepeatPercantage(repSrNo,repetabilityDetailTable,balId){
         return new Promise((resolve,reject) => {
-            let strquery = "CALL RepeatabilityPercentage(" + repSrNo + ",'" + balId + "','" + repetabilityDetailTable + "'," +
+            let strquery = "CALL RepeatabilityPercentage_7Goa(" + repSrNo + ",'" + balId + "','" + repetabilityDetailTable + "'," +
                 "@balLeastCount,@balDSNW,@repeatabilityPer,@repFormula,@result);"+
                 "SELECT @balLeastCount,@balDSNW,@repeatabilityPer,@repFormula,@result;";
             connection.query(strquery, function (err, rows, fields) {

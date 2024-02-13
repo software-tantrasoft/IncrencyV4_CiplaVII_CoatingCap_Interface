@@ -61,6 +61,11 @@
             "SendCmd":"Y"
         },
         {
+            "Model":"CPA323S",
+            "TareCmd":"T",
+            "SendCmd":"Y"
+        },
+        {
             "Model":"Default",
             "TareCmd":"T",
             "SendCmd":"Y"
