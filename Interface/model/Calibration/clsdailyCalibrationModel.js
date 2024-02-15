@@ -312,11 +312,11 @@ class CalibrationModel {
                 //return `CR${calibDId}0Daily Verification,Pending,,,`;
                 //}
                 //else {
-                  if(objOwner.owner == 'analytical' && strBalId != 'None'){
+                  // if(objOwner.owner == 'analytical' && strBalId != 'None'){
                     return `CR${calibDId}1Daily Verification,Pending,,,`;
-                  }else{
-                    return "CR0";
-                  }
+                  // }else{
+                  //   return "CR0";
+                  // }
                 
                 //}
               } else {
