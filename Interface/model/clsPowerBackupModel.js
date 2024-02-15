@@ -330,6 +330,10 @@ class PowerBackup {
                     Weightment_type = 3;// individual layer 1
                     Weightment_name = 'Thickness';
                     break; 
+                case "D":
+                    Weightment_type = 3;
+                    Weightment_name = 'Differential';
+                    break;
                 case "4":
                     Weightment_name = 'Breadth';
                     break; 
