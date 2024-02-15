@@ -3629,7 +3629,7 @@ class BulkWeighment {
                     if (testBasketType == true) {
                         var basketA = actualProtocol.split("|")[1].trim()
                         var basketB = actualProtocol.split("|")[2].trim()
-                        if (basketA.includes('10 Mesh')|| basketA.includes('Bolus')) {
+                        if ((basketA.includes('10 Mesh') && basketB.includes('10 Mesh')) || (basketA.includes('Bolus') && basketB.includes('Bolus'))) {
                             tempDTObj.basketType = basketA;
                         } else {
                             const objBulkInvalid = new bulkInvalid();
@@ -3649,12 +3649,79 @@ class BulkWeighment {
                     }
 
                     if (testDurTime) {
-                        if (tempDTObj.mode == 'Dual') {
-                            var sample = actualProtocol;
-                            var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
-                            if (productObj.Sys_RotaryType == 'Single') {
-                                if (JARTypeobj.JarType === 'A') {
-                                    if (!await this.isValidTime(sample.split("|")[1].trim())) {
+
+                        if (tempDTObj.basketType.includes("Bolus")) {
+                            if (tempDTObj.mode == 'Dual') {
+                                var sample = actualProtocol;
+                                var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                                // if (productObj.Sys_RotaryType == 'Single') {
+                                //     if (JARTypeobj.JarType === 'A') {
+                                //         if (!await this.isValidTime(sample.split("|")[1].trim())) {
+                                //             const objBulkInvalid = new bulkInvalid();
+                                //             objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                //             objBulkInvalid.invalidObj.DT.invalid = true;
+                                //             objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                //             Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                //         }
+                                //     }
+                                //     if (JARTypeobj.JarType === 'B') {
+                                //         if (!await this.isValidTime(sample.split("|")[2].trim())) {
+                                //             const objBulkInvalid = new bulkInvalid();
+                                //             objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                //             objBulkInvalid.invalidObj.DT.invalid = true;
+                                //             objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                //             Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                //         }
+                                //     }
+                                // }
+                                // else {
+                                    if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                // }
+
+
+                                var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
+                                //globalData.arrDTDataReading.push(c1Obj);
+                                if (sample1.A != undefined && sample1.B != undefined) {
+                                    tempDTObj.arr_reading.push(sample1);
+                                }
+                                sample_recived = true;
+
+
+                            }
+
+                        }
+                        else {
+                            if (tempDTObj.mode == 'Dual') {
+                                var sample = actualProtocol;
+                                var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                                if (productObj.Sys_RotaryType == 'Single') {
+                                    if (JARTypeobj.JarType === 'A') {
+                                        if (!await this.isValidTime(sample.split("|")[1].trim())) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    }
+                                    if (JARTypeobj.JarType === 'B') {
+                                        if (!await this.isValidTime(sample.split("|")[2].trim())) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    }
+                                }
+                                else {
+                                    if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
                                         const objBulkInvalid = new bulkInvalid();
                                         objBulkInvalid.invalidObj.idsNo = IdsNo;
                                         objBulkInvalid.invalidObj.DT.invalid = true;
@@ -3662,18 +3729,266 @@ class BulkWeighment {
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                     }
                                 }
-                                if (JARTypeobj.JarType === 'B') {
-                                    if (!await this.isValidTime(sample.split("|")[2].trim())) {
+
+
+                                var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
+                                //globalData.arrDTDataReading.push(c1Obj);
+                                if (sample1.A != undefined && sample1.B != undefined) {
+                                    tempDTObj.arr_reading.push(sample1);
+                                }
+                                sample_recived = true;
+
+                            }
+
+                        }
+                    }
+
+                    if (tempDTObj.basketType != undefined) {
+
+                        if (tempDTObj.basketType.includes("Bolus")) {
+                            var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                            var count1 = actualProtocol.includes("1. ");
+                            if (count1 == true) {
+                                if (tempDTObj.arr_reading[0] == undefined) {
+                                    var countOne = actualProtocol;
+                                    if (countOne.split("|")[1].trim().split(':').length >= 4 || (countOne.split("|")[2].trim().split(':').length >= 4)) {
                                         const objBulkInvalid = new bulkInvalid();
                                         objBulkInvalid.invalidObj.idsNo = IdsNo;
                                         objBulkInvalid.invalidObj.DT.invalid = true;
                                         objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    } else {
+                                        await this.validateTwoSaTime(countOne, productObj, JARTypeobj, IdsNo);
+                                        var c1Obj = { "A": countOne.split("|")[1], "B": countOne.split("|")[2] };
+                                        //globalData.arrDTDataReading.push(c1Obj);
+                                        if (c1Obj.A != undefined && c1Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c1Obj);
+                                        }
                                     }
+                                } else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                 }
                             }
-                            else {
-                                if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
+                            var count2 = actualProtocol.includes("2. ");
+                            if (count2 == true) {
+                                if (tempDTObj.arr_reading[1] == undefined && tempDTObj.arr_reading[0] != undefined) {
+                                    var countTwo = actualProtocol;
+                                    if (countTwo.split("|")[1].trim().split(':').length >= 4 || (countTwo.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c2Obj = { "A": countTwo.split("|")[1], "B": countTwo.split("|")[2] };
+                                        await this.validateTwoSaTime(countTwo, productObj, JARTypeobj, IdsNo);
+                                        if (c2Obj.A != undefined && c2Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c2Obj);
+                                        }
+                                    }
+                                }
+                                else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+                            }
+                            var count3 = actualProtocol.includes("3. ");
+                            if (count3 == true) {
+                                if (tempDTObj.arr_reading[2] == undefined && tempDTObj.arr_reading[1] != undefined) {
+                                    var countThree = actualProtocol;
+                                    if (countThree.split("|")[1].trim().split(':').length >= 4 || (countThree.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c3Obj = { "A": countThree.split("|")[1], "B": countThree.split("|")[2] };
+                                        await this.validateTwoSaTime(countThree, productObj, JARTypeobj, IdsNo);
+                                        if (c3Obj.A != undefined && c3Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c3Obj);
+                                        }
+                                    }
+                                    sample_recived = true;
+                                } else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+
+                            }
+
+                        }
+                        else {
+
+                            var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                            var count1 = actualProtocol.includes("1. ");
+                            if (count1 == true) {
+                                if (tempDTObj.arr_reading[0] == undefined) {
+                                    var countOne = actualProtocol;
+                                    if (countOne.split("|")[1].trim().split(':').length >= 4 || (countOne.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    } else {
+                                        await this.validateTwoSaTime(countOne, productObj, JARTypeobj, IdsNo);
+                                        var c1Obj = { "A": countOne.split("|")[1], "B": countOne.split("|")[2] };
+                                        //globalData.arrDTDataReading.push(c1Obj);
+                                        if (c1Obj.A != undefined && c1Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c1Obj);
+                                        }
+                                    }
+                                } else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+                            }
+                            var count2 = actualProtocol.includes("2. ");
+                            if (count2 == true) {
+                                if (tempDTObj.arr_reading[1] == undefined && tempDTObj.arr_reading[0] != undefined) {
+                                    var countTwo = actualProtocol;
+                                    if (countTwo.split("|")[1].trim().split(':').length >= 4 || (countTwo.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c2Obj = { "A": countTwo.split("|")[1], "B": countTwo.split("|")[2] };
+                                        await this.validateTwoSaTime(countTwo, productObj, JARTypeobj, IdsNo);
+                                        if (c2Obj.A != undefined && c2Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c2Obj);
+                                        }
+                                    }
+                                }
+                                else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+                            }
+                            var count3 = actualProtocol.includes("3. ");
+                            if (count3 == true) {
+                                if (tempDTObj.arr_reading[2] == undefined && tempDTObj.arr_reading[1] != undefined) {
+                                    var countThree = actualProtocol;
+                                    if (countThree.split("|")[1].trim().split(':').length >= 4 || (countThree.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c3Obj = { "A": countThree.split("|")[1], "B": countThree.split("|")[2] };
+                                        await this.validateTwoSaTime(countThree, productObj, JARTypeobj, IdsNo);
+                                        if (c3Obj.A != undefined && c3Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c3Obj);
+                                        }
+                                    }
+                                } else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+
+                            }
+                            var count4 = actualProtocol.includes("4. ");
+                            if (count4 == true) {
+                                if (tempDTObj.arr_reading[3] == undefined && tempDTObj.arr_reading[2] != undefined) {
+                                    var countFour = actualProtocol;
+                                    if (countFour.split("|")[1].trim().split(':').length >= 4 || (countFour.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c4Obj = { "A": countFour.split("|")[1], "B": countFour.split("|")[2] };
+                                        //globalData.arrDTDataReading.push(c4Obj);
+                                        await this.validateTwoSaTime(countFour, productObj, JARTypeobj, IdsNo);
+                                        if (c4Obj.A != undefined && c4Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c4Obj);
+                                        }
+                                    }
+                                } else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+                            }
+                            var count5 = actualProtocol.includes("5. ");
+                            if (count5 == true) {
+                                if (tempDTObj.arr_reading[4] == undefined && tempDTObj.arr_reading[3] != undefined) {
+                                    var countFive = actualProtocol;
+                                    if (countFive.split("|")[1].trim().split(':').length >= 4 || (countFive.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c5Obj = { "A": countFive.split("|")[1], "B": countFive.split("|")[2] };
+                                        //globalData.arrDTDataReading.push(c5Obj);
+                                        await this.validateTwoSaTime(countFive, productObj, JARTypeobj, IdsNo);
+                                        if (c5Obj.A != undefined && c5Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c5Obj);
+                                        }
+                                    }
+                                } else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+
+                            }
+                            var count6 = actualProtocol.includes("6. ");
+                            if (count6 == true) {
+                                if (tempDTObj.arr_reading[5] == undefined && tempDTObj.arr_reading[4] != undefined) {
+                                    var countSix = actualProtocol;
+                                    if (countSix.split("|")[1].trim().split(':').length >= 4 || (countSix.split("|")[2].trim().split(':').length >= 4)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                    else {
+                                        var c6Obj = { "A": countSix.split("|")[1], "B": countSix.split("|")[2] };
+                                        //globalData.arrDTDataReading.push(c6Obj);
+                                        await this.validateTwoSaTime(countSix, productObj, JARTypeobj, IdsNo);
+                                        if (c6Obj.A != undefined && c6Obj.B != undefined) {
+                                            tempDTObj.arr_reading.push(c6Obj);
+                                        }
+                                        sample_recived = true;
+                                    }
+                                } else {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
@@ -3682,181 +3997,8 @@ class BulkWeighment {
                                 }
                             }
 
-
-                            var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
-                            //globalData.arrDTDataReading.push(c1Obj);
-                            if (sample1.A != undefined && sample1.B != undefined) {
-                                tempDTObj.arr_reading.push(sample1);
-                            }
-
-
                         }
                     }
-                    var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
-                    var count1 = actualProtocol.includes("1. ");
-                    if (count1 == true) {
-                        if (tempDTObj.arr_reading[0] == undefined) {
-                            var countOne = actualProtocol;
-                            if (countOne.split("|")[1].trim().split(':').length >= 4 || (countOne.split("|")[2].trim().split(':').length >= 4)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            } else {
-                                await this.validateTwoSaTime(countOne, productObj, JARTypeobj, IdsNo);
-                                var c1Obj = { "A": countOne.split("|")[1], "B": countOne.split("|")[2] };
-                                //globalData.arrDTDataReading.push(c1Obj);
-                                if (c1Obj.A != undefined && c1Obj.B != undefined) {
-                                    tempDTObj.arr_reading.push(c1Obj);
-                                }
-                            }
-                        } else {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
-                    }
-                    var count2 = actualProtocol.includes("2. ");
-                    if (count2 == true) {
-                        if (tempDTObj.arr_reading[1] == undefined && tempDTObj.arr_reading[0] != undefined) {
-                            var countTwo = actualProtocol;
-                            if (countTwo.split("|")[1].trim().split(':').length >= 4 || (countTwo.split("|")[2].trim().split(':').length >= 4)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                            else {
-                                var c2Obj = { "A": countTwo.split("|")[1], "B": countTwo.split("|")[2] };
-                                await this.validateTwoSaTime(countTwo, productObj, JARTypeobj, IdsNo);
-                                if (c2Obj.A != undefined && c2Obj.B != undefined) {
-                                    tempDTObj.arr_reading.push(c2Obj);
-                                }
-                            }
-                        }
-                        else {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
-                    }
-                    var count3 = actualProtocol.includes("3. ");
-                    if (count3 == true) {
-                        if (tempDTObj.arr_reading[2] == undefined && tempDTObj.arr_reading[1] != undefined) {
-                            var countThree = actualProtocol;
-                            if (countThree.split("|")[1].trim().split(':').length >= 4 || (countThree.split("|")[2].trim().split(':').length >= 4)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                            else {
-                                var c3Obj = { "A": countThree.split("|")[1], "B": countThree.split("|")[2] };
-                                await this.validateTwoSaTime(countThree, productObj, JARTypeobj, IdsNo);
-                                if (c3Obj.A != undefined && c3Obj.B != undefined) {
-                                    tempDTObj.arr_reading.push(c3Obj);
-                                }
-                            }
-                        } else {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
-
-                    }
-                    var count4 = actualProtocol.includes("4. ");
-                    if (count4 == true) {
-                        if (tempDTObj.arr_reading[3] == undefined && tempDTObj.arr_reading[2] != undefined) {
-                            var countFour = actualProtocol;
-                            if (countFour.split("|")[1].trim().split(':').length >= 4 || (countFour.split("|")[2].trim().split(':').length >= 4)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                            else {
-                                var c4Obj = { "A": countFour.split("|")[1], "B": countFour.split("|")[2] };
-                                //globalData.arrDTDataReading.push(c4Obj);
-                                await this.validateTwoSaTime(countFour, productObj, JARTypeobj, IdsNo);
-                                if (c4Obj.A != undefined && c4Obj.B != undefined) {
-                                    tempDTObj.arr_reading.push(c4Obj);
-                                }
-                            }
-                        } else {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
-                    }
-                    var count5 = actualProtocol.includes("5. ");
-                    if (count5 == true) {
-                        if (tempDTObj.arr_reading[4] == undefined && tempDTObj.arr_reading[3] != undefined) {
-                            var countFive = actualProtocol;
-                            if (countFive.split("|")[1].trim().split(':').length >= 4 || (countFive.split("|")[2].trim().split(':').length >= 4)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                            else {
-                                var c5Obj = { "A": countFive.split("|")[1], "B": countFive.split("|")[2] };
-                                //globalData.arrDTDataReading.push(c5Obj);
-                                await this.validateTwoSaTime(countFive, productObj, JARTypeobj, IdsNo);
-                                if (c5Obj.A != undefined && c5Obj.B != undefined) {
-                                    tempDTObj.arr_reading.push(c5Obj);
-                                }
-                            }
-                        } else {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
-
-                    }
-                    var count6 = actualProtocol.includes("6. ");
-                    if (count6 == true) {
-                        if (tempDTObj.arr_reading[5] == undefined && tempDTObj.arr_reading[4] != undefined) {
-                            var countSix = actualProtocol;
-                            if (countSix.split("|")[1].trim().split(':').length >= 4 || (countSix.split("|")[2].trim().split(':').length >= 4)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                            else {
-                                var c6Obj = { "A": countSix.split("|")[1], "B": countSix.split("|")[2] };
-                                //globalData.arrDTDataReading.push(c6Obj);
-                                await this.validateTwoSaTime(countSix, productObj, JARTypeobj, IdsNo);
-                                if (c6Obj.A != undefined && c6Obj.B != undefined) {
-                                    tempDTObj.arr_reading.push(c6Obj);
-                                }
-                                sample_recived = true;
-                            }
-                        } else {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                        }
-                    }
-
                     var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
                     if (obJARTypeDT == undefined) {
                         globalData.arrJARTypeDT.push({
@@ -3880,30 +4022,68 @@ class BulkWeighment {
                             JARA.push(tempDTObj.arr_reading[i].A);
                             JARB.push(tempDTObj.arr_reading[i].B);
                         }
-                        if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
-                            tempDTObj.rotaryType = "Double";
+
+
+                        if (tempDTObj.basketType.includes("Bolus")) {
+                            if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
+                                tempDTObj.rotaryType = "Single";
+                            }
+                            else {
+                                const objBulkInvalid = new bulkInvalid();
+                                objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                objBulkInvalid.invalidObj.DT.invalid = true;
+                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
+                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                            }
+
+                            if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
+                                const objBulkInvalid = new bulkInvalid();
+                                objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                objBulkInvalid.invalidObj.DT.invalid = true;
+                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
+                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                            }
                         }
                         else {
+                            if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
+                                tempDTObj.rotaryType = "Double";
+                            }
+                            else {
 
-                            tempDTObj.rotaryType = "Single";
-                        }
+                                tempDTObj.rotaryType = "Single";
+                            }
+                            if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
+                                const objBulkInvalid = new bulkInvalid();
+                                objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                objBulkInvalid.invalidObj.DT.invalid = true;
+                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
+                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                            }
 
-                        if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
-                            const objBulkInvalid = new bulkInvalid();
-                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                            objBulkInvalid.invalidObj.DT.invalid = true;
-                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
-                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
                         }
 
 
                         for (let i = 0; i < tempDTObj.arr_reading.length; i++) {
+                            if (tempDTObj.basketType.includes("Bolus")) {
+                                if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
+                                    obJARTypeDT.JarType = "A/B";
+                                }
+                                else {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID JARTYPE";
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
-                            if (JARA[i].match(/\d+/g)) {
-                                obJARTypeDT.JarType = "A"
-                            }
-                            else if (JARB[i].match(/\d+/g)) {
-                                obJARTypeDT.JarType = "B"
+                                }
+                            } else {
+                                if (JARA[i].match(/\d+/g)) {
+                                    obJARTypeDT.JarType = "A"
+                                }
+                                else if (JARB[i].match(/\d+/g)) {
+                                    obJARTypeDT.JarType = "B"
+                                }
                             }
                         }
 
@@ -4063,43 +4243,53 @@ class BulkWeighment {
 
                         }
                         else {
-
                             var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
                             var A_Min = tempMinVal1.split("|")[1] == '--' ? 0 : tempMinVal1.split("|")[1]
                             var B_Min = tempMinVal1.split("|")[2] == '--' ? 0 : tempMinVal1.split("|")[2]
                             var tempMinObj = { "A_tempMin": A_Min, "B_tempMin": B_Min };
-                            if (productObj.Sys_RotaryType == 'Single' && (A_Min != 0 && B_Min != 0)) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                            }
-
-                            if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
-                                if (isNaN(A_Min) || A_Min === 0) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                }
-                            } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
-                                if (isNaN(B_Min) || B_Min === 0) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                }
-                            } else if (productObj.Sys_RotaryType == 'Double') {
+                            if (tempDTObj.basketType.includes("Bolus")) {
                                 if (isNaN(A_Min) || A_Min === 0 || isNaN(B_Min) || B_Min === 0) {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
                                     objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
                                     Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+                            } else {
+
+                                if (productObj.Sys_RotaryType == 'Single' && (A_Min != 0 && B_Min != 0)) {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                                }
+
+                                if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
+                                    if (isNaN(A_Min) || A_Min === 0) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
+                                    if (isNaN(B_Min) || B_Min === 0) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                } else if (productObj.Sys_RotaryType == 'Double') {
+                                    if (isNaN(A_Min) || A_Min === 0 || isNaN(B_Min) || B_Min === 0) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
                                 }
                             }
 
@@ -4176,24 +4366,7 @@ class BulkWeighment {
                             var tempMaxObj = { "A_tempMax": A_tempMax, "B_tempMax": B_tempMax };
                             var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
                             // globalData.arrDTData.push(tempMaxObj);
-
-                            if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
-                                if (isNaN(A_tempMax) || A_tempMax === 0) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                }
-                            } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
-                                if (isNaN(B_tempMax) || B_tempMax === 0) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                }
-                            } else if (productObj.Sys_RotaryType == 'Double') {
+                            if (tempDTObj.basketType.includes("Bolus")) {
                                 if (isNaN(A_tempMax) || A_tempMax === 0 || isNaN(B_tempMax) || B_tempMax === 0) {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
@@ -4201,7 +4374,34 @@ class BulkWeighment {
                                     objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
                                     Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                 }
+                            } else {
+                                if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
+                                    if (isNaN(A_tempMax) || A_tempMax === 0) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
+                                    if (isNaN(B_tempMax) || B_tempMax === 0) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                } else if (productObj.Sys_RotaryType == 'Double') {
+                                    if (isNaN(A_tempMax) || A_tempMax === 0 || isNaN(B_tempMax) || B_tempMax === 0) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                }
                             }
+
 
                         }
                         tempDTObj.arr_heading.push(tempMaxObj);
@@ -4302,35 +4502,56 @@ class BulkWeighment {
                     var tempTDObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
                     var objJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
                     if (tempTDObj.rotaryType == "Single") {
-                        var endTime = "00:00:00"
-                        if (objJARTypeDT.JarType == "A") {
+                        if (tempTDObj.basketType.includes("Bolus")) {
+                            var endTimeA = "00:00:00"
+                            var endTimeB = "00:00:00"
                             for (var obj of tempTDObj.arr_reading) {
-                                if (obj.A.trim() > endTime) {
-                                    endTime = obj.A.trim();
+                                if (obj.A.trim() > endTimeA) {
+                                    endTimeA = obj.A.trim();
+                                }
+                                if (obj.B.trim() > endTimeB) {
+                                    endTimeB = obj.B.trim();
                                 }
                             }
-                            if (endTime == "00:00:00") {
+                            if (endTimeA == "00:00:00" || endTimeB == "00:00:00") {
                                 const objBulkInvalid = new bulkInvalid();
                                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                                 objBulkInvalid.invalidObj.DT.invalid = true;
                                 objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID Reading Time";
                                 Object.assign(objInvalid, objBulkInvalid.invalidObj);
                             }
-                        }
-                        if (objJARTypeDT.JarType == "B") {
-                            for (var obj of tempTDObj.arr_reading) {
-                                if (obj.B.trim() > endTime) {
-                                    endTime = obj.B.trim();
+                        } else {
+                            var endTime = "00:00:00"
+                            if (objJARTypeDT.JarType == "A") {
+                                for (var obj of tempTDObj.arr_reading) {
+                                    if (obj.A.trim() > endTime) {
+                                        endTime = obj.A.trim();
+                                    }
+                                }
+                                if (endTime == "00:00:00") {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID Reading Time";
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                 }
                             }
-                            if (endTime == "00:00:00") {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID Reading Time";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                            if (objJARTypeDT.JarType == "B") {
+                                for (var obj of tempTDObj.arr_reading) {
+                                    if (obj.B.trim() > endTime) {
+                                        endTime = obj.B.trim();
+                                    }
+                                }
+                                if (endTime == "00:00:00") {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID Reading Time";
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
                             }
                         }
+
                     }
                     else {
                         var endTimeA = "00:00:00"
@@ -4427,6 +4648,17 @@ class BulkWeighment {
                                     var regExp = /(\d{1,2})\:(\d{1,2})\:(\d{1,2})/;
                                     var timeStatus = (parseInt(endTime.replace(regExp, "$1$2$3")) > parseInt(startTime.replace(regExp, "$1$2$3")))
                                     endDate = timeStatus ? startDate : date.format(now, 'YYYY-MM-DD');
+                                } else if (objJARTypeDT.JarType = "A/B") {
+                                    jarType = "A/B";
+                                    endTime = '00:00:00';
+                                    for (let obj of tempTDObj.arr_reading) {
+                                        if (obj.A.trim() > endTime || obj.B.trim() > endTime) { endTime = obj.A.trim() > obj.B.trim() ? obj.A.trim() : obj.B.trim() }
+                                    }
+                                    startTime = newDTData[0].A_st;
+                                    endTime = await this.addTwoTimes(startTime, endTime);
+                                    var regExp = /(\d{1,2})\:(\d{1,2})\:(\d{1,2})/;
+                                    var timeStatus = (parseInt(endTime.replace(regExp, "$1$2$3")) > parseInt(startTime.replace(regExp, "$1$2$3")))
+                                    endDate = timeStatus ? startDate : date.format(now, 'YYYY-MM-DD');
                                 }
                                 else {
                                     jarType = "B";
@@ -4468,8 +4700,8 @@ class BulkWeighment {
                                     { str_colName: 'BFGCode', value: productObj.Sys_BFGCode },
                                     { str_colName: 'ProductName', value: productObj.Sys_ProductName },
                                     { str_colName: 'ProductType', value: ProductType.productType },
-                                    // { str_colName: 'Qty', value: productlimits.DT.noOfSamples },
-                                    { str_colName: 'Qty', value: 6 },
+                                    { str_colName: 'Qty', value: productlimits.DT.noOfSamples },     //client requirement
+                                    // { str_colName: 'Qty', value: 6 },
                                     { str_colName: 'Idsno', value: IdsNo },
                                     { str_colName: 'CubicalNo', value: productObj.Sys_CubicNo },
                                     { str_colName: 'BalanceId', value: currentCubicleObj.Sys_BalID },
@@ -4529,6 +4761,16 @@ class BulkWeighment {
 
                                     { str_colName: 'MinTemp', value: newDTData[3].B_tempMin },
                                     { str_colName: 'MaxTemp', value: newDTData[4].B_tempMax },
+
+                                );
+                            }else if(jarType == "A/B"){
+                               var Min_Temp = newDTData[3].A_tempMin < newDTData[3].B_tempMin ? newDTData[3].A_tempMin : newDTData[3].B_tempMin
+
+                               var Max_Temp = newDTData[4].A_tempMax > newDTData[4].B_tempMax ? newDTData[4].A_tempMax : newDTData[4].B_tempMax
+                                masterCompleteData.data.push(
+
+                                    { str_colName: 'MinTemp', value: Min_Temp },
+                                    { str_colName: 'MaxTemp', value: Max_Temp },
 
                                 );
                             }
@@ -4784,6 +5026,165 @@ class BulkWeighment {
                                 }
                                 return le;
 
+                            }else if(jarType == "A/B"){
+                                    var startTime = newDTData[0].B_st.trim();
+                                    var endTime = newDTData[1].B_et.trim();
+                                    var startTimeval = moment(startTime, 'HH:mm:ss');
+                                    var endTimeval = moment(endTime, 'HH:mm:ss');
+                                    var runTime = moment.utc(moment(endTimeval, "HH:mm:ss")
+                                        .diff(moment(startTimeval, "HH:mm:ss"))).format("HH:mm:ss")
+                                    var hDur = newDTData[2].A_hd.trim();
+    
+                                    for (const [i, dtVal] of jarA.entries()) {
+    
+                                        var endTmSS = moment(startTime, "HH:mm:ss").add(dtVal.trim().split(":")[2], 'seconds').format("HH:mm:ss");
+                                        var endTmMM = moment(endTmSS, "HH:mm:ss").add(dtVal.trim().split(":")[1], 'minutes').format("HH:mm:ss");
+                                        var endTm = moment(endTmMM, "HH:mm:ss").add(dtVal.trim().split(":")[0], 'hours').format("HH:mm:ss");
+    
+                                        const insertDetailObj = {
+                                            str_tableName: detailTable,
+                                            data: [
+                                                { str_colName: 'RepSerNo', value: lastInsertedID },
+                                                { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
+                                                { str_colName: 'RecSeqNo', value: i + 1 },
+                                                { str_colName: 'DT_Side', value: "NA" },
+                                                { str_colName: 'DT_BasketID', value: 0 },
+                                                // { str_colName: 'DT_Temp', value: 0 },
+                                                { str_colName: 'DT_Temp', value: newDTData[4].A_tempMax },//as discussed with sheetal and shraddhanad for hosure
+                                                { str_colName: 'DT_StartTm', value: startTime },
+                                                { str_colName: 'DT_EndTm', value: endTm },
+                                                { str_colName: 'DT_TimeMinSec', value: 0 },
+                                                // { str_colName: 'DT_RunTime', value: runTime },
+                                                { str_colName: 'DT_RunTime', value: dtVal.trim() },
+                                                { str_colName: 'DT_Remark', value: 0 },
+                                                { str_colName: 'DT_DoneByID', value: tempUserObject.UserId },
+                                                { str_colName: 'DT_DoneByName', value: tempUserObject.UserName },
+                                                { str_colName: 'DT_StartDate', value: date.format(now, 'YYYY-MM-DD') },
+                                                { str_colName: 'DT_HaltDur', value: hDur }
+                                            ]
+                                        }
+                                        //console.log(insertDetailObj);
+                                        var jarARes = await database.save(insertDetailObj);
+                                    }
+                                    var hDur = newDTData[2].B_hd.trim();
+                                    for (const [i, dtVal] of jarB.entries()) {
+
+                                        var endTmSS = moment(startTime, "HH:mm:ss").add(dtVal.trim().split(":")[2], 'seconds').format("HH:mm:ss");
+                                        var endTmMM = moment(endTmSS, "HH:mm:ss").add(dtVal.trim().split(":")[1], 'minutes').format("HH:mm:ss");
+                                        var endTm = moment(endTmMM, "HH:mm:ss").add(dtVal.trim().split(":")[0], 'hours').format("HH:mm:ss");
+    
+                                        const insertDetailObj = {
+                                            str_tableName: detailTable,
+                                            data: [
+                                                { str_colName: 'RepSerNo', value: lastInsertedID },
+                                                { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
+                                                { str_colName: 'RecSeqNo', value: i + 1 },
+                                                { str_colName: 'DT_Side', value: "NA" },
+                                                { str_colName: 'DT_BasketID', value: 0 },
+                                                { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
+                                                { str_colName: 'DT_StartTm', value: startTime },
+                                                { str_colName: 'DT_EndTm', value: endTm },
+                                                { str_colName: 'DT_TimeMinSec', value: 0 },
+                                                { str_colName: 'DT_RunTime', value: dtVal.trim() },
+                                                { str_colName: 'DT_Remark', value: 0 },
+                                                { str_colName: 'DT_DoneByID', value: tempUserObject.UserId },
+                                                { str_colName: 'DT_DoneByName', value: tempUserObject.UserName },
+                                                { str_colName: 'DT_StartDate', value: date.format(now, 'YYYY-MM-DD') },
+                                                { str_colName: 'DT_HaltDur', value: hDur }
+                                            ]
+                                        }
+    
+                                        var jarBRes = await database.save(insertDetailObj);
+    
+    
+                                    }
+    
+                                    var regExp = /(\d{1,2})\:(\d{1,2})\:(\d{1,2})/;
+    
+    
+                                    var currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+                                    if (!(currentCubicle.Sys_IPQCType == 'Compression' && currentCubicle.Sys_Area == "Coating")) {
+                                        var returnBatchRes = await objBatchSummary.saveBatchSummaryDT(lastInsertedID, 0, productObj, IdsNo);
+                                    }
+                                    var objUpdateValidation = {
+                                        str_tableName: "tbl_cubical",
+                                        data: [
+                                            { str_colName: 'Sys_Validation', value: 0 },
+                                        ],
+                                        condition: [
+                                            { str_colName: 'Sys_IDSNo', value: IdsNo },
+                                        ]
+                                    }
+                                    await database.update(objUpdateValidation);
+                                    // //Online printing code of Jar B 
+                                    // const objIOnlinePrint = new IOnlinePrint();
+                                    // objIOnlinePrint.RepSerNo = lastInsertedID;
+                                    // objIOnlinePrint.reportOption = "Disintegration Tester";
+                                    // objIOnlinePrint.testType = "Regular";
+                                    // objIOnlinePrint.userId = tempUserObject.UserId;
+                                    // objIOnlinePrint.username = tempUserObject.UserName;
+                                    // objIOnlinePrint.idsNo = IdsNo
+                                    // const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+    
+                                    // await objPrintReport.generateOnlineReport(objIOnlinePrint, objPrinterName.Sys_PrinterName);
+                                    le = `${protocolIncomingType}` + `R1`;
+                                    var tempFlagAJar = false; // For time
+                                    var tempFlagTemp = false // for Tempreture
+
+                                    endTime = '00:00:00';
+                                    for (let obj of tempTDObj.arr_reading) {
+                                        if (obj.A.trim() > endTime || obj.B.trim() > endTime) { endTime = obj.A.trim() > obj.B.trim() ? obj.A.trim() : obj.B.trim() }
+                                    }
+
+                                    if (parseInt(endTime.replace(regExp, "$1$2$3")) > parseInt(actualRunTime.replace(regExp, "$1$2$3"))) {
+                                        tempFlagAJar = true;
+                                    }
+                                    // for (const [i, dtVal] of jarA.entries()) {
+                                    //     if (parseInt(dtVal.trim().replace(regExp, "$1$2$3")) > parseInt(actualRunTime.replace(regExp, "$1$2$3"))) {
+                                    //         // return le = `${protocolIncomingType}` + `R2`;
+                                    //         tempFlagAJar = true;
+                                    //     }
+                                    // }
+
+                                    var Max_Temp = newDTData[4].A_tempMax > newDTData[4].B_tempMax ? newDTData[4].A_tempMax : newDTData[4].B_tempMax
+                                    if ((parseFloat(objArrLimits.DT.T1Neg) > parseFloat(Max_Temp)) ||
+                                        (parseFloat(objArrLimits.DT.T1Pos) < parseFloat(Max_Temp))) {
+                                        tempFlagTemp = true;
+                                    }
+                                    if (tempFlagTemp == true || tempFlagAJar == true) {
+                                        le = `${protocolIncomingType}` + `R2`;
+                                    }
+                                    var objActivity = {};
+                                    Object.assign(objActivity,
+                                        { strUserId: tempUserObject.UserId },
+                                        { strUserName: tempUserObject.UserName },
+                                        { activity: 'DT Weighment Completed on IDS' + IdsNo });
+                                    objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
+                                    objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', 'DT', 'completed');
+                                    //empty object when data is completly saved 
+                                    var tempTDObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
+                                    if (tempTDObj == undefined) {
+                                        globalData.arrDTData.push({
+                                            idsNo: IdsNo, arr_heading: [], arr_reading: [], arr_info: [],
+                                            rotaryType: undefined,
+                                            mode: undefined,
+                                            basketType: undefined,
+                                            Bath_Temp: undefined
+    
+                                        })
+                                    } else {
+                                        tempTDObj.arr_heading = [];
+                                        tempTDObj.arr_reading = [];
+                                        tempTDObj.arr_info = [];
+                                        tempTDObj.rotaryType = undefined;
+                                        tempTDObj.mode = undefined;
+                                        tempTDObj.basketType = undefined;
+                                        tempTDObj.Bath_Temp = undefined;
+    
+                                    }
+                                    return le;
+    
+                                
                             }
                             else {
 
@@ -4868,8 +5269,8 @@ class BulkWeighment {
                                         { str_colName: 'BFGCode', value: productObj.Sys_BFGCode },
                                         { str_colName: 'ProductName', value: productObj.Sys_ProductName },
                                         { str_colName: 'ProductType', value: ProductType.productType },
-                                        // { str_colName: 'Qty', value: templimits.DT.noOfSamples },
-                                        { str_colName: 'Qty', value: 6 },
+                                        { str_colName: 'Qty', value: productlimits.DT.noOfSamples },   //client requirement
+                                        // { str_colName: 'Qty', value: 6 },
                                         { str_colName: 'Idsno', value: IdsNo },
                                         { str_colName: 'CubicalNo', value: productObj.Sys_CubicNo },
                                         { str_colName: 'BalanceId', value: currentCubicleObj.Sys_BalID },
@@ -6817,7 +7218,7 @@ class BulkWeighment {
                     var difference = parseFloat(parseFloat(V3.split(' ')[4]))
                     var diffCountValue = { "diff1": difference };
                     tempTDObj.arr.push(diffCountValue);
-                    
+
                 }
                 else if (actualProtocol.includes("V4A")) {
                     var V4 = actualProtocol.replace(/ +(?= )/g, '');
@@ -6829,7 +7230,7 @@ class BulkWeighment {
                     var difference = parseFloat(parseFloat(V4.split(' ')[4]))
                     var diffCountValue = { "diff2": difference };
                     tempTDObj.arr.push(diffCountValue);
-                  
+
                 }
                 else if (actualProtocol.includes("V4B")) {
                     var V4b = actualProtocol.replace(/ +(?= )/g, '');
@@ -6847,12 +7248,12 @@ class BulkWeighment {
             }
 
 
-          var testResult = actualProtocol.includes("TEST RESULTS");
-          if(testResult ==  true){
-            if(newstring ==  true){
-                tempTDObj.version = undefined;
+            var testResult = actualProtocol.includes("TEST RESULTS");
+            if (testResult == true) {
+                if (newstring == true) {
+                    tempTDObj.version = undefined;
+                }
             }
-          }
 
 
             var serialNo = actualProtocol.includes("Serial No");
@@ -7210,10 +7611,10 @@ class BulkWeighment {
                         // Clear Array on Invalid String 
                         var tempTDOb = globalData.arrTDTData.find(td => td.idsNo == IdsNo);
                         if (tempTDOb == undefined) {
-                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version : undefined  })
+                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version: undefined })
                         } else {
                             tempTDOb.arr = [];
-                            tempTDOb.version = undefined 
+                            tempTDOb.version = undefined
                         }
                         var msg = `${protocolIncomingType}R40Invalid String,,,,`;
                         //var msg = `${protocolIncomingType}R40INVALID DATA,RECEIVED,RETRANSMIT DATA,,`
@@ -7234,10 +7635,10 @@ class BulkWeighment {
                             { activity: 'Tapped Density Weighment Completed on IDS' + IdsNo });
                         var tempTDOb = globalData.arrTDTData.find(td => td.idsNo == IdsNo);
                         if (tempTDOb == undefined) {
-                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version : undefined })
+                            globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version: undefined })
                         } else {
                             tempTDOb.arr = [];
-                            tempTDOb.version = undefined 
+                            tempTDOb.version = undefined
                         }
                         objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
                         // Instrument usage for TDT completed
@@ -7251,10 +7652,10 @@ class BulkWeighment {
                 catch (err) {
                     var TDObj = globalData.arrTDTData.find(td => td.idsNo == IdsNo);
                     if (TDObj == undefined) {
-                        globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version : undefined  })
+                        globalData.arrTDTData.push({ idsNo: IdsNo, arr: [], version: undefined })
                     } else {
                         TDObj.arr = [];
-                        TDObj.version = undefined 
+                        TDObj.version = undefined
                     }
                     console.log(err)
                     return '+';
