@@ -2264,10 +2264,10 @@ class MenuRequestModel {
             query = `SELECT * FROM tbl_cubical WHERE Sys_Area = '${sysArea}' 
                 AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
                 AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType != 'IPC'`;
-        } else if(sysArea == 'Compression' && CubicalData.Sys_CubType == 'IPC'){       //Inprocess-III
+        } else if(sysArea == 'Compression'){       //Inprocess-III    check normal flow as well on compression only
             query = `SELECT * FROM tbl_cubical WHERE Sys_Area = 'Compression' 
             AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'
-            AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0' AND Sys_CubType = 'IPC'`;
+            AND Sys_Batch != 'NULL' AND Sys_IDSNo != '0'`;
         } else if(sysArea == 'Inprocess-I'){                                           //Inprocess-I
             query = `SELECT * FROM tbl_cubical WHERE Sys_Area = 'Inprocess-I' 
             AND Sys_BFGCode != 'NULL' AND Sys_BFGCode != 'None' AND Sys_Batch != 'None'

@@ -8,6 +8,8 @@ const printReport = require('../Weighments/clsPrintReport');
 const serverConfig = require('../../global/severConfig');
 const objPrintReport = new printReport();
 const objActivityLog = new clsActivityLog();
+const clsArea = require('../../model/clsAreaSelection');
+var objArea = new clsArea();
 class Container {
 
     constructor() { }
@@ -274,7 +276,6 @@ class Container {
                     { str_colName: 'Bin_ProductVersion', value: objBin.selProductVersion },
                     { str_colName: 'Bin_Version', value: objBin.selVersion },
                     { str_colName: 'Bin_BatchNo', value: objBin.selBatch },
-                    { str_colName: 'Bin_BatchComplete', value: 1 },       //IPC in Corrioder hence always set batchcomplete 1
                 ]
 
             }
@@ -314,7 +315,6 @@ class Container {
                     { str_colName: 'Bin_DoneUserID', value: objBin.userid },
                     { str_colName: 'Bin_DoneUserName', value: objBin.username },
                     { str_colName: 'Bin_IDSNoWeighment', value: objBin.idsNo },
-                    { str_colName: 'Bin_BatchComplete', value: 1 },  //after gross weight enter the batchcomplete flag set 1 bcoz of ipc in corrioder only
 
                 ],
                 condition: [
@@ -355,6 +355,94 @@ class Container {
                     SerialNoOfContainer.SrNo = SerialNoOfContainer.SrNo + 1;
                 } 
             objUpdateBinInfo.data.push({ str_colName: 'Bin_SrNoWeighment', value: SerialNoOfContainer.SrNo });
+
+            var result = await database.update(objUpdateBinInfo);
+
+            var checkData ={
+                str_tableName: "tbl_cubicle_bin_setting",
+                data: 'Sys_TotalBinSelected',
+                condition: [
+                    { str_colName: 'Sys_IDS', value: objBin.selIds, comp: 'eq' },
+                    { str_colName: 'Sys_PrdID', value: objBin.selProductId, comp: 'eq' },
+                    { str_colName: 'Sys_PrdName', value: objBin.selProductName, comp: 'eq' },
+                    { str_colName: 'Sys_PrdVersion', value: objBin.selProductVersion, comp: 'eq' },
+                    { str_colName: 'Sys_Version', value: objBin.selVersion, comp: 'eq' },
+                    { str_colName: 'Sys_BatchNo', value: objBin.selBatch, comp: 'eq' },
+                ]
+            } 
+
+            var selectBinSettings = await database.select(checkData);
+
+            var checkData1 ={
+                str_tableName: objUpdateBinInfo.str_tableName,
+                data: 'COUNT(*) AS reccount',
+                condition: [
+                    { str_colName: 'Bin_IDSNo', value: objBin.selIds, comp: 'eq' },
+                    { str_colName: 'Bin_ProductID', value: objBin.selProductId, comp: 'eq' },
+                    { str_colName: 'Bin_ProductName', value: objBin.selProductName, comp: 'eq' },
+                    { str_colName: 'Bin_ProductVersion', value: objBin.selProductVersion, comp: 'eq' },
+                    { str_colName: 'Bin_Version', value: objBin.selVersion, comp: 'eq' },
+                    { str_colName: 'Bin_BatchNo', value: objBin.selBatch, comp: 'eq' },
+                    { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
+                    { str_colName: 'Bin_Status', value: 1, comp: 'eq' },
+                ]
+
+            } 
+            var totalBins = await database.select(checkData1);
+
+            if (selectBinSettings[0][0].Sys_TotalBinSelected === totalBins[0][0].reccount) {
+
+                if (area.toUpperCase() == "INPROCESS-I"  ||
+                    area.toUpperCase() == "INPROCESS-IV") {
+
+                    var objBatchInfo = cuurentCubicle
+
+                  
+
+                    var batchCompletestatus ={
+                        str_tableName:   objUpdateBinInfo.str_tableName,
+                        data: [
+                            { str_colName: 'Bin_BatchComplete', value: 1, comp: 'eq' },
+                        ],
+                        condition: [
+                            { str_colName: 'Bin_CubicleNo', value:  objBatchInfo.Sys_CubicNo, comp: 'eq' },
+                            { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
+                        ]
+        
+                    } 
+                    var result = await database.update(batchCompletestatus);      //batchcomplete status 1 when only in IPC i.e. without corrioder
+
+                    var updateArchivedtable ={
+                        str_tableName:   objUpdateBinInfo.str_tableName+ "_archived",
+                        data: [
+                            { str_colName: 'Bin_BatchComplete', value: 1, comp: 'eq' },
+                        ],
+                        condition: [
+                            { str_colName: 'Bin_CubicleNo', value: objBatchInfo.Sys_CubicNo, comp: 'eq' },
+                            { str_colName: 'Bin_BatchComplete', value: 0, comp: 'eq' },
+                        ]
+        
+                    } 
+
+                    var updateBinlocked ={
+                        str_tableName:   "tbl_bin_list",
+                        data: [
+                            { str_colName: 'bin_locked', value: 0, comp: 'eq' },
+                        ],
+                        condition: [
+                            { str_colName: 'BatchNo', value: objBatchInfo.Sys_Batch, comp: 'eq' },
+                            { str_colName: 'cubicleType', value: objBatchInfo.Sys_CubType, comp: 'eq' },
+                            { str_colName: 'CubicleNo', value: objBatchInfo.Sys_CubicNo, comp: 'eq' },
+                            { str_colName: 'IsDiscarded', value: 0, comp: 'eq' },
+                        ]
+        
+                    } 
+
+                    var resultBinlocked = await database.update(updateBinlocked); 
+
+                }
+            }
+
             var objActivity = {};
             var userObj = globalData.arrUsers.find(k => k.IdsNo == IdsNo);
             Object.assign(objActivity,
@@ -366,7 +454,7 @@ class Container {
             await objActivityLog.ActivityLogEntry(objActivity);
             var cubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
             var bininfo = globalData.arrBinSetting.find(k => k.Sys_IDS == IdsNo);
-            var result = await database.update(objUpdateBinInfo);
+            
             if (globalData.arrsAllParameters[0].tbl_PrintingMode == 'Auto' && bininfo.Sys_Printer != 'NA') {
                 /**
                  * First here for online ipc print we need id of report
@@ -510,7 +598,8 @@ class Container {
                 if (strProductList != "") {
                     return "LDP01" + strProductList.trim(',') + ";";
                 } else {
-                    return 'LEP';
+                    var retProtocol = await objArea.areaSelection();   //if IPC Not batch started then allowed to other area test
+                   return retProtocol;
                 }
             }else {
                 var objProductList = {
