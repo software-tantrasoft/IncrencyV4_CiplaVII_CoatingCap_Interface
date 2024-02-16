@@ -7188,29 +7188,29 @@ class BulkWeighment {
             if (newstring) {
                 // according to new string with version 5.5 and make is ETD:1020X 
                 if (actualProtocol.includes("V0")) {
-                    let V0 = actualProtocol.replace(/ +(?= )/g, '');
-                    V0 = V0.split(' ')[3].split("N")[0]
+                    let V0 = actualProtocol.replace(/[NRrn?= ]+/g, " ");
+                    V0 = V0.split(' ')[3]
 
                     let initialValue = { "initialVolume": V0 };
                     tempTDObj.arr.push(initialValue);
                 }
                 else if (actualProtocol.includes("V1")) {
-                    var V1 = actualProtocol.replace(/ +(?= )/g, '');
-                    V1 = V1.split(' ')[3].split("N")[0]
+                    var V1 = actualProtocol.replace(/[NRrn?= ]+/g, " ");
+                    V1 = V1.split(' ')[3]
                     let tapVol1 = { "tapCountvol1": V1 };
                     let unitval = { "unit": 'ml' };
                     tempTDObj.arr.push(tapVol1);
                     tempTDObj.arr.push(unitval);
                 }
                 else if (actualProtocol.includes("V2")) {
-                    var V2 = actualProtocol.replace(/ +(?= )/g, '');
-                    V2 = V2.split(' ')[3].split("N")[0]
+                    var V2 = actualProtocol.replace(/[NRrn?= ]+/g, " ");
+                    V2 = V2.split(' ')[3]
                     var tapVol2 = { "tapCountvol2": V2 };
                     tempTDObj.arr.push(tapVol2);
                 }
                 else if (actualProtocol.includes("V3")) {
-                    var V3 = actualProtocol.replace(/ +(?= )/g, '');
-                    let version = V3.split(' ')[3].split("N")[0]
+                    var V3 = actualProtocol.replace(/[NRrn?= ]+/g, " ");
+                    let version = V3.split(' ')[3]
 
                     let tapVol3 = { "tapCountvol3": version };
                     tempTDObj.arr.push(tapVol3);
@@ -7221,8 +7221,8 @@ class BulkWeighment {
 
                 }
                 else if (actualProtocol.includes("V4A")) {
-                    var V4 = actualProtocol.replace(/ +(?= )/g, '');
-                    let version = V4.split(' ')[3].split("N")[0]
+                    var V4 = actualProtocol.replace(/[NRrn?= ]+/g, " ");
+                    let version = V4.split(' ')[3]
 
                     let tapVol4 = { "add1": version };
                     tempTDObj.arr.push(tapVol4);
@@ -7233,8 +7233,8 @@ class BulkWeighment {
 
                 }
                 else if (actualProtocol.includes("V4B")) {
-                    var V4b = actualProtocol.replace(/ +(?= )/g, '');
-                    let version = V4b.split(' ')[3].split("N")[0]
+                    var V4b = actualProtocol.replace(/[NRrn?= ]+/g, " ");
+                    let version = V4b.split(' ')[3]
 
                     let tapVol4b = { "add2": version };
                     tempTDObj.arr.push(tapVol4b);
@@ -16080,7 +16080,7 @@ class BulkWeighment {
                         var intNos, maxLimit, minLimit;
                         var objActivity = {}
                         if (data.actualSampleValue == 1) {
-                            await clspowerbackup.insertPowerBackupData(cubicalObj, typeValue, tempUserObject, IdsNo);
+                            // await clspowerbackup.insertPowerBackupData(cubicalObj, typeValue, tempUserObject, IdsNo);
                             Object.assign(objActivity,
                                 { strUserId: tempUserObject.UserId },
                                 { strUserName: tempUserObject.UserName },
@@ -16088,7 +16088,7 @@ class BulkWeighment {
                             await objActivityLog.ActivityLogEntry(objActivity);
                             // Instrument Usage log for balance start
                             await objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', 'Particle Seizing', 'started');
-                            await objRemarkInComplete.updateEntry(IdsNo, 'P');
+                            // await objRemarkInComplete.updateEntry(IdsNo, 'P');
                         }
                     }
                 }
@@ -16350,7 +16350,7 @@ class BulkWeighment {
                         var intNos, maxLimit, minLimit;
                         var objActivity = {}
                         if (data.actualSampleValue == 1) {
-                            await clspowerbackup.insertPowerBackupData(cubicalObj, typeValue, tempUserObject, IdsNo);
+                            // await clspowerbackup.insertPowerBackupData(cubicalObj, typeValue, tempUserObject, IdsNo);
                             Object.assign(objActivity,
                                 { strUserId: tempUserObject.UserId },
                                 { strUserName: tempUserObject.UserName },
@@ -16358,7 +16358,7 @@ class BulkWeighment {
                             await objActivityLog.ActivityLogEntry(objActivity);
                             // Instrument Usage log for balance start
                             await objInstrumentUsage.InstrumentUsage('Balance', IdsNo, 'tbl_instrumentlog_balance', 'Particle Seizing', 'started');
-                            await objRemarkInComplete.updateEntry(IdsNo, 'F');
+                            // await objRemarkInComplete.updateEntry(IdsNo, 'F');
                         }
                     }
                 }

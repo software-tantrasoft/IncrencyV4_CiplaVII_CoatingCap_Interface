@@ -4,6 +4,13 @@ const Database = require('../../database/clsQueryProcess');
 const database = new Database();
 const globalData = require('../../global/globalData');
 const date = require('date-and-time');
+
+const PowerBackup = require('../../model/clsPowerBackupModel');
+const clspowerbackup = new PowerBackup();
+
+
+const clsRemarkInComplete = require('../../model/clsRemarkIncomplete');
+const objRemarkInComplete = new clsRemarkInComplete();
 class IncompleteGranulationData {
     async saveIncompleteData(cubicalObj,data,actualSampleValue, intNos, typeValue, tempUserObject, IdsNo) {
 
@@ -178,7 +185,7 @@ class IncompleteGranulationData {
                     }
                     const masterResult = await database.save(masterObj)
                     var lastInsertedID = masterResult[0].insertId;
-
+                    await clspowerbackup.insertPowerBackupData(cubicalObj, typeValue, tempUserObject, IdsNo);
 
                     let objUpdatepowerbackup = {
                         str_tableName: 'tbl_powerbackup',
@@ -193,7 +200,7 @@ class IncompleteGranulationData {
                         ]
                     }
                     await database.update(objUpdatepowerbackup);
-
+                    await objRemarkInComplete.updateEntry(IdsNo, 'F');
                     const checkTabDetails = {
                         str_tableName: detailTable,
                         data: '*',
@@ -374,7 +381,7 @@ class IncompleteGranulationData {
                     var lastInsertedID = masterResult[0].insertId;
 
 
-
+                    await clspowerbackup.insertPowerBackupData(cubicalObj, typeValue, tempUserObject, IdsNo);
                     let objUpdatepowerbackup = {
                         str_tableName: 'tbl_powerbackup',
                         data: [
@@ -388,7 +395,7 @@ class IncompleteGranulationData {
                         ]
                     }
                     await database.update(objUpdatepowerbackup);
-
+                    await objRemarkInComplete.updateEntry(IdsNo, 'P');
                     const checkTabDetails = {
                         str_tableName: detailTable,
                         data: '*',
