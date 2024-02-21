@@ -1531,7 +1531,7 @@ class CalibrationModel {
         } else {
           tempcalibObj.Daily = {};
           tempcalibObj.datetimecount = 0;
-          return `+`
+          return `HR40Invalid String,,,,` ;
         }
       }
     }

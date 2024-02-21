@@ -300,7 +300,7 @@ class CopyObject {
     }
     //********************************************************************************** */
     // linearity copy object for master and details
-    linearity(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
+    async linearity(fromCopyTblName, toCopyTableName, oldRepSrNo, RecSrNo, type) {
         return new Promise((resolve, reject) => {
             if (type == 'master') {
                 var copyObj = {

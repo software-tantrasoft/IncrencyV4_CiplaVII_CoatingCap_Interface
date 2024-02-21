@@ -8,6 +8,10 @@ const date1 = require('date-and-time');
 const serverConfig = require('../../global/severConfig');
 var clsMonitor = require('../../model/MonitorSocket/clsMonitSocket');
 const objMonitor = new clsMonitor();
+
+
+var Comman = require('./clsCommonFunction');
+var comman = new Comman();
 exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
 
     // below variable holds unsorted array
@@ -151,7 +155,25 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                                     //    return `CR${calibPId}0Periodic Calibration,Pending,,,`;
                                     //}
                                     //else {
-                                    return `CR${calibPId}1Periodic Calibration,Pending,,,`;
+                                        
+                                    var bln_isPresent = await comman.checkIfRecordInIncomplete('P', strBalId)
+                                    if (bln_isPresent) {
+                                        const selectRepSrNoObj = {
+                                            str_tableName: 'tbl_calibration_periodic_master_incomplete',
+                                            data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
+                                            condition: [
+                                                { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
+                                            ]
+                                        }
+                                        var result = await database.select(selectRepSrNoObj)
+                                        if(result.length > 0){
+                                            let int_periodic_RepNo = result[0][0].Periodic_RepNo;
+                                            await comman.caibrationFails('P', strBalId, int_periodic_RepNo)
+                                            return `CR${calibPId}1Periodic Calibration,Pending,,,`;
+                                        }
+                                    }else{
+                                        return `CR${calibPId}1Periodic Calibration,Pending,,,`;
+                                    }
                                     //}
 
                                 }
@@ -179,9 +201,26 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         //    return `CR${calibUId}0Uncertainty,Calibration Pending,,,`;
                         //}
                         //else {
-                        return `CR${calibUId}1Uncertainty,Calibration Pending,,,`;
-                        //}
 
+                        var bln_isPresent = await comman.checkIfRecordInIncomplete('U', strBalId)
+                        if (bln_isPresent) {
+                            const selectRepSrNoObj = {
+                                str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
+                                data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
+                                condition: [
+                                    { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
+                                ]
+                            }
+                            var result = await database.select(selectRepSrNoObj)
+                           
+                            if(result.length > 0){
+                                let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+                              await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
+                                return `CR${calibUId}1Uncertainty,Calibration Pending,,,`;
+                            }
+                        } else {
+                            return `CR${calibUId}1Uncertainty,Calibration Pending,,,`;
+                        }
                         next();
                         break;
                     case 'R':
@@ -197,7 +236,26 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         //   return `CR${calibRId}0Repeatability,Calibration Pending,,,`;
                         //}
                         //else {
-                        return `CR${calibRId}1Repeatability,Calibration Pending,,,`;
+                        var bln_isPresent = await comman.checkIfRecordInIncomplete('R', strBalId)
+                        if (bln_isPresent) {
+                            const selectRepSrNoObj = {
+                                str_tableName: 'tbl_calibration_repetability_master_incomplete',
+                                data: 'MAX(Repet_RepNo) AS Repet_RepNo',
+                                condition: [
+                                    { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
+                                ]
+                            }
+                            var result = await database.select(selectRepSrNoObj)
+
+                            if (result.length > 0) {
+                                let int_Repet_RepNo = result[0][0].Repet_RepNo;
+                                await comman.caibrationFails('R', strBalId, int_Repet_RepNo);
+                                return `CR${calibRId}1Repeatability,Calibration Pending,,,`;
+                            }
+                        } else {
+                            return `CR${calibRId}1Repeatability,Calibration Pending,,,`;
+                        }
+
                         //}
 
                         next();
@@ -231,7 +289,27 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                         //   return `CR${calibEId}0Eccentricity,Calibration Pending,,,`;
                         //}
                         //else {
-                        return `CR${calibEId}1Eccentricity,Calibration Pending,,,`;
+                            var bln_isPresent = await comman.checkIfRecordInIncomplete('E', strBalId)
+                            if (bln_isPresent) {
+                                const selectRepSrNoObj = {
+                                    str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                                    data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
+                                    condition: [
+                                        { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
+                                    ]
+                                }
+                                var result = await database.select(selectRepSrNoObj)
+                               
+                                if(result.length > 0){
+                                    let int_eccent_RepNo = result[0][0].Eccent_RepNo;
+                                    await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
+                                    return `CR${calibEId}1Eccentricity,Calibration Pending,,,`;
+                    
+                                }
+                            }else{
+                                return `CR${calibEId}1Eccentricity,Calibration Pending,,,`;
+                            }
+                       
                         //}       
                         next();
                         break;

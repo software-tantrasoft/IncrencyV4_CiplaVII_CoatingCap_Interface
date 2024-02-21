@@ -49,7 +49,25 @@ class Eccentricity {
                 }
                 var result = await database.select(selectRepSrNoObj)
                 let int_eccent_RepNo = result[0][0].Eccent_RepNo;
-                await comman.caibrationFails('E', strBalId, int_eccent_RepNo)
+                await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
+
+                //calibration failed
+                // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                //     strBalId,
+                //     IDSSrNo
+                // );
+                // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Eccentricity", strBalId, repnofordelete);
+                // //POWERBACKUP DISCARD
+                // console.log("calibpowerbackup discard");
+                await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+
+                // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                // if (TempCalibType != undefined) {
+                //     TempCalibType.calibType = 'periodic';
+                // } else {
+                //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                // }
+                //
 
             }
             if (str_Protocol.substring(0, 2) == "VI") {
@@ -391,12 +409,12 @@ class Eccentricity {
                     }
                     var strUnit = tempBalace.balance_info[0].Bal_Unit
                     await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', 'Eccentricity Calibration', 'started');
-                    
+
                     if (tempCubicInfo.Sys_Area == 'Granulation') {
                         return "HRC" +
                             "Eccentricity Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + "," + "STD. 001 :" + ",";
                     } else {
-                    return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + `, 0.000,Eccentricity Calib,${TareCmd}`;
+                        return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + `, 0.000,Eccentricity Calib,${TareCmd}`;
                     }
                 }
             }
@@ -437,7 +455,7 @@ class Eccentricity {
                     ]
                 }
                 resultBal = await database.select(selectBalObj);
-              }
+            }
             // calculating below parameted from string 
             var srNo = str_Protocol.split(',')[0].substring(2, 4); // Weight Sr Number
             var sendWt = str_Protocol.split(',')[0].substring(4).slice(0, -1); // Weight send for calibration
@@ -452,10 +470,10 @@ class Eccentricity {
                 var weightVal = recieveWt.split(".");
                 decimalValue = weightVal[1].length;
             }
-            if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0  || weightVal.length > 2) {
+            if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2) {
                 var strprotocol = `EMPC00INVALID SAMPLE,RECIEVED,,,`
                 return strprotocol;
-                }
+            }
             // getting weight  for previously weight which we sent
             //commented by vivek on 28012020 as per new change*************************************************/ 
             //user can add balance haviing same weigths with different/same tollerence's
@@ -707,8 +725,9 @@ class Eccentricity {
                                 await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
                                 BalanceRecalibStatusObject.PeriodicBalRecalib = 0;
                             }
-                            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                            await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                             objFailedFlag.failFlagPeriodic = false;
+                            await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
 
                             // activity Entry for Eccentricity Calibration Completion
                             const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
@@ -730,11 +749,29 @@ class Eccentricity {
                                     { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                                 ]
                             }
-                            result = await database.select(selectRepSrNoObj)
+                            result = await database.select(selectRepSrNoObj) ;
                             let int_eccent_RepNo = result[0][0].Eccent_RepNo;
                             result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
+
+                            //calibration failed
+                            // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                            //     strBalId,
+                            //     IDSSrNo
+                            // );
+                            // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Eccentricity", strBalId, repnofordelete);
+                            await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+
+
+                            // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                            // if (TempCalibType != undefined) {
+                            //     TempCalibType.calibType = 'periodic';
+                            // } else {
+                            //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                            // }
+                            //
+
                             objFailedFlag.failFlagPeriodic = true;
-                            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                            await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                             return 'CF';
                         }
                         /*
@@ -765,8 +802,26 @@ class Eccentricity {
                     let int_eccent_RepNo = result[0][0].Eccent_RepNo;
                     await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
                     result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
+
+                    //calibration failed
+                    // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                    //     strBalId,
+                    //     IDSSrNo
+                    // );
+                    // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Eccentricity", strBalId, repnofordelete);
+                    //POWERBACKUP DISCARD
+                    console.log("calibpowerbackup discard");
+                    await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+
+                    // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                    // if (TempCalibType != undefined) {
+                    //     TempCalibType.calibType = 'periodic';
+                    // } else {
+                    //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                    // }
+                    //
                     objFailedFlag.failFlagPeriodic = true;
-                    objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                    await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                     return 'CF';
 
                 }
@@ -780,6 +835,9 @@ class Eccentricity {
         }
     }
 
+    async  containsNumber(str) {
+        return /\d/.test(str);
+    }
     async newverifyWeights(str_Protocol, IDSSrNo) {
         try {
             let now = new Date();
@@ -807,7 +865,7 @@ class Eccentricity {
                     ]
                 }
                 resultBal = await database.select(selectBalObj);
-              }
+            }
             // calculating below parameted from string 
             // var srNo = str_Protocol.split(',')[0].substring(2, 4); // Weight Sr Number
             // var sendWt = str_Protocol.split(',')[0].substring(4).slice(0, -1); // Weight send for calibration
@@ -836,7 +894,7 @@ class Eccentricity {
 
             // Selecting selectpreCalibWtObj from tbl_precalibration_periodic based on 'strBalId' and
             // First weight was sent
-           
+
 
             var Bal_DP = globalData.arrBalance.filter((k) => k.idsNo == IDSSrNo)[0].balance_info.find(k => k.Bal_ID == strBalId).Bal_DP
 
@@ -850,7 +908,7 @@ class Eccentricity {
             const balanceInfo = tempBalObject.balance_info[0];
             var objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
 
-      
+
             if (objFailedFlag == undefined) {
                 globalData.arrFlagForFailCalib.push({
                     idsNo: IDSSrNo,
@@ -861,7 +919,7 @@ class Eccentricity {
             }
 
             if (protocolValue != protocolIncomingType + "C000") {
-                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await containsNumber(protocolValueData))) {
+                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await this.containsNumber(protocolValueData))) {
                     if (tempcalibObj.sampleNoforEccentricity != 0) {
                         tempcalibObj.sampleNoforEccentricity -= 1;
                     }
@@ -918,111 +976,12 @@ class Eccentricity {
                     }
                 }
                 return protocolValue;
-            } else{ 
+            } else {
                 if (tempcalibObj.datetimecount == 3) {
-                var srNo = tempcalibObj.sampleNoforEccentricity;
-                var recieveWt = tempcalibObj.Eccentricity.WT;
-                var objBalRelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
-                const objSentWt = objBalRelWt.calibWt[0];
-            
-            const selectpreCalibWtObj = {
-                str_tableName: 'tbl_precalibration_eccentricity',
-                data: '*',
-                condition: [
-                    { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
-                    { str_colName: 'UID', value: objSentWt.Id, comp: 'eq' },
-                    // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
-                ]
-            }
-            var result = await database.select(selectpreCalibWtObj)
-            var eccentricity_precalib_weights = result[0][0];
-            var counter = eccentricity_precalib_weights.Repeat_Count;
-            const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
-            if (parseInt(srNo) <= counter) {
-
-                var srNotobepalced = parseInt(srNo) + 1;
-                var int_RepSrNo;
-
-                
-                // getting only balanceInfo
-                const balanceInfo = tempBalObject.balance_info[0];
-                if (objOwner.owner == 'analytical') {
-                    var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatus.find(k => k.Bal_ID == strBalId);
-                } else {
-                    var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatusBin.find(k => k.Bal_ID == strBalId);
-                }
-                // getting userIfo logged in for that cubicle
-                const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
-                if (parseInt(srNo) == 1) {
-                    var RepNo = await obj_getRepSrNo.getReportSerialNumber('E', strBalId, IDSSrNo);
-                    /** code for storing all the wgt in column of std wgt ,neg tol and pos tol */
-                    var combineStdWt = "";
-                    var combineLowerLimit = "";
-                    var combineUpperLimit = "";
-                    for (let i of objBalRelWt.calibWt) {
-                        combineStdWt = combineStdWt + i.Bal_StdWt + ",";
-                        combineLowerLimit = combineLowerLimit + i.Bal_NegTol + ",";
-                        combineUpperLimit = combineUpperLimit + i.Bal_PosTol + ",";
-                    }
-                    combineStdWt = combineStdWt.slice(0, -1)
-                    combineLowerLimit = combineLowerLimit.slice(0, -1)
-                    combineUpperLimit = combineUpperLimit.slice(0, -1)
-                    // for sun halol we want precalibration details in report
-                    if (serverConfig.ProjectName == 'SunHalolGuj1') {
-                        var Eccent_AllWeightboxID = "";
-                        var Eccent_AllWeightboxCert = "";
-                        var Eccent_AllWeightboxValidUpto = "";
-                        const selectPrecalibSelWtObjForMaster = {
-                            str_tableName: 'tbl_precalibration_eccentricity',
-                            data: '*',
-                            condition: [
-                                { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
-                                // { str_colName: 'Standard_Weight_Block', value: objSendWt.Bal_StdWt, comp: 'eq' },
-                                // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
-                            ]
-                        }
-                        var preRes = await database.select(selectPrecalibSelWtObjForMaster);
-                        for (let i of preRes[0]) {
-                            Eccent_AllWeightboxID = Eccent_AllWeightboxID + i.CalibrationBox_ID + ",";
-                            Eccent_AllWeightboxCert = Eccent_AllWeightboxCert + i.CalibrationBox_Calibration_CertificateNo + ",";
-                            Eccent_AllWeightboxValidUpto = Eccent_AllWeightboxValidUpto + i.CalibrationBox_Validity_Date + ","
-                        }
-                        Eccent_AllWeightboxID = Eccent_AllWeightboxID.slice(0, -1);
-                        Eccent_AllWeightboxCert = Eccent_AllWeightboxCert.slice(0, -1);
-                        Eccent_AllWeightboxValidUpto = Eccent_AllWeightboxValidUpto.slice(0, -1)
-                    }
-                    const insertObj = {
-                        str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                        data: [
-                            { str_colName: 'Eccent_RepNo', value: RepNo },
-                            { str_colName: 'Eccent_CalbDate', value: date.format(now, 'YYYY-MM-DD') },
-                            { str_colName: 'Eccent_CalbTime', value: date.format(now, 'HH:mm:ss') },
-                            { str_colName: 'Eccent_BalID', value: balanceInfo.Bal_ID, },
-                            { str_colName: 'Eccent_BalSrNo', value: balanceInfo.Bal_SrNo },
-                            { str_colName: 'Eccent_Make', value: balanceInfo.Bal_Make },
-                            { str_colName: 'Eccent_Model', value: balanceInfo.Bal_Model },
-                            { str_colName: 'Eccent_Unit', value: balanceInfo.Bal_Unit },
-                            { str_colName: 'Eccent_Dept', value: balanceInfo.Bal_Dept },
-                            { str_colName: 'Eccent_LeastCnt', value: balanceInfo.Bal_LeastCnt },
-                            { str_colName: 'Eccent_MaxCap', value: balanceInfo.Bal_MaxCap },
-                            { str_colName: 'Eccent_MinCap', value: balanceInfo.Bal_MinCap },
-                            { str_colName: 'Eccent_ZeroError', value: 0 },
-                            { str_colName: 'Eccent_SpritLevel', value: 0 },
-                            { str_colName: 'Eccent_GerneralCare', value: 0 },
-                            { str_colName: 'Eccent_UserID', value: tempUserObject.UserId },
-                            { str_colName: 'Eccent_UserName', value: tempUserObject.UserName },
-                            { str_colName: 'Eccent_Location', value: serverConfig.ProjectName == 'SunHalolGuj1' ? tempCubicInfo.Sys_Location : tempCubicInfo.Sys_Area },
-                            { str_colName: 'Eccent_RoomNo', value: tempCubicInfo.Sys_RoomNo },
-                            { str_colName: 'Eccent_DueDate', value: 0 },
-                            { str_colName: 'Eccent_StdWeight', value: combineStdWt },
-                            { str_colName: 'Eccent_NegTol', value: combineLowerLimit },
-                            { str_colName: 'Eccent_PosTol', value: combineUpperLimit },
-                            { str_colName: 'Decimal_Point', value: Bal_DP },// added by vivek on 07-08-2020 for decimal point from Balance info table
-                            { str_colName: 'Eccent_IsBinBalance', value: balanceInfo.IsBinBalance },
-                        ]
-                    }
-                   
-                    await database.save(insertObj)
+                    var srNo = tempcalibObj.sampleNoforEccentricity;
+                    var recieveWt = tempcalibObj.Eccentricity.WT;
+                    var objBalRelWt = globalData.arrBalCalibWeights.find(k => k.idsNo == IDSSrNo);
+                    const objSentWt = objBalRelWt.calibWt[0];
 
                     const selectpreCalibWtObj = {
                         str_tableName: 'tbl_precalibration_eccentricity',
@@ -1035,167 +994,219 @@ class Eccentricity {
                     }
                     var result = await database.select(selectpreCalibWtObj)
                     var eccentricity_precalib_weights = result[0][0];
+                    var counter = eccentricity_precalib_weights.Repeat_Count;
+                    const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
+                    if (parseInt(srNo) <= counter) {
 
-                    const insertIncompleteDetailsObj = {
-                        str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
-                        data: [
-                            { str_colName: 'Eccent_RecNo', value: 1 },
-                            { str_colName: 'Eccent_RepNo', value: RepNo },
-                            { str_colName: 'Eccent_BalStdWt', value: objSentWt.Bal_StdWt },
-                            { str_colName: 'Eccent_BalNegTol', value: objSentWt.Bal_NegTol },
-                            { str_colName: 'Eccent_BalPosTol', value: objSentWt.Bal_PosTol },
-                            { str_colName: 'Eccent_ActualWt', value: recieveWt },
-                            { str_colName: 'Eccent_StdWtID', value: eccentricity_precalib_weights.CalibrationBox_ID },
-                            { str_colName: 'Eccent_StdWt', value: eccentricity_precalib_weights.CalibrationBox_Selected_Elements },
-                            { str_colName: 'Eccent_WtIdentification', value: '' },
-                            { str_colName: 'Eccent_WeightBox_certfctNo', value: eccentricity_precalib_weights.CalibrationBox_Calibration_CertificateNo },
-                            { str_colName: 'PercentofCapacity', value: eccentricity_precalib_weights.Percent_of_Capacity },
-                            { str_colName: 'Eccent_ValDate', value: eccentricity_precalib_weights.CalibrationBox_Validity_Date },
-                        ]
-                    }
-                   
-                    await database.save(insertIncompleteDetailsObj)
-
-                   
-                    // activity Entry for Eccentricity Calibration Completion
-
-                    var objActivity = {}
-                    Object.assign(objActivity,
-                        { strUserId: tempUserObject.UserId },
-                        { strUserName: tempUserObject.UserName },
-                      );
-                  
-                      if (objFailedFlag.failFlagPeriodic == true) {
-                        var CalibName = "repetability";
-                        Object.assign(objActivity,
-                            { activity: `${CalibName} Calibration Started on IDS ${IDSSrNo} after Failure` }
-                        );
-                    }
-                    else {
-                        var CalibName = "repetability";
-                        Object.assign(objActivity,
-                            { activity: `${CalibName} Calibration Started on IDS` + IDSSrNo }
-                        );
-                    }
-
-                    await objActivityLog.ActivityLogEntry(objActivity);
-
-                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
-
-                    // //powerbackup insertion
-                    // var data = await CalibPowerBackup.insertCalibPowerBackupData(
-                    //     RepNo,
-                    //     "Eccentricity",
-                    //     balanceInfo.Bal_ID,
-                    //     IDSSrNo
-                    // );
-                    //
-
-                    // Updating RepSrNo if this calibration is first
-                    var sortedArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
-                    if (sortedArray[0] == 'E') {
-                        await comman.updateRepSrNo('eccentricity', strBalId, IDSSrNo);
-                    }
+                        var srNotobepalced = parseInt(srNo) + 1;
+                        var int_RepSrNo;
 
 
-
-                } else {
-                    var int_Eccent_RecNo1;
-                    // Selecting data from tbl_calibration_repetability_master_incomplete based on 'strBalId'
-                    const selectRepSrNoObj = {
-                        str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                        data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
-                        condition: [
-                            { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
-                        ]
-                    }
-                    result = await database.select(selectRepSrNoObj)
-                    // console.log(result)
-                    let int_Eccentricity_RepNo = result[0][0].Eccent_RepNo;
-                    // Selecting Periodic_RecNo from tbl_calibration_uncertinity_detail_incomplete based on 'int_periodic_RepNo'
-                    const selectRecNoObj = {
-                        str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
-                        data: 'MAX(Eccent_RecNo) AS Eccent_RecNo',
-                        condition: [
-                            { str_colName: 'Eccent_RepNo', value: int_Eccentricity_RepNo, comp: 'eq' },
-                        ]
-                    }
-                    var resultRecNo = await database.select(selectRecNoObj)
-                    const Eccentricity_RecNo = resultRecNo[0][0].Eccent_RecNo;
-                    int_Eccent_RecNo1 = Eccentricity_RecNo + 1;
-                    const inserDetailObj = {
-                        str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
-                        data: [
-                            { str_colName: 'Eccent_RecNo', value: int_Eccent_RecNo1 },
-                            { str_colName: 'Eccent_RepNo', value: int_Eccentricity_RepNo },
-                            { str_colName: 'Eccent_BalStdWt', value: objSentWt.Bal_StdWt },
-                            { str_colName: 'Eccent_BalNegTol', value: objSentWt.Bal_NegTol },
-                            { str_colName: 'Eccent_BalPosTol', value: objSentWt.Bal_PosTol },
-                            { str_colName: 'Eccent_ActualWt', value: recieveWt },
-                            { str_colName: 'Eccent_StdWtID', value: eccentricity_precalib_weights.CalibrationBox_ID },
-                            { str_colName: 'Eccent_StdWt', value: eccentricity_precalib_weights.CalibrationBox_Selected_Elements },
-                            { str_colName: 'Eccent_WtIdentification', value: '' },
-                            { str_colName: 'Eccent_WeightBox_certfctNo', value: eccentricity_precalib_weights.CalibrationBox_Calibration_CertificateNo },
-                            { str_colName: 'PercentofCapacity', value: eccentricity_precalib_weights.Percent_of_Capacity },
-                            { str_colName: 'Eccent_ValDate', value: eccentricity_precalib_weights.CalibrationBox_Validity_Date },
-                        ]
-                    }
-                    await database.save(inserDetailObj)
-
-                    await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
-
-                }
-            }
-                if (objSentWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSentWt.Bal_PosTol)) {
-                    if (parseInt(srNo) == counter) {
-                        console.log('done');
-
-                        const selectRepSrNoObj = {
-                            str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                            data: 'Eccent_RepNo',
-                            condition: [
-                                { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
-                            ]
+                        // getting only balanceInfo
+                        const balanceInfo = tempBalObject.balance_info[0];
+                        if (objOwner.owner == 'analytical') {
+                            var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatus.find(k => k.Bal_ID == strBalId);
+                        } else {
+                            var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatusBin.find(k => k.Bal_ID == strBalId);
                         }
-                        let result = await database.select(selectRepSrNoObj)
-                        let int_Eccentricity_RepNo = result[0][0].Eccent_RepNo;
-
-                        let remark = await comman.calibrationCalculation('E', int_Eccentricity_RepNo);
-
-                        await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
-                        if (remark == "Complies") {
-                            var arr_sortedCalibArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
-                            let lastCalibration = arr_sortedCalibArray[arr_sortedCalibArray.length - 1];
-
-                            var calibType = 'E';
-                            for (var i in globalData.calibrationStatus) {
-                                if (globalData.calibrationStatus[i].BalId == strBalId) {
-                                    globalData.calibrationStatus[i].status[calibType] = 1;
-                                    break; //Stop this loop, we found it!
+                        // getting userIfo logged in for that cubicle
+                        const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+                        if (parseInt(srNo) == 1) {
+                            var RepNo = await obj_getRepSrNo.getReportSerialNumber('E', strBalId, IDSSrNo);
+                            /** code for storing all the wgt in column of std wgt ,neg tol and pos tol */
+                            var combineStdWt = "";
+                            var combineLowerLimit = "";
+                            var combineUpperLimit = "";
+                            for (let i of objBalRelWt.calibWt) {
+                                combineStdWt = combineStdWt + i.Bal_StdWt + ",";
+                                combineLowerLimit = combineLowerLimit + i.Bal_NegTol + ",";
+                                combineUpperLimit = combineUpperLimit + i.Bal_PosTol + ",";
+                            }
+                            combineStdWt = combineStdWt.slice(0, -1)
+                            combineLowerLimit = combineLowerLimit.slice(0, -1)
+                            combineUpperLimit = combineUpperLimit.slice(0, -1)
+                            // for sun halol we want precalibration details in report
+                            if (serverConfig.ProjectName == 'SunHalolGuj1') {
+                                var Eccent_AllWeightboxID = "";
+                                var Eccent_AllWeightboxCert = "";
+                                var Eccent_AllWeightboxValidUpto = "";
+                                const selectPrecalibSelWtObjForMaster = {
+                                    str_tableName: 'tbl_precalibration_eccentricity',
+                                    data: '*',
+                                    condition: [
+                                        { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
+                                        // { str_colName: 'Standard_Weight_Block', value: objSendWt.Bal_StdWt, comp: 'eq' },
+                                        // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
+                                    ]
                                 }
+                                var preRes = await database.select(selectPrecalibSelWtObjForMaster);
+                                for (let i of preRes[0]) {
+                                    Eccent_AllWeightboxID = Eccent_AllWeightboxID + i.CalibrationBox_ID + ",";
+                                    Eccent_AllWeightboxCert = Eccent_AllWeightboxCert + i.CalibrationBox_Calibration_CertificateNo + ",";
+                                    Eccent_AllWeightboxValidUpto = Eccent_AllWeightboxValidUpto + i.CalibrationBox_Validity_Date + ","
+                                }
+                                Eccent_AllWeightboxID = Eccent_AllWeightboxID.slice(0, -1);
+                                Eccent_AllWeightboxCert = Eccent_AllWeightboxCert.slice(0, -1);
+                                Eccent_AllWeightboxValidUpto = Eccent_AllWeightboxValidUpto.slice(0, -1)
                             }
-                            await comman.updateCalibStatus('E', strBalId, IDSSrNo);
-                            await comman.incompleteToComplete('E', strBalId, IDSSrNo);
-                            if (lastCalibration == 'E') {
-                                await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
-                                BalanceRecalibStatusObject.PeriodicBalRecalib = 0;
+                            const insertObj = {
+                                str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                                data: [
+                                    { str_colName: 'Eccent_RepNo', value: RepNo },
+                                    { str_colName: 'Eccent_CalbDate', value: date.format(now, 'YYYY-MM-DD') },
+                                    { str_colName: 'Eccent_CalbTime', value: date.format(now, 'HH:mm:ss') },
+                                    { str_colName: 'Eccent_BalID', value: balanceInfo.Bal_ID, },
+                                    { str_colName: 'Eccent_BalSrNo', value: balanceInfo.Bal_SrNo },
+                                    { str_colName: 'Eccent_Make', value: balanceInfo.Bal_Make },
+                                    { str_colName: 'Eccent_Model', value: balanceInfo.Bal_Model },
+                                    { str_colName: 'Eccent_Unit', value: balanceInfo.Bal_Unit },
+                                    { str_colName: 'Eccent_Dept', value: balanceInfo.Bal_Dept },
+                                    { str_colName: 'Eccent_LeastCnt', value: balanceInfo.Bal_LeastCnt },
+                                    { str_colName: 'Eccent_MaxCap', value: balanceInfo.Bal_MaxCap },
+                                    { str_colName: 'Eccent_MinCap', value: balanceInfo.Bal_MinCap },
+                                    { str_colName: 'Eccent_ZeroError', value: 0 },
+                                    { str_colName: 'Eccent_SpritLevel', value: 0 },
+                                    { str_colName: 'Eccent_GerneralCare', value: 0 },
+                                    { str_colName: 'Eccent_UserID', value: tempUserObject.UserId },
+                                    { str_colName: 'Eccent_UserName', value: tempUserObject.UserName },
+                                    { str_colName: 'Eccent_Location', value: serverConfig.ProjectName == 'SunHalolGuj1' ? tempCubicInfo.Sys_Location : tempCubicInfo.Sys_Area },
+                                    { str_colName: 'Eccent_RoomNo', value: tempCubicInfo.Sys_RoomNo },
+                                    { str_colName: 'Eccent_DueDate', value: 0 },
+                                    { str_colName: 'Eccent_StdWeight', value: combineStdWt },
+                                    { str_colName: 'Eccent_NegTol', value: combineLowerLimit },
+                                    { str_colName: 'Eccent_PosTol', value: combineUpperLimit },
+                                    { str_colName: 'Decimal_Point', value: Bal_DP },// added by vivek on 07-08-2020 for decimal point from Balance info table
+                                    { str_colName: 'Eccent_IsBinBalance', value: balanceInfo.IsBinBalance },
+                                ]
                             }
-                            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
-                            objFailedFlag.failFlagPeriodic = false;
+
+                            await database.save(insertObj)
+
+                            const selectpreCalibWtObj = {
+                                str_tableName: 'tbl_precalibration_eccentricity',
+                                data: '*',
+                                condition: [
+                                    { str_colName: 'Equipment_ID', value: strBalId, comp: 'eq' },
+                                    { str_colName: 'UID', value: objSentWt.Id, comp: 'eq' },
+                                    // { str_colName: 'Equipment_Type', value: 'Balance', comp: 'eq' }
+                                ]
+                            }
+                            var result = await database.select(selectpreCalibWtObj)
+                            var eccentricity_precalib_weights = result[0][0];
+
+                            const insertIncompleteDetailsObj = {
+                                str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
+                                data: [
+                                    { str_colName: 'Eccent_RecNo', value: 1 },
+                                    { str_colName: 'Eccent_RepNo', value: RepNo },
+                                    { str_colName: 'Eccent_BalStdWt', value: objSentWt.Bal_StdWt },
+                                    { str_colName: 'Eccent_BalNegTol', value: objSentWt.Bal_NegTol },
+                                    { str_colName: 'Eccent_BalPosTol', value: objSentWt.Bal_PosTol },
+                                    { str_colName: 'Eccent_ActualWt', value: recieveWt },
+                                    { str_colName: 'Eccent_StdWtID', value: eccentricity_precalib_weights.CalibrationBox_ID },
+                                    { str_colName: 'Eccent_StdWt', value: eccentricity_precalib_weights.CalibrationBox_Selected_Elements },
+                                    { str_colName: 'Eccent_WtIdentification', value: '' },
+                                    { str_colName: 'Eccent_WeightBox_certfctNo', value: eccentricity_precalib_weights.CalibrationBox_Calibration_CertificateNo },
+                                    { str_colName: 'PercentofCapacity', value: eccentricity_precalib_weights.Percent_of_Capacity },
+                                    { str_colName: 'Eccent_ValDate', value: eccentricity_precalib_weights.CalibrationBox_Validity_Date },
+                                ]
+                            }
+
+                            await database.save(insertIncompleteDetailsObj)
+
 
                             // activity Entry for Eccentricity Calibration Completion
-                            const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+
                             var objActivity = {}
                             Object.assign(objActivity,
                                 { strUserId: tempUserObject.UserId },
                                 { strUserName: tempUserObject.UserName },
-                                { activity: 'Eccentricity Calibration Completed on IDS' + IDSSrNo });
-                            await objActivityLog.ActivityLogEntry(objActivity)
+                            );
 
-                            result = await checkForPenCal.checkForPendingCalib(strBalId, IDSSrNo)
-                            return "HRc0";
+                            if (objFailedFlag.failFlagPeriodic == true) {
+                                var CalibName = "repetability";
+                                Object.assign(objActivity,
+                                    { activity: `${CalibName} Calibration Started on IDS ${IDSSrNo} after Failure` }
+                                );
+                            }
+                            else {
+                                var CalibName = "repetability";
+                                Object.assign(objActivity,
+                                    { activity: `${CalibName} Calibration Started on IDS` + IDSSrNo }
+                                );
+                            }
+
+                            await objActivityLog.ActivityLogEntry(objActivity);
+
+                            await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
+
+                            // //powerbackup insertion
+                            var data = await CalibPowerBackup.insertCalibPowerBackupData(
+                                RepNo,
+                                "Eccentricity",
+                                balanceInfo.Bal_ID,
+                                IDSSrNo
+                            );
+                            //
+
+                            // Updating RepSrNo if this calibration is first
+                            var sortedArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
+                            if (sortedArray[0] == 'E') {
+                                await comman.updateRepSrNo('eccentricity', strBalId, IDSSrNo);
+                            }
+
+
+
+                        } else {
+                            var int_Eccent_RecNo1;
+                            // Selecting data from tbl_calibration_repetability_master_incomplete based on 'strBalId'
+                            const selectRepSrNoObj = {
+                                str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                                data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
+                                condition: [
+                                    { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
+                                ]
+                            }
+                            result = await database.select(selectRepSrNoObj)
+                            // console.log(result)
+                            let int_Eccentricity_RepNo = result[0][0].Eccent_RepNo;
+                            // Selecting Periodic_RecNo from tbl_calibration_uncertinity_detail_incomplete based on 'int_periodic_RepNo'
+                            const selectRecNoObj = {
+                                str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
+                                data: 'MAX(Eccent_RecNo) AS Eccent_RecNo',
+                                condition: [
+                                    { str_colName: 'Eccent_RepNo', value: int_Eccentricity_RepNo, comp: 'eq' },
+                                ]
+                            }
+                            var resultRecNo = await database.select(selectRecNoObj)
+                            const Eccentricity_RecNo = resultRecNo[0][0].Eccent_RecNo;
+                            int_Eccent_RecNo1 = Eccentricity_RecNo + 1;
+                            const inserDetailObj = {
+                                str_tableName: 'tbl_calibration_eccentricity_detail_incomplete',
+                                data: [
+                                    { str_colName: 'Eccent_RecNo', value: int_Eccent_RecNo1 },
+                                    { str_colName: 'Eccent_RepNo', value: int_Eccentricity_RepNo },
+                                    { str_colName: 'Eccent_BalStdWt', value: objSentWt.Bal_StdWt },
+                                    { str_colName: 'Eccent_BalNegTol', value: objSentWt.Bal_NegTol },
+                                    { str_colName: 'Eccent_BalPosTol', value: objSentWt.Bal_PosTol },
+                                    { str_colName: 'Eccent_ActualWt', value: recieveWt },
+                                    { str_colName: 'Eccent_StdWtID', value: eccentricity_precalib_weights.CalibrationBox_ID },
+                                    { str_colName: 'Eccent_StdWt', value: eccentricity_precalib_weights.CalibrationBox_Selected_Elements },
+                                    { str_colName: 'Eccent_WtIdentification', value: '' },
+                                    { str_colName: 'Eccent_WeightBox_certfctNo', value: eccentricity_precalib_weights.CalibrationBox_Calibration_CertificateNo },
+                                    { str_colName: 'PercentofCapacity', value: eccentricity_precalib_weights.Percent_of_Capacity },
+                                    { str_colName: 'Eccent_ValDate', value: eccentricity_precalib_weights.CalibrationBox_Validity_Date },
+                                ]
+                            }
+                            await database.save(inserDetailObj)
+
+                            await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
+
                         }
-                        else {
+                    }
+                    if (objSentWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSentWt.Bal_PosTol)) {
+                        if (parseInt(srNo) == counter) {
+                            console.log('done');
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
                                 data: 'Eccent_RepNo',
@@ -1203,56 +1214,145 @@ class Eccentricity {
                                     { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                                 ]
                             }
-                            result = await database.select(selectRepSrNoObj)
-                            let int_eccent_RepNo = result[0][0].Eccent_RepNo;
-                            result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
-                            objFailedFlag.failFlagPeriodic = true;
-                            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
-                            return 'HRcF';
-                        }
-                        /*
-                           */
-                    } else {
+                            let result = await database.select(selectRepSrNoObj)
+                            let int_Eccentricity_RepNo = result[0][0].Eccent_RepNo;
 
-                        if (srNotobepalced < 10) {
-                            tempcalibObj.Uncertinity = {};
-                            tempcalibObj.datetimecount = 0;
-                            return "HRC" + "Eccentricity Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+                            let remark = await comman.calibrationCalculation('E', int_Eccentricity_RepNo);
+
+                            await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+                            if (remark == "Complies") {
+                                var arr_sortedCalibArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
+                                let lastCalibration = arr_sortedCalibArray[arr_sortedCalibArray.length - 1];
+
+                                var calibType = 'E';
+                                for (var i in globalData.calibrationStatus) {
+                                    if (globalData.calibrationStatus[i].BalId == strBalId) {
+                                        globalData.calibrationStatus[i].status[calibType] = 1;
+                                        break; //Stop this loop, we found it!
+                                    }
+                                }
+                                await comman.updateCalibStatus('E', strBalId, IDSSrNo);
+                                await comman.incompleteToComplete('E', strBalId, IDSSrNo);
+                                if (lastCalibration == 'E') {
+                                    await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
+                                    BalanceRecalibStatusObject.PeriodicBalRecalib = 0;
+                                }
+                                await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                                objFailedFlag.failFlagPeriodic = false;
+                                //POWERBACKUP DISCARD
+                                console.log("calibpowerbackup discard");
+                                await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+                                // activity Entry for Eccentricity Calibration Completion
+                                const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
+                                var objActivity = {}
+                                Object.assign(objActivity,
+                                    { strUserId: tempUserObject.UserId },
+                                    { strUserName: tempUserObject.UserName },
+                                    { activity: 'Eccentricity Calibration Completed on IDS' + IDSSrNo });
+                                await objActivityLog.ActivityLogEntry(objActivity)
+
+                                result = await checkForPenCal.checkForPendingCalib(strBalId, IDSSrNo)
+                                return "HRc0";
+                            }
+                            else {
+                                const selectRepSrNoObj = {
+                                    str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                                    data: 'Eccent_RepNo',
+                                    condition: [
+                                        { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
+                                    ]
+                                }
+                                result = await database.select(selectRepSrNoObj)
+                                let int_eccent_RepNo = result[0][0].Eccent_RepNo;
+                                //calibration failed
+                                // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                                //     strBalId,
+                                //     IDSSrNo
+                                // );
+                                // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Eccentricity", strBalId, repnofordelete);
+                                // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                                // if (TempCalibType != undefined) {
+                                //     TempCalibType.calibType = 'periodic';
+                                // } else {
+                                //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                                // }
+
+                                //POWERBACKUP DISCARD
+                                console.log("calibpowerbackup discard");
+                                await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+                                //
+
+                                result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
+                                objFailedFlag.failFlagPeriodic = true;
+                                await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                                return 'HRcF';
+                            }
+                            /*
+                               */
                         } else {
-                            tempcalibObj.Uncertinity = {};
+
+                            if (srNotobepalced < 10) {
+                                tempcalibObj.Uncertinity = {};
                                 tempcalibObj.datetimecount = 0;
-                            return "HRC" + "Eccentricity Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+                                return "HRC" + "Eccentricity Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+                            } else {
+                                tempcalibObj.Uncertinity = {};
+                                tempcalibObj.datetimecount = 0;
+                                return "HRC" + "Eccentricity Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
+                            }
+
+
                         }
-
-                       
                     }
+                    else {
+                        // We have to move records to failed tables
+                        const selectRepSrNoObj = {
+                            str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
+                            data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
+                            condition: [
+                                { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
+                            ]
+                        }
+                        result = await database.select(selectRepSrNoObj)
+                        let int_eccent_RepNo = result[0][0].Eccent_RepNo;
+
+
+                        //calibration failed
+                        // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                        //     strBalId,
+                        //     IDSSrNo
+                        // );
+                        // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Eccentricity", strBalId, repnofordelete);
+                        // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                        // if (TempCalibType != undefined) {
+                        //     TempCalibType.calibType = 'periodic';
+                        // } else {
+                        //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                        // }
+                        //
+
+                        await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
+
+                        result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
+                        objFailedFlag.failFlagPeriodic = true;
+                        await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                        return 'HRcF';
+
+                    }
+
                 }
+                // else if(tempcalibObj.datetimecount == 1 || tempcalibObj.datetimecount == 2){
+                //     tempcalibObj.Eccentricity = {};
+                //     tempcalibObj.datetimecount = 0;
+                //     return `HR40Invalid String,,,,`
+                // }
                 else {
-                    // We have to move records to failed tables
-                    const selectRepSrNoObj = {
-                        str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                        data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
-                        condition: [
-                            { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
-                        ]
-                    }
-                    result = await database.select(selectRepSrNoObj)
-                    let int_eccent_RepNo = result[0][0].Eccent_RepNo;
-                    await CalibPowerBackup.deleteCalibPowerBackupData("E", IDSSrNo);
-                    result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
-                    objFailedFlag.failFlagPeriodic = true;
-                    objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
-                    return 'HRcF';
-
+                    
+                    tempcalibObj.Eccentricity = {};
+                    tempcalibObj.datetimecount = 0;
+                    return `HR40Invalid String,,,,` ;
                 }
-            
-        }
-            else {
-                tempcalibObj.Eccentricity = {};
-                tempcalibObj.datetimecount = 0;
-                return `+,`
             }
-        }
         } catch (err) {
             console.log("Error from verifyWeights of Eccentricity", err);
             return err;

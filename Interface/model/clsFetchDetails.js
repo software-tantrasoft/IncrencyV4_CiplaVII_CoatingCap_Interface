@@ -15,6 +15,9 @@ const clsPreWeighmentChecks = new PreCalibCheck();
 const ClassCalibPowerBackup = require("../model/Calibration/clsCalibPowerbackup");
 const CalibPowerBackup = new ClassCalibPowerBackup();
 let now = new Date();
+
+var Comman = require('../model/Calibration/clsCommonFunction');
+var comman = new Comman();
 /**
  * @description Class to call startUp function
  */

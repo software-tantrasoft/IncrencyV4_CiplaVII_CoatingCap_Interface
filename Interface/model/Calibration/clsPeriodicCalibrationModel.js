@@ -23,9 +23,7 @@ const CalibPowerBackup = new ClassCalibPowerBackup();
 const moment = require('moment');
 //////////////////////////////////////////////////
 const database = new Database();
-async function containsNumber(str) {
-    return /\d/.test(str);
-}
+
 class CalibrationModel {
     // ****************************************************************************************************//
     // Below function takes argument as str_Protocol, IdSSrNo and stores all balance information related to
@@ -53,6 +51,22 @@ class CalibrationModel {
                 }
                 var result = await database.select(selectRepSrNoObj)
                 let int_periodic_RepNo = result[0][0].Periodic_RepNo;
+
+                //failed
+                // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                //     strBalId,
+                //     IDSSrNo
+                // );
+                // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Periodic", strBalId, repnofordelete);
+                // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                // if (TempCalibType != undefined) {
+                //     TempCalibType.calibType = 'periodic';
+                // } else {
+                //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                // }
+                //
+                await CalibPowerBackup.deleteCalibPowerBackupData("2", IDSSrNo);
+
                 await comman.caibrationFails('P', strBalId, int_periodic_RepNo)
             }
             if (str_Protocol.substring(0, 2) == "VI") {
@@ -451,7 +465,7 @@ class CalibrationModel {
                         { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
                     ]
                 }
-                 resultBal = await database.select(selectBalObj);
+                resultBal = await database.select(selectBalObj);
             }
 
             // calculating below parameted from string 
@@ -476,7 +490,7 @@ class CalibrationModel {
             }
 
             if (objOwner.owner == 'IPC') {    //unit check for IPC weigth testing bugs
-                if (recieveUnit.toUpperCase() !=  resultBal[0][0].Bal_Unit.toUpperCase()) {
+                if (recieveUnit.toUpperCase() != resultBal[0][0].Bal_Unit.toUpperCase()) {
                     var strprotocol = `EMPC00INVALID UNIT,RECIEVED,,,`
                     return strprotocol;
                 }
@@ -512,11 +526,11 @@ class CalibrationModel {
                 var periodicdue = balanceInfo.Bal_CalbDueDt;
                 let now = new Date();
                 let todayDate = moment(now).format('YYYY-MM-DD');
-                periodicdue =  moment(periodicdue).format('YYYY-MM-DD')
+                periodicdue = moment(periodicdue).format('YYYY-MM-DD')
                 if (periodicdue < todayDate) {
                     periodicdue = todayDate;
                 }
-                
+
                 var ResponseFrmPC = ""
                 // getting reCaibration status from `tbl_recalibration_balance_status` on start up
                 if (objOwner.owner == 'analytical') {
@@ -748,7 +762,7 @@ class CalibrationModel {
 
 
                 if (objSentWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSentWt.Bal_PosTol)) {
-
+                    
                     if (parseInt(srNo) == objBalRelWt.calibWt.length) {
                         console.log('done');
                         // let balCalDetPeri = globalData.arrBalCaibDet.        find(k => k.strBalId == strBalId);
@@ -775,7 +789,7 @@ class CalibrationModel {
                             await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
                             BalanceRecalibStatusObject.PeriodicBalRecalib = 0;
                         }
-                        objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                        await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                         result = await checkForPenCal.checkForPendingCalib(strBalId, IDSSrNo);
                         // activity Entry for Perioic Calibration Completion
                         const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
@@ -805,7 +819,6 @@ class CalibrationModel {
                         return result;
 
                     } else {
-
                         // if (srNotobepalced < 10) {
                         //     var protocolToBeSend = "CB0" + srNotobepalced + objBalRelWt.calibWt[parseInt(srNo)].Bal_StdWt + "g, " + recieveWt + ",Periodic Calib,";
                         // }
@@ -856,6 +869,19 @@ class CalibrationModel {
                         int_periodic_RepNo = 1;
                     } else {
                         int_periodic_RepNo = result[0][0].Periodic_RepNo;
+                        //failed
+                        // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                        //     strBalId,
+                        //     IDSSrNo
+                        // );
+                        // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Periodic", strBalId, repnofordelete);
+                        // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                        // if (TempCalibType != undefined) {
+                        //     TempCalibType.calibType = 'periodic';
+                        // } else {
+                        //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                        // }
+                        //
                         await comman.caibrationFails('P', strBalId, int_periodic_RepNo);
                         await CalibPowerBackup.deleteCalibPowerBackupData("2", IDSSrNo);
                     }
@@ -874,7 +900,9 @@ class CalibrationModel {
 
     }
 
-
+    async  containsNumber(str) {
+        return /\d/.test(str);
+    }
     async newverifyWeights(str_Protocol, IDSSrNo) {
         try {
             let now = new Date();
@@ -905,7 +933,7 @@ class CalibrationModel {
 
 
             if (protocolValue != protocolIncomingType + "C000") {
-                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await containsNumber(protocolValueData))) {
+                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await this.containsNumber(protocolValueData))) {
                     if (tempcalibObj.sampleNoforPeriodic != 0) {
                         tempcalibObj.sampleNoforPeriodic -= 1;
                     }
@@ -963,7 +991,6 @@ class CalibrationModel {
                 }
                 return protocolValue;
             } else {
-
                 if (tempcalibObj.datetimecount == 3) {
                     var srNo = tempcalibObj.sampleNoforPeriodic;
                     var recieveWt = tempcalibObj.Periodic.WT;
@@ -1069,6 +1096,15 @@ class CalibrationModel {
                             }
                             var objDetailSave = await database.save(insertIncompletePeriodicDetailsObj);
 
+
+                            //powerbackup insertion
+                            var data = await CalibPowerBackup.insertCalibPowerBackupData(
+                                RepNo,
+                                "Periodic",
+                                balanceInfo.Bal_ID,
+                                IDSSrNo
+                            );
+                            //
                             // activity Entry for Perioic Calibration start
 
                             var objActivity = {}
@@ -1173,9 +1209,10 @@ class CalibrationModel {
                                 await comman.UpdateRecalibFLagPeriodic(strBalId, IDSSrNo);
                                 BalanceRecalibStatusObject.PeriodicBalRecalib = 0;
                             }
-                            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                            await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                             const tempUserObject = globalData.arrUsers.find(k => k.IdsNo == IDSSrNo);
                             var objActivity = {};
+                            await CalibPowerBackup.deleteCalibPowerBackupData("2", IDSSrNo);
 
                             Object.assign(objActivity,
                                 { strUserId: tempUserObject.UserId },
@@ -1215,6 +1252,20 @@ class CalibrationModel {
                             int_periodic_RepNo = 1;
                         } else {
                             int_periodic_RepNo = result[0][0].Periodic_RepNo;
+                            //failed
+                            // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                            //     strBalId,
+                            //     IDSSrNo
+                            // );
+                            // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Periodic", strBalId, repnofordelete);
+                            // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                            // if (TempCalibType != undefined) {
+                            //     TempCalibType.calibType = 'periodic';
+                            // } else {
+                            //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                            // }
+                            //
+                            await CalibPowerBackup.deleteCalibPowerBackupData("2", IDSSrNo);
                             await comman.caibrationFails('P', strBalId, int_periodic_RepNo);
                         }
                         objFailedFlag.failFlagPeriodic = true;
@@ -1226,8 +1277,8 @@ class CalibrationModel {
                     }
                 } else {
                     tempcalibObj.Periodic = {};
-                    tempcalibObj.datetimecount = 0;
-                    return `+,`
+                    tempcalibObj.datetimecount = 0 ;
+                    return `HR40Invalid String,,,,` ;
                 }
             }
         }

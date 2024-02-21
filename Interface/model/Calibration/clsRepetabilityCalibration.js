@@ -49,7 +49,23 @@ class Repetabilty {
             }
             var result = await database.select(selectRepSrNoObj)
             let int_Repet_RepNo = result[0][0].Repet_RepNo;
-            await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
+            await comman.caibrationFails('R', strBalId, int_Repet_RepNo);
+
+            //failed
+            // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+            //     strBalId,
+            //     IDSSrNo
+            // );
+            // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Repeatability", strBalId, repnofordelete);
+            await CalibPowerBackup.deleteCalibPowerBackupData("R", IDSSrNo);
+
+            // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+            // if (TempCalibType != undefined) {
+            //     TempCalibType.calibType = 'periodic';
+            // } else {
+            //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+            // }
+            //
 
         }
         if (str_Protocol.substring(0, 2) == "VI") {
@@ -682,7 +698,6 @@ class Repetabilty {
         if (objSentWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSentWt.Bal_PosTol)) {
             if (parseInt(srNo) == counter) {
 
-                //Added by vivek *************************************************************
                 // var objAccepancelimit = await this.checkRepeatAccepancelimit(strBalId)
                 // if (objAccepancelimit == 'Not Complies'){
                 //     console.log('Fail');
@@ -751,9 +766,26 @@ class Repetabilty {
                     }
                     result = await database.select(selectRepSrNoObj)
                     let int_Repet_RepNo = result[0][0].Repet_RepNo;
-                    result = await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
+
+                    //
+
+                    // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                    //     strBalId,
+                    //     IDSSrNo
+                    // );
+                    // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Repeatability", strBalId, repnofordelete);
+
+                    // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                    // if (TempCalibType != undefined) {
+                    //     TempCalibType.calibType = 'periodic';
+                    // } else {
+                    //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                    // }
+
+                    //
+                    result = await comman.caibrationFails('R', strBalId, int_Repet_RepNo);
                     objFailedFlag.failFlagPeriodic = true;
-                    objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                    await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                     return 'CF';
                 }
 
@@ -767,8 +799,6 @@ class Repetabilty {
                     var protocolToBeSend = "CB" + srNotobepalced +
                         objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + ", " + recieveWt + ",Repeatability Calib,";
                 }
-
-
                 return protocolToBeSend;
             }
         }
@@ -783,13 +813,34 @@ class Repetabilty {
             }
             result = await database.select(selectRepSrNoObj)
             let int_Repet_RepNo = result[0][0].Repet_RepNo;
+
+
+            //
+
+            // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+            //     strBalId,
+            //     IDSSrNo
+            // );
+            // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Repeatability", strBalId, repnofordelete);
             await CalibPowerBackup.deleteCalibPowerBackupData("R", IDSSrNo);
-            result = await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
+            // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+            // if (TempCalibType != undefined) {
+            //     TempCalibType.calibType = 'periodic';
+            // } else {
+            //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+            // }
+
+            //
+            result = await comman.caibrationFails('R', strBalId, int_Repet_RepNo);
             objFailedFlag.failFlagPeriodic = true;
-            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+            await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
             return 'CF';
 
         }
+    }
+
+    async  containsNumber(str) {
+        return /\d/.test(str);
     }
 
     async newverifyWeights(str_Protocol, IDSSrNo) {
@@ -863,7 +914,7 @@ class Repetabilty {
             var protocolIncomingType = str_Protocol.substring(0, 1); //Check incoming Protocol is from "T" or "H"
             var tempcalibObj = globalData.calibrationforhard.find(td => td.idsNo == IDSSrNo);
 
-           
+
             const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
             const balanceInfo = tempBalObject.balance_info[0];
             var objFailedFlag = globalData.arrFlagForFailCalib.find(k => k.idsNo == IDSSrNo);
@@ -883,7 +934,7 @@ class Repetabilty {
 
 
             if (protocolValue != protocolIncomingType + "C000") {
-                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await containsNumber(protocolValueData))) {
+                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await this.containsNumber(protocolValueData))) {
                     if (tempcalibObj.sampleNoforRepetability != 0) {
                         tempcalibObj.sampleNoforRepetability -= 1;
                     }
@@ -964,7 +1015,7 @@ class Repetabilty {
                     var counter = repetability_precalib_weights.Repeat_Count;
                     const tempBalObject = globalData.arrBalance.find(k => k.idsNo == IDSSrNo);
                     // getting only balanceInfo
-                    
+
                     if (parseInt(srNo) <= counter) {
 
                         var srNotobepalced = parseInt(srNo) + 1;
@@ -1083,7 +1134,7 @@ class Repetabilty {
                                 ]
                             }
                             // monit send messages 
-  
+
 
                             await database.save(insertIncompleteDetailsObj)
 
@@ -1092,8 +1143,8 @@ class Repetabilty {
                             Object.assign(objActivity,
                                 { strUserId: tempUserObject.UserId },
                                 { strUserName: tempUserObject.UserName },
-                                );
-                           
+                            );
+
 
                             if (objFailedFlag.failFlagPeriodic == true) {
                                 var CalibName = "repetability";
@@ -1113,12 +1164,12 @@ class Repetabilty {
                             await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
 
                             //powerbackup insertion
-                            // var data = await CalibPowerBackup.insertCalibPowerBackupData(
-                            //     RepNo,
-                            //     "Repeatability",
-                            //     balanceInfo.Bal_ID,
-                            //     IDSSrNo
-                            // );
+                            var data = await CalibPowerBackup.insertCalibPowerBackupData(
+                                RepNo,
+                                "Repeatability",
+                                balanceInfo.Bal_ID,
+                                IDSSrNo
+                            );
                             //
                             // Updating RepSrNo if this calibration is first
                             var sortedArray = await sort.sortedSeqArray(globalData.arrSortedCalib, strBalId);
@@ -1247,8 +1298,22 @@ class Repetabilty {
                                 result = await database.select(selectRepSrNoObj)
                                 let int_Repet_RepNo = result[0][0].Repet_RepNo;
                                 result = await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
+
+                                //failed
+                                // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                                //     strBalId,
+                                //     IDSSrNo
+                                // );
+                                // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Repeatability", strBalId, repnofordelete);
+                                // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                                // if (TempCalibType != undefined) {
+                                //     TempCalibType.calibType = 'periodic';
+                                // } else {
+                                //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                                // }
+                                //
                                 objFailedFlag.failFlagPeriodic = true;
-                                objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                                await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                                 return 'HRcF';
                             }
 
@@ -1257,7 +1322,7 @@ class Repetabilty {
                                 tempcalibObj.Uncertinity = {};
                                 tempcalibObj.datetimecount = 0;
                                 return "HRC" + "Repeatability Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(objBalRelWt.calibWt[0].Bal_StdWt, balanceInfo.Bal_DP) + balanceInfo.Bal_Unit + "," + `STD. ${srNotobepalced} :` + ",";
-                              
+
                             } else {
                                 tempcalibObj.Uncertinity = {};
                                 tempcalibObj.datetimecount = 0;
@@ -1277,17 +1342,32 @@ class Repetabilty {
                         }
                         result = await database.select(selectRepSrNoObj)
                         let int_Repet_RepNo = result[0][0].Repet_RepNo;
+
+                        //failed
+                        // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                        //     strBalId,
+                        //     IDSSrNo
+                        // );
+                        // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Repeatability", strBalId, repnofordelete);
+                        // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                        // if (TempCalibType != undefined) {
+                        //     TempCalibType.calibType = 'periodic';
+                        // } else {
+                        //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                        // }
+                        //
+
                         await CalibPowerBackup.deleteCalibPowerBackupData("R", IDSSrNo);
                         result = await comman.caibrationFails('R', strBalId, int_Repet_RepNo)
                         objFailedFlag.failFlagPeriodic = true;
-                        objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                        await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                         return 'HRcF';
 
                     }
                 } else {
                     tempcalibObj.Repetability = {};
                     tempcalibObj.datetimecount = 0;
-                    return `+,`
+                    return `HR40Invalid String,,,,` ;
                 }
             }
         } catch (err) {
@@ -1305,6 +1385,7 @@ class Repetabilty {
         return false;
 
     }
+
     async checkRepeatAccepancelimit(strBalId) {
         try {
             var repetabilitymasterTable = '';

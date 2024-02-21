@@ -49,6 +49,22 @@ class Uncertinity {
                 let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
                 await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
 
+                //failed
+                // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                //     strBalId,
+                //     IDSSrNo
+                // );
+                // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Uncertainty", strBalId, repnofordelete);
+                await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
+
+                // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                // if (TempCalibType != undefined) {
+                //     TempCalibType.calibType = 'periodic';
+                // } else {
+                //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                // }
+                //
+
             }
             if (str_Protocol.substring(0, 2) == "VI") {
 
@@ -383,13 +399,13 @@ class Uncertinity {
                     }
                     var strUnit = tempBalace.balance_info[0].Bal_Unit
                     await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', 'Uncertainty Calibration', 'started');
-                   
-                   
+
+
                     if (tempCubicInfo.Sys_Area == 'Granulation') {
                         return "HRC" +
                             "Uncertainty Calib,," + `LOAD WITH : ` + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + "," + "STD. 001 :" + ",";
                     } else {
-                    return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + `, 0.000,Uncertainty Calib,${TareCmd}`;
+                        return 'CB01' + objFormulaFunction.FormatNumberString(result[0][0].Bal_StdWt, tempBalace.balance_info[0].Bal_DP) + strUnit + `, 0.000,Uncertainty Calib,${TareCmd}`;
                     }
                 }
             }
@@ -731,8 +747,23 @@ class Uncertinity {
                             }
                             result = await database.select(selectRepSrNoObj)
                             let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
-                            await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
-                            objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                            await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo);
+
+                            //             //failed
+                            // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                            //     strBalId,
+                            //     IDSSrNo
+                            // );
+                            // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Uncertainty", strBalId, repnofordelete);
+
+                            // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                            // if (TempCalibType != undefined) {
+                            //     TempCalibType.calibType = 'periodic';
+                            // } else {
+                            //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                            // }
+                            //
+                            await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                             return 'CF';
                         }
                     } else {
@@ -761,7 +792,22 @@ class Uncertinity {
                     let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
                     await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
                     await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
-                    objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+
+                    //failed
+                    // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                    //     strBalId,
+                    //     IDSSrNo
+                    // );
+                    // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Uncertainty", strBalId, repnofordelete);
+
+                    // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                    // if (TempCalibType != undefined) {
+                    //     TempCalibType.calibType = 'periodic';
+                    // } else {
+                    //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                    // }
+                    //
+                    await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                     return 'CF';
 
                 }
@@ -775,6 +821,10 @@ class Uncertinity {
         }
 
     }
+    async  containsNumber(str) {
+        return /\d/.test(str);
+    }
+
 
     async newverifyWeights(str_Protocol, IDSSrNo) {
         try {
@@ -849,7 +899,7 @@ class Uncertinity {
             }
 
             if (protocolValue != protocolIncomingType + "C000") {
-                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await containsNumber(protocolValueData))) {
+                if (tempcalibObj.datetimecount >= 3 && (protocolValueData.includes('Date') == true || protocolValueData.includes('Time') == true || await this.containsNumber(protocolValueData))) {
                     if (tempcalibObj.sampleNoforUncertainty != 0) {
                         tempcalibObj.sampleNoforUncertainty -= 1;
                     }
@@ -1021,8 +1071,10 @@ class Uncertinity {
                                 ]
                             }
 
+
+
                             await database.save(insertIncompleteDetailsObj)
-                          
+
                             // activity Entry for Uncerinity Calibration Start
 
                             var objActivity = {}
@@ -1045,7 +1097,16 @@ class Uncertinity {
                                 );
                             }
 
+
                             await objActivityLog.ActivityLogEntry(objActivity);
+                            //powerbackup insertion
+                            var data = await CalibPowerBackup.insertCalibPowerBackupData(
+                                RepNo,
+                                "Uncertainty",
+                                balanceInfo.Bal_ID,
+                                IDSSrNo
+                            );
+                            //
 
                             await objMonitor.monit({ case: 'CB', idsNo: IDSSrNo, data: { Weight: recieveWt } });
                             //
@@ -1169,10 +1230,25 @@ class Uncertinity {
                                         { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                                     ]
                                 }
-                                result = await database.select(selectRepSrNoObj)
+                                result = await database.select(selectRepSrNoObj) ;
                                 let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+
+                                //failed
+                                // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                                //     strBalId,
+                                //     IDSSrNo
+                                // );
+                                // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Uncertainty", strBalId, repnofordelete);
+
+                                // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                                // if (TempCalibType != undefined) {
+                                //     TempCalibType.calibType = 'periodic';
+                                // } else {
+                                //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                                // }
+                                //
                                 await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
-                                objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
+                                await objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
                                 return 'HRcF';
                             }
                         } else {
@@ -1202,6 +1278,21 @@ class Uncertinity {
                         }
                         result = await database.select(selectRepSrNoObj)
                         let int_uncertinity_RepNo = result[0][0].Uncertinity_RepNo;
+
+                        //failed
+                        // var repnofordelete = await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                        //     strBalId,
+                        //     IDSSrNo
+                        // );
+                        // await CalibPowerBackup.moving_incomplete_calib_entry_whose_flag_zero("Uncertainty", strBalId, repnofordelete);
+
+                        // var TempCalibType = globalData.arrcalibType.find(k => k.idsNo == IDSSrNo);
+                        // if (TempCalibType != undefined) {
+                        //     TempCalibType.calibType = 'periodic';
+                        // } else {
+                        //     globalData.arrcalibType.push({ idsNo: IDSSrNo, calibType: 'periodic' })
+                        // }
+                        //
                         await comman.caibrationFails('U', strBalId, int_uncertinity_RepNo)
                         await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
                         objInstrumentUsage.InstrumentUsage('Balance', IDSSrNo, 'tbl_instrumentlog_balance', '', 'completed')
@@ -1211,7 +1302,7 @@ class Uncertinity {
                 } else {
                     tempcalibObj.Uncertainty = {};
                     tempcalibObj.datetimecount = 0;
-                    return `+,`
+                    return `HR40Invalid String,,,,` ;
                 }
             }
         } catch (err) {

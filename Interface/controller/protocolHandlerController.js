@@ -350,172 +350,149 @@ class ProtocolHandler {
                             * routine so here we are bypass VerifyPreCalibration
                             */
                             //if (config.ProjectName == 'SunPharmaVP') {
-                            if (config.ProjectName == 'SunPharmaVP') {
-                                this.sendProtocol("CR0", str_IpAddress);
-                            } else {
-                                var tempCubicInfo = globalData.arrIdsInfo.find(ids => ids.Sys_IDSNo == idsNo);
-                                var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == idsNo);
-                                var tempBalace = tempCubicInfo.Sys_BalID;
-                                var tempVernier = tempCubicInfo.Sys_VernierID;
-                                var calibDId = '1';
-                                var calibPId = '2';
-                                if (objOwner.owner == 'analytical') {
-                                    tempBalace = tempCubicInfo.Sys_BalID;
-                                    calibDId = '1';
-                                    calibPId = '2';
-                                } else {
-                                    tempBalace = tempCubicInfo.Sys_BinBalID; // Bin Bal
-                                    if (tempCubicInfo.Sys_Port3 == 'IPC Balance') {
-                                        calibDId = '4';
-                                        calibPId = '5';
-                                    }
-                                }
-                                if (tempBalace != 'None' &&
-                                    (tempCubicInfo.Sys_Port1 == 'Balance' || tempCubicInfo.Sys_Port2 == 'Balance' || tempCubicInfo.Sys_Port1 == 'IPC Balance'
-                                        || tempCubicInfo.Sys_Port3 == 'Balance' || tempCubicInfo.Sys_Port3 == 'IPC Balance')) {
-                                    var tempVerify = await objCommanFun.calibrationVerificationafterfailed(idsNo); //CR-54 UNable to login after calibration failed
-                                    if (tempVerify) {
-                                        this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
-                                    }
-                                    else {
-                                        var strReturnProtocol = await dailyCalibrationModel.checkDailyCalibrationPending(str_IpAddress.split('.')[3]);
 
-                                        if (tempCubicInfo.Sys_Area == 'Granulation') {
-                                            if (strReturnProtocol.includes('Pending')) {
-                                                if (strReturnProtocol.includes('Daily')) {
-                                                    strReturnProtocol = `CRH1Daily Calibration,Pending,,,`;
-                                                    // strReturnProtocol = `CRH1Periodic Calibration,Pending,,,`;
-                                                } else if (strReturnProtocol.includes('Periodic')) {
-                                                    strReturnProtocol = `CRH1Periodic Calibration,Pending,,,`;
-                                                } else if (strReturnProtocol.includes('Uncertainty')) {
-                                                    strReturnProtocol = `CRH1Uncertainty Calibration,Pending,,,`;
-                                                } else if (strReturnProtocol.includes('Repeatability')) {
-                                                    strReturnProtocol = `CRH1Repeatability Calibration,Pending,,,`;
-                                                } else if (strReturnProtocol.includes('Eccentricity')) {
-                                                    strReturnProtocol = `CRH1Eccentricity Calibration,Pending,,,`;
-                                                } 
-                                                var tempcalibObj = globalData.calibrationforhard.find(td => td.idsNo == idsNo);
-                                                ///foreasycheck
-                                                if (tempcalibObj == undefined) {
-                                                    const obj = {
-                                                        idsNo: idsNo,
-                                                        unit: "",
-                                                        datetimecount: 0,
-                                                        sampleNoforDaily: 0,
-                                                        sampleNoforPeriodic: 0,
-                                                        sampleNoforUncertainty: 0,
-                                                        sampleNoforEccentricity: 0,
-                                                        sampleNoforRepetability: 0,
-                                                        Daily: {},
-                                                        Periodic: {},
-                                                        Uncertainty: {},
-                                                        Eccentricity: {},
-                                                        Repetability: {},
-                                                    };
-                                                    globalData.calibrationforhard.push(obj);
-                                                } else {
-                                                        tempcalibObj.sampleNoforDaily = 0,
-                                                        tempcalibObj.unit = "",
-                                                        tempcalibObj.datetimecount = 0,
-                                                        tempcalibObj.sampleNoforPeriodic = 0,
-                                                        tempcalibObj.sampleNoforUncertainty = 0,
-                                                        tempcalibObj.sampleNoforEccentricity = 0,
-                                                        tempcalibObj.sampleNoforRepetability = 0,
-                                                        tempcalibObj.Daily = {},
-                                                        tempcalibObj.Periodic = {},
-                                                        tempcalibObj.Uncertainty = {},
-                                                        tempcalibObj.Eccentricity = {},
-                                                        tempcalibObj.Repetability = {}
-                                                }
+                            var tempCubicInfo = globalData.arrIdsInfo.find(ids => ids.Sys_IDSNo == idsNo);
+                            var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == idsNo);
+                            var tempBalace = tempCubicInfo.Sys_BalID;
+                            var tempVernier = tempCubicInfo.Sys_VernierID;
+                            var calibDId = '1';
+                            var calibPId = '2';
+                            if (objOwner.owner == 'analytical') {
+                                tempBalace = tempCubicInfo.Sys_BalID;
+                                calibDId = '1';
+                                calibPId = '2';
+                            } else {
+                                tempBalace = tempCubicInfo.Sys_BinBalID; // Bin Bal
+                                if (tempCubicInfo.Sys_Port3 == 'IPC Balance') {
+                                    calibDId = '4';
+                                    calibPId = '5';
+                                }
+                            }
+                            if (tempBalace != 'None' &&
+                                (tempCubicInfo.Sys_Port1 == 'Balance' || tempCubicInfo.Sys_Port2 == 'Balance' || tempCubicInfo.Sys_Port1 == 'IPC Balance'
+                                    || tempCubicInfo.Sys_Port3 == 'Balance' || tempCubicInfo.Sys_Port3 == 'IPC Balance')) {
+
+                                var strReturnProtocol = await dailyCalibrationModel.checkDailyCalibrationPending(str_IpAddress.split('.')[3]);
+                                var tempVerify = await objCommanFun.calibrationVerificationafterfailed(idsNo); //CR-54 UNable to login after calibration failed
+                                if (tempVerify) {
+                                    this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
+                                }
+                                else {
+                                    if (tempCubicInfo.Sys_Area == 'Granulation') {
+                                        if (strReturnProtocol.includes('Pending')) {
+                                            if (strReturnProtocol.includes('Daily')) {
+                                                strReturnProtocol = `CRH1Daily Calibration,Pending,,,`;
+                                                // strReturnProtocol = `CRH1Periodic Calibration,Pending,,,`;
+                                            } else if (strReturnProtocol.includes('Periodic')) {
+                                                strReturnProtocol = `CRH1Periodic Calibration,Pending,,,`;
+                                            } else if (strReturnProtocol.includes('Uncertainty')) {
+                                                strReturnProtocol = `CRH1Uncertainty Calibration,Pending,,,`;
+                                            } else if (strReturnProtocol.includes('Repeatability')) {
+                                                strReturnProtocol = `CRH1Repeatability Calibration,Pending,,,`;
+                                            } else if (strReturnProtocol.includes('Eccentricity')) {
+                                                strReturnProtocol = `CRH1Eccentricity Calibration,Pending,,,`;
+                                            }
+                                            var tempcalibObj = globalData.calibrationforhard.find(td => td.idsNo == idsNo);
+                                            ///foreasycheck
+                                            if (tempcalibObj == undefined) {
+                                                const obj = {
+                                                    idsNo: idsNo,
+                                                    unit: "",
+                                                    datetimecount: 0,
+                                                    sampleNoforDaily: 0,
+                                                    sampleNoforPeriodic: 0,
+                                                    sampleNoforUncertainty: 0,
+                                                    sampleNoforEccentricity: 0,
+                                                    sampleNoforRepetability: 0,
+                                                    Daily: {},
+                                                    Periodic: {},
+                                                    Uncertainty: {},
+                                                    Eccentricity: {},
+                                                    Repetability: {},
+                                                };
+                                                globalData.calibrationforhard.push(obj);
+                                            } else {
+                                                tempcalibObj.sampleNoforDaily = 0,
+                                                    tempcalibObj.unit = "",
+                                                    tempcalibObj.datetimecount = 0,
+                                                    tempcalibObj.sampleNoforPeriodic = 0,
+                                                    tempcalibObj.sampleNoforUncertainty = 0,
+                                                    tempcalibObj.sampleNoforEccentricity = 0,
+                                                    tempcalibObj.sampleNoforRepetability = 0,
+                                                    tempcalibObj.Daily = {},
+                                                    tempcalibObj.Periodic = {},
+                                                    tempcalibObj.Uncertainty = {},
+                                                    tempcalibObj.Eccentricity = {},
+                                                    tempcalibObj.Repetability = {}
                                             }
                                         }
-                                        let obj;
-                                        if (strReturnProtocol.substring(0, 3) == `CR${calibDId}`) {
-                                            await objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
-                                            //strReturnProtocol = "CR0"; // to avoide calibraiton
-                                        } else if (strReturnProtocol.substring(0, 3) == `CR${calibPId}`) {
-                                            // objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Periodic' } });
-                                            //strReturnProtocol = "CR0"; // to avoide calibraiton
-                                        }
+                                    }
+                                    let obj;
+                                    if (strReturnProtocol.substring(0, 3) == `CR${calibDId}`) {
+                                        await objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Daily' } });
+                                        //strReturnProtocol = "CR0"; // to avoide calibraiton
+                                    } else if (strReturnProtocol.substring(0, 3) == `CR${calibPId}`) {
+                                        // objMonitor.monit({ case: 'CR', idsNo: idsNo, data: { calibType: 'Periodic' } });
+                                        //strReturnProtocol = "CR0"; // to avoide calibraiton
+                                    }
 
-                                        //strReturnProtocol = "CR0" //uncomment this line to skip calibration
+                                    //strReturnProtocol = "CR0" //uncomment this line to skip calibration
 
-                                        if (strReturnProtocol.substring(0, 3) == 'CR0') {
-                                            const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(idsNo));
+                                    if (strReturnProtocol.substring(0, 3) == 'CR0') {
+                                        const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(idsNo));
 
-                                            if ((tempCubicInfo.Sys_Area == "Compression" || tempCubicInfo.Sys_Area == "Capsule Filling"
-                                                || tempCubicInfo.Sys_Area == "Coating" || tempCubicInfo.Sys_Area == 'Granulation'
-                                                || tempCubicInfo.Sys_Area == 'Effervescent Compression' || tempCubicInfo.Sys_Area == 'Effervescent Granulation'
-                                                || tempCubicInfo.Sys_Area == 'Strepsils' || tempCubicInfo.Sys_Area == 'Allopathic' || tempCubicInfo.Sys_Area == 'Personal Care'
-                                                || tempCubicInfo.Sys_Area == "Inprocess-I" || tempCubicInfo.Sys_Area == "Inprocess-IV") && tempCubicInfo.Sys_CubType == globalData.objNominclature.BinText) {
+                                        if ((tempCubicInfo.Sys_Area == "Compression" || tempCubicInfo.Sys_Area == "Capsule Filling"
+                                            || tempCubicInfo.Sys_Area == "Coating" || tempCubicInfo.Sys_Area == 'Granulation'
+                                            || tempCubicInfo.Sys_Area == 'Effervescent Compression' || tempCubicInfo.Sys_Area == 'Effervescent Granulation'
+                                            || tempCubicInfo.Sys_Area == 'Strepsils' || tempCubicInfo.Sys_Area == 'Allopathic' || tempCubicInfo.Sys_Area == 'Personal Care'
+                                            || tempCubicInfo.Sys_Area == "Inprocess-I" || tempCubicInfo.Sys_Area == "Inprocess-IV") && tempCubicInfo.Sys_CubType == globalData.objNominclature.BinText) {
 
-                                                var response = await objContainer.sendIPCProductList(tempCubicInfo.Sys_CubType, tempCubicInfo.Sys_Area);
-                                                strReturnProtocol = response;
-                                                this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            var response = await objContainer.sendIPCProductList(tempCubicInfo.Sys_CubType, tempCubicInfo.Sys_Area);
+                                            strReturnProtocol = response;
+                                            this.sendProtocol(strReturnProtocol, str_IpAddress);
+
+                                        } else {
+                                            // Checking for Periodic Bal_CalbReminder
+                                            //COMMENT THIS IF BLOCK FOR REGULAR ROUTINE***********************************************
+                                            //Added by vivek on 24-04-2020 11:05
+                                            // this if added for protocol validation..
+                                            // only 3 commas a  re allowed  AND No need to send TAREA COMMAND
+                                            strReturnProtocol = await objFetchDetails.checkForPeriodicDue(str_IpAddress.split('.')[3]);
+                                            //************************************************************************************** */
+                                            if (strReturnProtocol.substring(0, 3) == 'CR0') {
+                                                // If balance routine has no calibration or completed then check calibration for vernier
+                                                let vernierCalibrationResponse = await objFetchDetails.checkVernierCalibration(idsNo);
+
+                                                if (vernierCalibrationResponse.substring(0, 3) != 'CR0') {
+                                                    let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
+                                                    //sending CR1
+                                                    if (tempRightsObj.rights.includes('Calibration')) {
+                                                        let objUpdateCubicle = {
+                                                            str_tableName: 'tbl_cubical',
+                                                            data: [
+                                                                { str_colName: 'Sys_CalibInProcess', value: 1 },
+                                                            ],
+                                                            condition: [
+                                                                { str_colName: 'Sys_IDSNo', value: idsNo }
+                                                            ]
+                                                        }
+                                                        console.log('Sys_CalibInProcess set from CP=1')
+                                                        await database.update(objUpdateCubicle);
+                                                        await this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
+                                                    } else {
+                                                        //message change for mesage validation*******************
+                                                        // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
+                                                        //*********************************************** */
+                                                        this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
+                                                    }
+                                                } else {
+                                                    // CR0
+                                                    await this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
+                                                }
 
                                             } else {
-                                                // Checking for Periodic Bal_CalbReminder
-                                                //COMMENT THIS IF BLOCK FOR REGULAR ROUTINE***********************************************
-                                                //Added by vivek on 24-04-2020 11:05
-                                                // this if added for protocol validation..
-                                                // only 3 commas a  re allowed  AND No need to send TAREA COMMAND
-                                                strReturnProtocol = await objFetchDetails.checkForPeriodicDue(str_IpAddress.split('.')[3]);
-                                                //************************************************************************************** */
-                                                if (strReturnProtocol.substring(0, 3) == 'CR0') {
-                                                    // If balance routine has no calibration or completed then check calibration for vernier
-                                                    let vernierCalibrationResponse = await objFetchDetails.checkVernierCalibration(idsNo);
-
-                                                    if (vernierCalibrationResponse.substring(0, 3) != 'CR0') {
-                                                        let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
-                                                        //sending CR1
-                                                        if (tempRightsObj.rights.includes('Calibration')) {
-                                                            let objUpdateCubicle = {
-                                                                str_tableName: 'tbl_cubical',
-                                                                data: [
-                                                                    { str_colName: 'Sys_CalibInProcess', value: 1 },
-                                                                ],
-                                                                condition: [
-                                                                    { str_colName: 'Sys_IDSNo', value: idsNo }
-                                                                ]
-                                                            }
-                                                            console.log('Sys_CalibInProcess set from CP=1')
-                                                            await database.update(objUpdateCubicle);
-                                                            await this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
-                                                        } else {
-                                                            //message change for mesage validation*******************
-                                                            // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
-                                                            //*********************************************** */
-                                                            this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
-                                                        }
-                                                    } else {
-                                                        // CR0
-                                                        await this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
-                                                    }
-
-                                                } else {
-                                                    // Other Wise send Reminder protocol from here
-                                                    //sending CR2 
-                                                    let objUpdateCubicle = {
-                                                        str_tableName: 'tbl_cubical',
-                                                        data: [
-                                                            { str_colName: 'Sys_CalibInProcess', value: 1 },
-                                                        ],
-                                                        condition: [
-                                                            { str_colName: 'Sys_IDSNo', value: idsNo }
-                                                        ]
-                                                    }
-                                                    console.log('Sys_CalibInProcess set from CP=1')
-                                                    await database.update(objUpdateCubicle);
-
-                                                    await this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                                }
-
-                                            }
-                                        }
-                                        else {
-                                            let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
-                                            //sending CR1
-                                            if (tempRightsObj.rights.includes('Calibration')) {
+                                                // Other Wise send Reminder protocol from here
+                                                //sending CR2 
                                                 let objUpdateCubicle = {
                                                     str_tableName: 'tbl_cubical',
                                                     data: [
@@ -528,176 +505,197 @@ class ProtocolHandler {
                                                 console.log('Sys_CalibInProcess set from CP=1')
                                                 await database.update(objUpdateCubicle);
 
-                                                strReturnProtocol = strReturnProtocol.substring(0, strReturnProtocol.length - 1)
                                                 await this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                                // //sending powerbackup
-                                                // var calibtype = strReturnProtocol.substring(2, 3);
-                                                // switch (calibtype) {
-                                                //     case "1":
-                                                //         calibtype = "Daily";
-                                                //         break;
-                                                //     case "2":
-                                                //         calibtype = "Periodic";
-                                                //         break;
-                                                //     case "E":
-                                                //         calibtype = "Eccentricity";
-                                                //         break;
-                                                //     case "R":
-                                                //         calibtype = "Repeatability";
-                                                //         break;
-                                                //     case "U":
-                                                //         calibtype = "Uncertainty";
-                                                //         break;
-                                                // }
-                                                // let objFetchcalibpowerbackup =
-                                                //     await CalibPowerBackup.fetchCalibPowerBackupData(
-                                                //         idsNo,
-                                                //         calibtype,
-                                                //         tempBalace
-                                                //     );
-                                                // if (
-                                                //     objFetchcalibpowerbackup.status &&
-                                                //     objFetchcalibpowerbackup.result.length > 0
-                                                // ) {
-                                                //     strReturnProtocol =
-                                                //         await CalibPowerBackup.sendCalibPowerBackupData(
-                                                //             strReturnProtocol,
-                                                //             objFetchcalibpowerbackup.result,
-                                                //             idsNo,
-                                                //             str_IpAddress
-                                                //         );
-                                                // } else {
-                                                //     //clearing of different user entry if entry is not present in calibrationpowerbackup table
-                                                //     var tempCalibStatus = globalData.calibrationStatus.find(
-                                                //         (k) => k.BalId == tempBalace
-                                                //     );
-                                                //     const tempUserObject = globalData.arrUsers.find(
-                                                //         (k) => k.IdsNo == idsNo
-                                                //     );
-                                                //     var curruser = tempUserObject.UserId;
-                                                //     var calibrationentrypresent = false;
-                                                //     var differentuserentrypresent = false;
-
-                                                //     for (var i in tempCalibStatus.status) {
-                                                //         if (tempCalibStatus.status[i] == "1") {
-                                                //             calibrationentrypresent = true;
-                                                //             break;
-                                                //         }
-                                                //     }
-                                                //     if (calibrationentrypresent) {
-                                                //         var selectCalibData = {
-                                                //             str_tableName:
-                                                //                 "tbl_calibration_periodic_master_incomplete",
-                                                //             data: "*",
-                                                //             condition: [
-                                                //                 // { str_colName: "IdsNo", value: IdsNo },
-                                                //                 {
-                                                //                     str_colName: "Periodic_BalID",
-                                                //                     value: tempBalace,
-                                                //                 },
-                                                //             ],
-                                                //         };
-                                                //         var result = await database.select(selectCalibData);
-                                                //         if (result[0][0].Periodic_UserID != curruser) {
-                                                //             differentuserentrypresent = true;
-                                                //         }
-                                                //     }
-
-                                                //     if (differentuserentrypresent) {
-                                                //         await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
-                                                //             tempBalace,
-                                                //             idsNo
-                                                //         );
-                                                //         strReturnProtocol = "DIFUSER";
-                                                //     }
-                                                // }
-                                                // if (strReturnProtocol == "DIFUSER") {
-                                                //     this.handleProtocol("CRN￻", str_IpAddress, "");
-                                                // } else {
-                                                //     if (!strReturnProtocol.includes("VI")) {
-                                                //         var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
-                                                //         if (tempVerifyforfailed) {
-                                                //             await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
-                                                //         }
-                                                //         else {
-                                                //             this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                                //         }
-                                                //     } else {
-                                                //         this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                                //     }
-
-                                                // }
-
-                                            } else {
-                                                //message change for mesage validation*******************
-                                                // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
-                                                //*********************************************** */
-                                                await this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
                                             }
-                                        }
-                                    }
-                                } else if (tempVernier != 'None' && tempCubicInfo.Sys_Port2 == 'Vernier') {
-                                    let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
-                                    // if (tempRightsObj.rights.includes('Calibration')) {
-                                    let vernierCalibrationResponse = await objFetchDetails.checkVernierCalibration(idsNo);
 
-                                    if (vernierCalibrationResponse != "CR0") {//CR3
-                                        if (tempRightsObj.rights.includes('Calibration')) {
-                                            this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
-                                        }
-                                        else {
-                                            this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
                                         }
                                     }
                                     else {
-                                        this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
-                                    }
+                                        let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
+                                        //sending CR1
+                                        if (tempRightsObj.rights.includes('Calibration')) {
+                                            let objUpdateCubicle = {
+                                                str_tableName: 'tbl_cubical',
+                                                data: [
+                                                    { str_colName: 'Sys_CalibInProcess', value: 1 },
+                                                ],
+                                                condition: [
+                                                    { str_colName: 'Sys_IDSNo', value: idsNo }
+                                                ]
+                                            }
+                                            console.log('Sys_CalibInProcess set from CP=1')
+                                            await database.update(objUpdateCubicle);
 
-                                    //}
+                                            strReturnProtocol = strReturnProtocol.substring(0, strReturnProtocol.length - 1)
+                                            await this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            // //sending powerbackup
+                                            // var calibtype = strReturnProtocol.substring(2, 3);
+                                            // switch (calibtype) {
+                                            //     case "1":
+                                            //         calibtype = "Daily";
+                                            //         break;
+                                            //     case "2":
+                                            //         calibtype = "Periodic";
+                                            //         break;
+                                            //     case "E":
+                                            //         calibtype = "Eccentricity";
+                                            //         break;
+                                            //     case "R":
+                                            //         calibtype = "Repeatability";
+                                            //         break;
+                                            //     case "U":
+                                            //         calibtype = "Uncertainty";
+                                            //         break;
+                                            // }
+                                            // let objFetchcalibpowerbackup =
+                                            //     await CalibPowerBackup.fetchCalibPowerBackupData(
+                                            //         idsNo,
+                                            //         calibtype,
+                                            //         tempBalace
+                                            //     );
+                                            // if (
+                                            //     objFetchcalibpowerbackup.status &&
+                                            //     objFetchcalibpowerbackup.result.length > 0
+                                            // ) {
+                                            //     strReturnProtocol =
+                                            //         await CalibPowerBackup.sendCalibPowerBackupData(
+                                            //             strReturnProtocol,
+                                            //             objFetchcalibpowerbackup.result,
+                                            //             idsNo,
+                                            //             str_IpAddress
+                                            //         );
+                                            // } else {
+                                            //     //clearing of different user entry if entry is not present in calibrationpowerbackup table
+                                            //     var tempCalibStatus = globalData.calibrationStatus.find(
+                                            //         (k) => k.BalId == tempBalace
+                                            //     );
+                                            //     const tempUserObject = globalData.arrUsers.find(
+                                            //         (k) => k.IdsNo == idsNo
+                                            //     );
+                                            //     var curruser = tempUserObject.UserId;
+                                            //     var calibrationentrypresent = false;
+                                            //     var differentuserentrypresent = false;
 
-                                } else {
-                                    if (tempBalace == 'None' && tempCubicInfo.Sys_CubType == 'IPC') {
-                                        //Added by Pradip 17/09/2020 When port settig is not done then it
-                                        // will not ask for weighment
-                                        this.sendProtocol("ID3 IPC Balance,Not Assigned,,", str_IpAddress);
-                                    } else {
-                                        this.sendProtocol("CR0", str_IpAddress);
+                                            //     for (var i in tempCalibStatus.status) {
+                                            //         if (tempCalibStatus.status[i] == "1") {
+                                            //             calibrationentrypresent = true;
+                                            //             break;
+                                            //         }
+                                            //     }
+                                            //     if (calibrationentrypresent) {
+                                            //         var selectCalibData = {
+                                            //             str_tableName:
+                                            //                 "tbl_calibration_periodic_master_incomplete",
+                                            //             data: "*",
+                                            //             condition: [
+                                            //                 // { str_colName: "IdsNo", value: IdsNo },
+                                            //                 {
+                                            //                     str_colName: "Periodic_BalID",
+                                            //                     value: tempBalace,
+                                            //                 },
+                                            //             ],
+                                            //         };
+                                            //         var result = await database.select(selectCalibData);
+                                            //         if (result[0][0].Periodic_UserID != curruser) {
+                                            //             differentuserentrypresent = true;
+                                            //         }
+                                            //     }
+
+                                            //     if (differentuserentrypresent) {
+                                            //         await CalibPowerBackup.movingtocalibfailafterlogindifferrentUser(
+                                            //             tempBalace,
+                                            //             idsNo
+                                            //         );
+                                            //         strReturnProtocol = "DIFUSER";
+                                            //     }
+                                            // }
+                                            // if (strReturnProtocol == "DIFUSER") {
+                                            //     this.handleProtocol("CRN￻", str_IpAddress, "");
+                                            // } else {
+                                            //     if (!strReturnProtocol.includes("VI")) {
+                                            //         var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
+                                            //         if (tempVerifyforfailed) {
+                                            //             await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
+                                            //         }
+                                            //         else {
+                                            //             this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            //         }
+                                            //     } else {
+                                            //         this.sendProtocol(strReturnProtocol, str_IpAddress);
+                                            //     }
+
+                                            // }
+
+                                        } else {
+                                            //message change for mesage validation*******************
+                                            // this.sendProtocol("ID3 YOU DONT HAVE,CALIBRATION RIGHT,,", str_IpAddress);
+                                            //*********************************************** */
+                                            await this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
+                                        }
                                     }
                                 }
+                            } else if (tempVernier != 'None' && tempCubicInfo.Sys_Port2 == 'Vernier') {
+                                let tempRightsObj = globalData.arrUserRights.find(k => k.idsNo == idsNo);
+                                // if (tempRightsObj.rights.includes('Calibration')) {
+                                let vernierCalibrationResponse = await objFetchDetails.checkVernierCalibration(idsNo);
+
+                                if (vernierCalibrationResponse != "CR0") {//CR3
+                                    if (tempRightsObj.rights.includes('Calibration')) {
+                                        this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
+                                    }
+                                    else {
+                                        this.sendProtocol("ID3 Calibration Right,Not Assigned,,", str_IpAddress);
+                                    }
+                                }
+                                else {
+                                    this.sendProtocol(vernierCalibrationResponse, str_IpAddress);
+                                }
+
+                                //}
+
+                            } else {
+                                if (tempBalace == 'None' && tempCubicInfo.Sys_CubType == 'IPC') {
+                                    //Added by Pradip 17/09/2020 When port settig is not done then it
+                                    // will not ask for weighment
+                                    this.sendProtocol("ID3 IPC Balance,Not Assigned,,", str_IpAddress);
+                                } else {
+                                    this.sendProtocol("CR0", str_IpAddress);
+                                }
                             }
+
                             break;
                         // if Caibration pending 
                         case "CP":
-                                await objMonitor.monit({ case: 'CP', idsNo: idsNo });
-                                await this.sendProtocol("SP10SIR,", str_IpAddress);
-                                let objFlagCalibWeigh = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
-                                if (objFlagCalibWeigh != undefined) {
-                                    objFlagCalibWeigh.alertFlag = true;
-                                }
-                                var strReturnProtocol = await caliDecider.calibPendingDecider(str_Protocol, str_IpAddress.split('.')[3]);
-                                var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
-                                if (tempVerifyforfailed) {
-                                    await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
-                                } else{
-                                    this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                }
+                            await objMonitor.monit({ case: 'CP', idsNo: idsNo });
+                            await this.sendProtocol("SP10SIR,", str_IpAddress);
+                            let objFlagCalibWeigh = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
+                            if (objFlagCalibWeigh != undefined) {
+                                objFlagCalibWeigh.alertFlag = true;
+                            }
+                            var strReturnProtocol = await caliDecider.calibPendingDecider(str_Protocol, str_IpAddress.split('.')[3]);
+                            var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
+                            if (tempVerifyforfailed) {
+                                await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
+                            } else {
+                                this.sendProtocol(strReturnProtocol, str_IpAddress);
+                            }
                             break;
 
                         // if Caibration pending in granulation
                         case "CH":
-                                await objMonitor.monit({ case: 'CP', idsNo: idsNo });
-                                let objFlagCalibWeightinch = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
-                                if (objFlagCalibWeightinch != undefined) {
-                                    objFlagCalibWeightinch.alertFlag = true;
-                                }
+                            await objMonitor.monit({ case: 'CP', idsNo: idsNo });
+                            let objFlagCalibWeightinch = globalData.arr_FlagCallibWeighment.find(k => k.idsNo == idsNo);
+                            if (objFlagCalibWeightinch != undefined) {
+                                objFlagCalibWeightinch.alertFlag = true;
+                            }
 
-                                var strReturnProtocol = await caliDecider.calibPendingDecider(str_Protocol, str_IpAddress.split('.')[3]);
-                                var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
-                                if (tempVerifyforfailed) {
-                                    await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
-                                } else {
+                            var strReturnProtocol = await caliDecider.calibPendingDecider(str_Protocol, str_IpAddress.split('.')[3]);
+                            var tempVerifyforfailed = await objCommanFun.calibrationVerificationafterfailed(idsNo);   //CR-54 UNable to login after calibration failed
+                            if (tempVerifyforfailed) {
+                                await this.sendProtocol(`ID3 UNABLE TO CONTINUE,VERIFY CALIBRATION,,`, str_IpAddress);
+                            } else {
                                 this.sendProtocol(strReturnProtocol, str_IpAddress);
-                                }
+                            }
                             break;
                         // for incoming calibration weights 
                         case "CB":
@@ -1651,14 +1649,14 @@ class ProtocolHandler {
                             //     await CalibPowerBackup.deletepowerbackupaftercalibterminated(
                             //         idsNo
                             //     );
-                            // }
+                            // }'
+
                             ///////////////////////////////////////////////////////////////////////////////////////////////////////
                             await objIncompleteRemark.updateReportRemarkOnLO(idsNo);
                             await handleLoginModal.logOut(str_IpAddress.split('.')[3], logOutType);
-                            this.sendProtocol('+', str_IpAddress);
+                            await this.sendProtocol('+', str_IpAddress);
                             await objMonitor.monit({ case: 'LO', idsNo: idsNo });
-                            // var strReturnProtocol = "+";
-                            // this.sendProtocol(strReturnProtocol, str_IpAddress);
+
 
                             break;
 
