@@ -511,6 +511,13 @@ class LoginModal {
 
     async logOut(strIdsNo, strProtocol) {
         const tempObject = globalData.arrUsers.find(k => k.IdsNo == strIdsNo);
+        var selectedIds = strIdsNo;
+        var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == strIdsNo);
+        if (IPQCObject != undefined) {
+            selectedIds = IPQCObject.selectedIds;
+        } else {
+            selectedIds = strIdsNo; // for compression and coating
+        };
         if (tempObject != undefined) {
             var strUserId = tempObject.UserId;
             var objUpdateLogOutData = {
@@ -553,7 +560,7 @@ class LoginModal {
             }
             await database.update(objUpdateCubicle);
             console.log('Sys_CalibInProcess set from logOut=0')
-            await this.updateWeighmentStatus(strIdsNo, 0);
+            await this.updateWeighmentStatus(selectedIds, 0);
             await this.clearArrays(strIdsNo);
             return '+';
         }
@@ -567,6 +574,13 @@ class LoginModal {
     async logOutOnStart(strAddress, idsNo) {
         try {
             // First we check if given user is active or not
+            var selectedIds = idsNo;
+            var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == idsNo);
+            if (IPQCObject != undefined) {
+                selectedIds = IPQCObject.selectedIds
+            } else {
+                selectedIds = idsNo; // for compression and coating
+            };
             var objselectData = {
                 str_tableName: 'tbl_users',
                 data: '*',
@@ -588,7 +602,7 @@ class LoginModal {
                 }
 
                 await database.update(objUpdateLogOutData);
-                await this.updateWeighmentStatus(idsNo, 0)
+                await this.updateWeighmentStatus(selectedIds, 0)
                
 
                 // return '+';
@@ -604,7 +618,7 @@ class LoginModal {
             }
             console.log('Sys_CalibInProcess set from logOutOnStart=0')
             await database.update(objUpdateCubicle);
-            await this.updateWeighmentStatus(idsNo, 0);
+            await this.updateWeighmentStatus(selectedIds, 0);
             let tempAlertObj = globalData.alertArrTemp.find(k => k.IDSNO == idsNo);
             if(tempAlertObj != undefined){
                 var objselectData = {
@@ -941,6 +955,13 @@ class LoginModal {
         return new Promise((resolve, reject) => {
             var activeUser = obj.IdsNo;
             var strUserObj = globalData.arrUsers.find(k => k.IdsNo == activeUser.toString());
+            var selectedIds = activeUser.toString();
+            var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == activeUser.toString());
+            if (IPQCObject != undefined) {
+                selectedIds = IPQCObject.selectedIds
+            } else {
+                selectedIds = activeUser.toString(); // for compression and coating
+            };
             var objActivity = {};
             if (strUserObj != undefined) {
                 Object.assign(objActivity,
@@ -953,7 +974,7 @@ class LoginModal {
                     { strUserName: 'NA' },
                     { activity: 'IDS ' + obj.IdsNo + ' Communication Off' });
             }
-            this.updateWeighmentStatus(obj.IdsNo, 0);
+            this.updateWeighmentStatus(selectedIds, 0);
             objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
             objIncompleteUpdation.updateReportRemarkaftercommunicationoff(activeUser);
 

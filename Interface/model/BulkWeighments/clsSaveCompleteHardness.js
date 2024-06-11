@@ -131,7 +131,8 @@ class Hardness {
                     { str_colName: 'MachineSpeed_Min', value: completeMastData.MachineSpeed_Min },
                     { str_colName: 'MachineSpeed_Max', value: completeMastData.MachineSpeed_Max },
                     { str_colName: 'GenericName', value: completeMastData.GenericName },
-                    { str_colName: 'BMRNo', value: completeMastData.BMRNo }
+                    { str_colName: 'BMRNo', value: completeMastData.BMRNo },
+                    { str_colName: 'RepoLabel14', value: completeMastData.RepoLabel14 }   //producttype added for coating area
 
                 ]
             }

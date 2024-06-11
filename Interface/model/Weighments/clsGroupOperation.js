@@ -230,7 +230,8 @@ class Group {
                             { str_colName: `MachineTime`, value: MachineTime },//added for MLV by vivek on 14-04-2020
                             { str_colName: 'AvgWt', value: serverConfig.ProjectName == 'MLVeer' ? (Number(groupWeightVal) / Number(intNos)) * 1000 : (Number(groupWeightVal) / Number(intNos)) },//dded for MLV added by vivek on 29-10-2020 as per discussion with pushkar 
                             { str_colName: 'Remark', value: ResultOfReport == 'LE0' ? 'Ok' : 'Not Ok' },
-                            { str_colName: 'InstrumentID', value: ipcCode == undefined ? 0 : ipcCode.ipcCode }
+                            { str_colName: 'InstrumentID', value: ipcCode == undefined ? 0 : ipcCode.ipcCode },
+                            { str_colName: 'LotNo', value: objLotData.LotNo },
 
                         ]
                     }
@@ -402,7 +403,8 @@ class Group {
                             { str_colName: `MachineTime`, value: MachineTime },//added for MLV by vivek on 14-04-2020
                             { str_colName: 'AvgWt', value: serverConfig.ProjectName == 'MLVeer' ? (Number(groupWeightVal) / Number(intNos)) * 1000 : (Number(groupWeightVal) / Number(intNos)) },
                             { str_colName: 'Remark', value: ResultOfReport == 'LE0' ? 'Ok' : 'Not Ok' },
-                            { str_colName: 'InstrumentID', value: ipcCode == undefined ? 0 : ipcCode.ipcCode }
+                            { str_colName: 'InstrumentID', value: ipcCode == undefined ? 0 : ipcCode.ipcCode },
+                            { str_colName: 'LotNo', value: objLotData.LotNo },
                         ]
                     }
                     let detal_res = await database.save(insertIncompleteDetailObj);

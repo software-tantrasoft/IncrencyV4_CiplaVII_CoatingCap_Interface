@@ -121,7 +121,7 @@ class ProtocolHandler {
                     }
                     else {
                         RepeatResponse = oldProtocolData.Response;
-                        this.sendProtocol(RepeatResponse, oldProtocolData.ip);
+                        await this.sendProtocol(RepeatResponse, oldProtocolData.ip);
                     }
                     //console.log(`REPEAT TRANSMISSION ${oldProtocolData.protocolRecived} -> ${RepeatResponse}`);
 
@@ -1107,11 +1107,11 @@ class ProtocolHandler {
                                         } else {
                                             this.sendProtocol(protocol, str_IpAddress);
                                         }
-                                        await handleLoginModal.updateWeighmentStatus(idsNo, 1);
+                                        await handleLoginModal.updateWeighmentStatus(selectedIds, 1);
                                     }
                                     else {
                                         // Here we update weighment status true in database
-                                        await handleLoginModal.updateWeighmentStatus(idsNo, 1);
+                                        await handleLoginModal.updateWeighmentStatus(selectedIds, 1);
                                         //var currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == idsNo);
                                         // var productDetail = await proObj.productData(currentCubicle);
                                         /**
@@ -1776,6 +1776,7 @@ class ProtocolHandler {
                                 arrgroupipcob.ipcCode = IPC_CODE;
                             }
                             console.log(IPC_CODE);
+                            this.sendProtocol('+', str_IpAddress);
                             break;
                         case "ES":
 

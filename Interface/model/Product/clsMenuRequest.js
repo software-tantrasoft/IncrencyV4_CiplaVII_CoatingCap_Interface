@@ -2412,7 +2412,7 @@ class MenuRequestModel {
 
                 switch (selectedTypeLS) {
                     case 'P':
-                         await handleLoginModal.updateWeighmentStatus(IdsSrNo, 1);
+                        //  await handleLoginModal.updateWeighmentStatus(IdsSrNo, 1);
                         var objLocation = globalData.arrIPCLocation.find(k => k.idsNo == IdsSrNo);
                         if (objLocation != undefined) {
                             var arrSelProduct = str_Protocol.split(":");
@@ -2490,7 +2490,15 @@ class MenuRequestModel {
                         break;
                     case 'N': // container list
                         //var selectedCubic = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsSrNo);
-                        await objloginModel.updateWeighmentStatus(IdsSrNo, 1);
+                        var selectedIds;
+                
+                        var IPQCObject = globalData.arr_IPQCRelIds.find(k => k.idsNo == IdsSrNo);
+                        if (IPQCObject != undefined) {
+                            selectedIds = IPQCObject.selectedIds
+                        } else {
+                            selectedIds = IdsSrNo; // for compression and coating
+                        };
+                        await objloginModel.updateWeighmentStatus(selectedIds, 1);
                         var splitBin = str_Protocol.split(',');
                         var selectedContainer = splitBin[0].substring(3);
                         var objBin = globalData.arrBinInfo.find(k => k.idsNo == IdsSrNo);

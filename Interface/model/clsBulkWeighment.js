@@ -3649,32 +3649,32 @@ class BulkWeighment {
                     }
 
                     if (testDurTime) {
-
-                        if (tempDTObj.basketType.includes("Bolus")) {
-                            if (tempDTObj.mode == 'Dual') {
-                                var sample = actualProtocol;
-                                var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
-                                // if (productObj.Sys_RotaryType == 'Single') {
-                                //     if (JARTypeobj.JarType === 'A') {
-                                //         if (!await this.isValidTime(sample.split("|")[1].trim())) {
-                                //             const objBulkInvalid = new bulkInvalid();
-                                //             objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                //             objBulkInvalid.invalidObj.DT.invalid = true;
-                                //             objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                //             Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                //         }
-                                //     }
-                                //     if (JARTypeobj.JarType === 'B') {
-                                //         if (!await this.isValidTime(sample.split("|")[2].trim())) {
-                                //             const objBulkInvalid = new bulkInvalid();
-                                //             objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                //             objBulkInvalid.invalidObj.DT.invalid = true;
-                                //             objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                //             Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                //         }
-                                //     }
-                                // }
-                                // else {
+                        if (tempDTObj.basketType != undefined) {
+                            if (tempDTObj.basketType.includes("Bolus")) {
+                                if (tempDTObj.mode == 'Dual') {
+                                    var sample = actualProtocol;
+                                    var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                                    // if (productObj.Sys_RotaryType == 'Single') {
+                                    //     if (JARTypeobj.JarType === 'A') {
+                                    //         if (!await this.isValidTime(sample.split("|")[1].trim())) {
+                                    //             const objBulkInvalid = new bulkInvalid();
+                                    //             objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    //             objBulkInvalid.invalidObj.DT.invalid = true;
+                                    //             objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    //             Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    //         }
+                                    //     }
+                                    //     if (JARTypeobj.JarType === 'B') {
+                                    //         if (!await this.isValidTime(sample.split("|")[2].trim())) {
+                                    //             const objBulkInvalid = new bulkInvalid();
+                                    //             objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    //             objBulkInvalid.invalidObj.DT.invalid = true;
+                                    //             objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                    //             Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    //         }
+                                    //     }
+                                    // }
+                                    // else {
                                     if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
                                         const objBulkInvalid = new bulkInvalid();
                                         objBulkInvalid.invalidObj.idsNo = IdsNo;
@@ -3682,27 +3682,46 @@ class BulkWeighment {
                                         objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                     }
-                                // }
+                                    // }
 
 
-                                var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
-                                //globalData.arrDTDataReading.push(c1Obj);
-                                if (sample1.A != undefined && sample1.B != undefined) {
-                                    tempDTObj.arr_reading.push(sample1);
+                                    var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
+                                    //globalData.arrDTDataReading.push(c1Obj);
+                                    if (sample1.A != undefined && sample1.B != undefined) {
+                                        tempDTObj.arr_reading.push(sample1);
+                                    }
+                                    sample_recived = true;
+
+
                                 }
-                                sample_recived = true;
-
 
                             }
-
-                        }
-                        else {
-                            if (tempDTObj.mode == 'Dual') {
-                                var sample = actualProtocol;
-                                var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
-                                if (productObj.Sys_RotaryType == 'Single') {
-                                    if (JARTypeobj.JarType === 'A') {
-                                        if (!await this.isValidTime(sample.split("|")[1].trim())) {
+                            else {
+                                if (tempDTObj.mode == 'Dual') {
+                                    var sample = actualProtocol;
+                                    var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                                    if (productObj.Sys_RotaryType == 'Single') {
+                                        if (JARTypeobj.JarType === 'A') {
+                                            if (!await this.isValidTime(sample.split("|")[1].trim())) {
+                                                const objBulkInvalid = new bulkInvalid();
+                                                objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                                objBulkInvalid.invalidObj.DT.invalid = true;
+                                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                            }
+                                        }
+                                        if (JARTypeobj.JarType === 'B') {
+                                            if (!await this.isValidTime(sample.split("|")[2].trim())) {
+                                                const objBulkInvalid = new bulkInvalid();
+                                                objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                                objBulkInvalid.invalidObj.DT.invalid = true;
+                                                objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
+                                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
                                             const objBulkInvalid = new bulkInvalid();
                                             objBulkInvalid.invalidObj.idsNo = IdsNo;
                                             objBulkInvalid.invalidObj.DT.invalid = true;
@@ -3710,36 +3729,18 @@ class BulkWeighment {
                                             Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                         }
                                     }
-                                    if (JARTypeobj.JarType === 'B') {
-                                        if (!await this.isValidTime(sample.split("|")[2].trim())) {
-                                            const objBulkInvalid = new bulkInvalid();
-                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                            objBulkInvalid.invalidObj.DT.invalid = true;
-                                            objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                        }
-                                    }
-                                }
-                                else {
-                                    if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
-                                        const objBulkInvalid = new bulkInvalid();
-                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                        objBulkInvalid.invalidObj.DT.invalid = true;
-                                        objBulkInvalid.invalidObj.DT.invalidMsg = `Invalid Reading Received`;
-                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                    }
-                                }
 
 
-                                var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
-                                //globalData.arrDTDataReading.push(c1Obj);
-                                if (sample1.A != undefined && sample1.B != undefined) {
-                                    tempDTObj.arr_reading.push(sample1);
+                                    var sample1 = { "A": sample.split("|")[1].trim(), "B": sample.split("|")[2].trim() };
+                                    //globalData.arrDTDataReading.push(c1Obj);
+                                    if (sample1.A != undefined && sample1.B != undefined) {
+                                        tempDTObj.arr_reading.push(sample1);
+                                    }
+                                    sample_recived = true;
+
                                 }
-                                sample_recived = true;
 
                             }
-
                         }
                     }
 
@@ -4023,66 +4024,68 @@ class BulkWeighment {
                             JARB.push(tempDTObj.arr_reading[i].B);
                         }
 
-
-                        if (tempDTObj.basketType.includes("Bolus")) {
-                            if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
-                                tempDTObj.rotaryType = "Single";
-                            }
-                            else {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                            }
-
-                            if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-                        }
-                        else {
-                            if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
-                                tempDTObj.rotaryType = "Double";
-                            }
-                            else {
-
-                                tempDTObj.rotaryType = "Single";
-                            }
-                            if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                            }
-
-                        }
-
-
-                        for (let i = 0; i < tempDTObj.arr_reading.length; i++) {
+                        if (tempDTObj.basketType != undefined) {
                             if (tempDTObj.basketType.includes("Bolus")) {
                                 if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
-                                    obJARTypeDT.JarType = "A/B";
+                                    tempDTObj.rotaryType = "Single";
                                 }
                                 else {
                                     const objBulkInvalid = new bulkInvalid();
                                     objBulkInvalid.invalidObj.idsNo = IdsNo;
                                     objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID JARTYPE";
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
                                     Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
                                 }
-                            } else {
-                                if (JARA[i].match(/\d+/g)) {
-                                    obJARTypeDT.JarType = "A"
+
+                                if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                 }
-                                else if (JARB[i].match(/\d+/g)) {
-                                    obJARTypeDT.JarType = "B"
+                            }
+                            else {
+                                if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
+                                    tempDTObj.rotaryType = "Double";
+                                }
+                                else {
+
+                                    tempDTObj.rotaryType = "Single";
+                                }
+                                if (tempDTObj.rotaryType != productObj.Sys_RotaryType) {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID ROTARY";
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                }
+                            }
+                        }
+
+
+                        for (let i = 0; i < tempDTObj.arr_reading.length; i++) {
+                            if (tempDTObj.basketType != undefined) {
+                                if (tempDTObj.basketType.includes("Bolus")) {
+                                    if (JARA[0].match(/\d+/g) && JARB[0].match(/\d+/g)) {
+                                        obJARTypeDT.JarType = "A/B";
+                                    }
+                                    else {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID JARTYPE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                                    }
+                                }else {
+                                    if (JARA[i].match(/\d+/g)) {
+                                        obJARTypeDT.JarType = "A"
+                                    }
+                                    else if (JARB[i].match(/\d+/g)) {
+                                        obJARTypeDT.JarType = "B"
+                                    }
                                 }
                             }
                         }
@@ -4247,48 +4250,50 @@ class BulkWeighment {
                             var A_Min = tempMinVal1.split("|")[1] == '--' ? 0 : tempMinVal1.split("|")[1]
                             var B_Min = tempMinVal1.split("|")[2] == '--' ? 0 : tempMinVal1.split("|")[2]
                             var tempMinObj = { "A_tempMin": A_Min, "B_tempMin": B_Min };
-                            if (tempDTObj.basketType.includes("Bolus")) {
-                                if (isNaN(A_Min) || A_Min === 0 || isNaN(B_Min) || B_Min === 0) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                }
-                            } else {
-
-                                if (productObj.Sys_RotaryType == 'Single' && (A_Min != 0 && B_Min != 0)) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                                }
-
-                                if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
-                                    if (isNaN(A_Min) || A_Min === 0) {
-                                        const objBulkInvalid = new bulkInvalid();
-                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                        objBulkInvalid.invalidObj.DT.invalid = true;
-                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                    }
-                                } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
-                                    if (isNaN(B_Min) || B_Min === 0) {
-                                        const objBulkInvalid = new bulkInvalid();
-                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                        objBulkInvalid.invalidObj.DT.invalid = true;
-                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                    }
-                                } else if (productObj.Sys_RotaryType == 'Double') {
+                            if (tempDTObj.basketType != undefined) {
+                                if (tempDTObj.basketType.includes("Bolus")) {
                                     if (isNaN(A_Min) || A_Min === 0 || isNaN(B_Min) || B_Min === 0) {
                                         const objBulkInvalid = new bulkInvalid();
                                         objBulkInvalid.invalidObj.idsNo = IdsNo;
                                         objBulkInvalid.invalidObj.DT.invalid = true;
                                         objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    }
+                                }else {
+
+                                    if (productObj.Sys_RotaryType == 'Single' && (A_Min != 0 && B_Min != 0)) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                                    }
+
+                                    if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
+                                        if (isNaN(A_Min) || A_Min === 0) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
+                                        if (isNaN(B_Min) || B_Min === 0) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    } else if (productObj.Sys_RotaryType == 'Double') {
+                                        if (isNaN(A_Min) || A_Min === 0 || isNaN(B_Min) || B_Min === 0) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
                                     }
                                 }
                             }
@@ -4366,32 +4371,8 @@ class BulkWeighment {
                             var tempMaxObj = { "A_tempMax": A_tempMax, "B_tempMax": B_tempMax };
                             var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
                             // globalData.arrDTData.push(tempMaxObj);
-                            if (tempDTObj.basketType.includes("Bolus")) {
-                                if (isNaN(A_tempMax) || A_tempMax === 0 || isNaN(B_tempMax) || B_tempMax === 0) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                }
-                            } else {
-                                if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
-                                    if (isNaN(A_tempMax) || A_tempMax === 0) {
-                                        const objBulkInvalid = new bulkInvalid();
-                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                        objBulkInvalid.invalidObj.DT.invalid = true;
-                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                    }
-                                } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
-                                    if (isNaN(B_tempMax) || B_tempMax === 0) {
-                                        const objBulkInvalid = new bulkInvalid();
-                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                        objBulkInvalid.invalidObj.DT.invalid = true;
-                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
-                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
-                                    }
-                                } else if (productObj.Sys_RotaryType == 'Double') {
+                            if (tempDTObj.basketType != undefined) {
+                                if (tempDTObj.basketType.includes("Bolus")) {
                                     if (isNaN(A_tempMax) || A_tempMax === 0 || isNaN(B_tempMax) || B_tempMax === 0) {
                                         const objBulkInvalid = new bulkInvalid();
                                         objBulkInvalid.invalidObj.idsNo = IdsNo;
@@ -4399,9 +4380,34 @@ class BulkWeighment {
                                         objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                     }
+                                }else {
+                                    if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
+                                        if (isNaN(A_tempMax) || A_tempMax === 0) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    } else if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'B') {
+                                        if (isNaN(B_tempMax) || B_tempMax === 0) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    } else if (productObj.Sys_RotaryType == 'Double') {
+                                        if (isNaN(A_tempMax) || A_tempMax === 0 || isNaN(B_tempMax) || B_tempMax === 0) {
+                                            const objBulkInvalid = new bulkInvalid();
+                                            objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                            objBulkInvalid.invalidObj.DT.invalid = true;
+                                            objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
+                                            Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        }
+                                    }
                                 }
                             }
-
 
                         }
                         tempDTObj.arr_heading.push(tempMaxObj);
@@ -4648,7 +4654,7 @@ class BulkWeighment {
                                     var regExp = /(\d{1,2})\:(\d{1,2})\:(\d{1,2})/;
                                     var timeStatus = (parseInt(endTime.replace(regExp, "$1$2$3")) > parseInt(startTime.replace(regExp, "$1$2$3")))
                                     endDate = timeStatus ? startDate : date.format(now, 'YYYY-MM-DD');
-                                } else if (objJARTypeDT.JarType = "A/B") {
+                                } else if (objJARTypeDT.JarType == "A/B") {
                                     jarType = "A/B";
                                     endTime = '00:00:00';
                                     for (let obj of tempTDObj.arr_reading) {
@@ -4763,10 +4769,10 @@ class BulkWeighment {
                                     { str_colName: 'MaxTemp', value: newDTData[4].B_tempMax },
 
                                 );
-                            }else if(jarType == "A/B"){
-                               var Min_Temp = newDTData[3].A_tempMin < newDTData[3].B_tempMin ? newDTData[3].A_tempMin : newDTData[3].B_tempMin
+                            } else if (jarType == "A/B") {
+                                var Min_Temp = newDTData[3].A_tempMin < newDTData[3].B_tempMin ? newDTData[3].A_tempMin : newDTData[3].B_tempMin
 
-                               var Max_Temp = newDTData[4].A_tempMax > newDTData[4].B_tempMax ? newDTData[4].A_tempMax : newDTData[4].B_tempMax
+                                var Max_Temp = newDTData[4].A_tempMax > newDTData[4].B_tempMax ? newDTData[4].A_tempMax : newDTData[4].B_tempMax
                                 masterCompleteData.data.push(
 
                                     { str_colName: 'MinTemp', value: Min_Temp },
@@ -5026,165 +5032,165 @@ class BulkWeighment {
                                 }
                                 return le;
 
-                            }else if(jarType == "A/B"){
-                                    var startTime = newDTData[0].B_st.trim();
-                                    var endTime = newDTData[1].B_et.trim();
-                                    var startTimeval = moment(startTime, 'HH:mm:ss');
-                                    var endTimeval = moment(endTime, 'HH:mm:ss');
-                                    var runTime = moment.utc(moment(endTimeval, "HH:mm:ss")
-                                        .diff(moment(startTimeval, "HH:mm:ss"))).format("HH:mm:ss")
-                                    var hDur = newDTData[2].A_hd.trim();
-    
-                                    for (const [i, dtVal] of jarA.entries()) {
-    
-                                        var endTmSS = moment(startTime, "HH:mm:ss").add(dtVal.trim().split(":")[2], 'seconds').format("HH:mm:ss");
-                                        var endTmMM = moment(endTmSS, "HH:mm:ss").add(dtVal.trim().split(":")[1], 'minutes').format("HH:mm:ss");
-                                        var endTm = moment(endTmMM, "HH:mm:ss").add(dtVal.trim().split(":")[0], 'hours').format("HH:mm:ss");
-    
-                                        const insertDetailObj = {
-                                            str_tableName: detailTable,
-                                            data: [
-                                                { str_colName: 'RepSerNo', value: lastInsertedID },
-                                                { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
-                                                { str_colName: 'RecSeqNo', value: i + 1 },
-                                                { str_colName: 'DT_Side', value: "NA" },
-                                                { str_colName: 'DT_BasketID', value: 0 },
-                                                // { str_colName: 'DT_Temp', value: 0 },
-                                                { str_colName: 'DT_Temp', value: newDTData[4].A_tempMax },//as discussed with sheetal and shraddhanad for hosure
-                                                { str_colName: 'DT_StartTm', value: startTime },
-                                                { str_colName: 'DT_EndTm', value: endTm },
-                                                { str_colName: 'DT_TimeMinSec', value: 0 },
-                                                // { str_colName: 'DT_RunTime', value: runTime },
-                                                { str_colName: 'DT_RunTime', value: dtVal.trim() },
-                                                { str_colName: 'DT_Remark', value: 0 },
-                                                { str_colName: 'DT_DoneByID', value: tempUserObject.UserId },
-                                                { str_colName: 'DT_DoneByName', value: tempUserObject.UserName },
-                                                { str_colName: 'DT_StartDate', value: date.format(now, 'YYYY-MM-DD') },
-                                                { str_colName: 'DT_HaltDur', value: hDur }
-                                            ]
-                                        }
-                                        //console.log(insertDetailObj);
-                                        var jarARes = await database.save(insertDetailObj);
-                                    }
-                                    var hDur = newDTData[2].B_hd.trim();
-                                    for (const [i, dtVal] of jarB.entries()) {
+                            } else if (jarType == "A/B") {
+                                var startTime = newDTData[0].B_st.trim();
+                                var endTime = newDTData[1].B_et.trim();
+                                var startTimeval = moment(startTime, 'HH:mm:ss');
+                                var endTimeval = moment(endTime, 'HH:mm:ss');
+                                var runTime = moment.utc(moment(endTimeval, "HH:mm:ss")
+                                    .diff(moment(startTimeval, "HH:mm:ss"))).format("HH:mm:ss")
+                                var hDur = newDTData[2].A_hd.trim();
 
-                                        var endTmSS = moment(startTime, "HH:mm:ss").add(dtVal.trim().split(":")[2], 'seconds').format("HH:mm:ss");
-                                        var endTmMM = moment(endTmSS, "HH:mm:ss").add(dtVal.trim().split(":")[1], 'minutes').format("HH:mm:ss");
-                                        var endTm = moment(endTmMM, "HH:mm:ss").add(dtVal.trim().split(":")[0], 'hours').format("HH:mm:ss");
-    
-                                        const insertDetailObj = {
-                                            str_tableName: detailTable,
-                                            data: [
-                                                { str_colName: 'RepSerNo', value: lastInsertedID },
-                                                { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
-                                                { str_colName: 'RecSeqNo', value: i + 1 },
-                                                { str_colName: 'DT_Side', value: "NA" },
-                                                { str_colName: 'DT_BasketID', value: 0 },
-                                                { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
-                                                { str_colName: 'DT_StartTm', value: startTime },
-                                                { str_colName: 'DT_EndTm', value: endTm },
-                                                { str_colName: 'DT_TimeMinSec', value: 0 },
-                                                { str_colName: 'DT_RunTime', value: dtVal.trim() },
-                                                { str_colName: 'DT_Remark', value: 0 },
-                                                { str_colName: 'DT_DoneByID', value: tempUserObject.UserId },
-                                                { str_colName: 'DT_DoneByName', value: tempUserObject.UserName },
-                                                { str_colName: 'DT_StartDate', value: date.format(now, 'YYYY-MM-DD') },
-                                                { str_colName: 'DT_HaltDur', value: hDur }
-                                            ]
-                                        }
-    
-                                        var jarBRes = await database.save(insertDetailObj);
-    
-    
-                                    }
-    
-                                    var regExp = /(\d{1,2})\:(\d{1,2})\:(\d{1,2})/;
-    
-    
-                                    var currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
-                                    if (!(currentCubicle.Sys_IPQCType == 'Compression' && currentCubicle.Sys_Area == "Coating")) {
-                                        var returnBatchRes = await objBatchSummary.saveBatchSummaryDT(lastInsertedID, 0, productObj, IdsNo);
-                                    }
-                                    var objUpdateValidation = {
-                                        str_tableName: "tbl_cubical",
+                                for (const [i, dtVal] of jarA.entries()) {
+
+                                    var endTmSS = moment(startTime, "HH:mm:ss").add(dtVal.trim().split(":")[2], 'seconds').format("HH:mm:ss");
+                                    var endTmMM = moment(endTmSS, "HH:mm:ss").add(dtVal.trim().split(":")[1], 'minutes').format("HH:mm:ss");
+                                    var endTm = moment(endTmMM, "HH:mm:ss").add(dtVal.trim().split(":")[0], 'hours').format("HH:mm:ss");
+
+                                    const insertDetailObj = {
+                                        str_tableName: detailTable,
                                         data: [
-                                            { str_colName: 'Sys_Validation', value: 0 },
-                                        ],
-                                        condition: [
-                                            { str_colName: 'Sys_IDSNo', value: IdsNo },
+                                            { str_colName: 'RepSerNo', value: lastInsertedID },
+                                            { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
+                                            { str_colName: 'RecSeqNo', value: i + 1 },
+                                            { str_colName: 'DT_Side', value: "NA" },
+                                            { str_colName: 'DT_BasketID', value: 0 },
+                                            // { str_colName: 'DT_Temp', value: 0 },
+                                            { str_colName: 'DT_Temp', value: newDTData[4].A_tempMax },//as discussed with sheetal and shraddhanad for hosure
+                                            { str_colName: 'DT_StartTm', value: startTime },
+                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_TimeMinSec', value: 0 },
+                                            // { str_colName: 'DT_RunTime', value: runTime },
+                                            { str_colName: 'DT_RunTime', value: dtVal.trim() },
+                                            { str_colName: 'DT_Remark', value: 0 },
+                                            { str_colName: 'DT_DoneByID', value: tempUserObject.UserId },
+                                            { str_colName: 'DT_DoneByName', value: tempUserObject.UserName },
+                                            { str_colName: 'DT_StartDate', value: date.format(now, 'YYYY-MM-DD') },
+                                            { str_colName: 'DT_HaltDur', value: hDur }
                                         ]
                                     }
-                                    await database.update(objUpdateValidation);
-                                    // //Online printing code of Jar B 
-                                    // const objIOnlinePrint = new IOnlinePrint();
-                                    // objIOnlinePrint.RepSerNo = lastInsertedID;
-                                    // objIOnlinePrint.reportOption = "Disintegration Tester";
-                                    // objIOnlinePrint.testType = "Regular";
-                                    // objIOnlinePrint.userId = tempUserObject.UserId;
-                                    // objIOnlinePrint.username = tempUserObject.UserName;
-                                    // objIOnlinePrint.idsNo = IdsNo
-                                    // const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
-    
-                                    // await objPrintReport.generateOnlineReport(objIOnlinePrint, objPrinterName.Sys_PrinterName);
-                                    le = `${protocolIncomingType}` + `R1`;
-                                    var tempFlagAJar = false; // For time
-                                    var tempFlagTemp = false // for Tempreture
+                                    //console.log(insertDetailObj);
+                                    var jarARes = await database.save(insertDetailObj);
+                                }
+                                var hDur = newDTData[2].B_hd.trim();
+                                for (const [i, dtVal] of jarB.entries()) {
 
-                                    endTime = '00:00:00';
-                                    for (let obj of tempTDObj.arr_reading) {
-                                        if (obj.A.trim() > endTime || obj.B.trim() > endTime) { endTime = obj.A.trim() > obj.B.trim() ? obj.A.trim() : obj.B.trim() }
+                                    var endTmSS = moment(startTime, "HH:mm:ss").add(dtVal.trim().split(":")[2], 'seconds').format("HH:mm:ss");
+                                    var endTmMM = moment(endTmSS, "HH:mm:ss").add(dtVal.trim().split(":")[1], 'minutes').format("HH:mm:ss");
+                                    var endTm = moment(endTmMM, "HH:mm:ss").add(dtVal.trim().split(":")[0], 'hours').format("HH:mm:ss");
+
+                                    const insertDetailObj = {
+                                        str_tableName: detailTable,
+                                        data: [
+                                            { str_colName: 'RepSerNo', value: lastInsertedID },
+                                            { str_colName: 'MstSerNo', value: serverConfig.ProjectName == 'MLVeer' ? 1 : 0 },
+                                            { str_colName: 'RecSeqNo', value: i + 1 },
+                                            { str_colName: 'DT_Side', value: "NA" },
+                                            { str_colName: 'DT_BasketID', value: 0 },
+                                            { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
+                                            { str_colName: 'DT_StartTm', value: startTime },
+                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_TimeMinSec', value: 0 },
+                                            { str_colName: 'DT_RunTime', value: dtVal.trim() },
+                                            { str_colName: 'DT_Remark', value: 0 },
+                                            { str_colName: 'DT_DoneByID', value: tempUserObject.UserId },
+                                            { str_colName: 'DT_DoneByName', value: tempUserObject.UserName },
+                                            { str_colName: 'DT_StartDate', value: date.format(now, 'YYYY-MM-DD') },
+                                            { str_colName: 'DT_HaltDur', value: hDur }
+                                        ]
                                     }
 
-                                    if (parseInt(endTime.replace(regExp, "$1$2$3")) > parseInt(actualRunTime.replace(regExp, "$1$2$3"))) {
-                                        tempFlagAJar = true;
-                                    }
-                                    // for (const [i, dtVal] of jarA.entries()) {
-                                    //     if (parseInt(dtVal.trim().replace(regExp, "$1$2$3")) > parseInt(actualRunTime.replace(regExp, "$1$2$3"))) {
-                                    //         // return le = `${protocolIncomingType}` + `R2`;
-                                    //         tempFlagAJar = true;
-                                    //     }
-                                    // }
+                                    var jarBRes = await database.save(insertDetailObj);
 
-                                    var Max_Temp = newDTData[4].A_tempMax > newDTData[4].B_tempMax ? newDTData[4].A_tempMax : newDTData[4].B_tempMax
-                                    if ((parseFloat(objArrLimits.DT.T1Neg) > parseFloat(Max_Temp)) ||
-                                        (parseFloat(objArrLimits.DT.T1Pos) < parseFloat(Max_Temp))) {
-                                        tempFlagTemp = true;
-                                    }
-                                    if (tempFlagTemp == true || tempFlagAJar == true) {
-                                        le = `${protocolIncomingType}` + `R2`;
-                                    }
-                                    var objActivity = {};
-                                    Object.assign(objActivity,
-                                        { strUserId: tempUserObject.UserId },
-                                        { strUserName: tempUserObject.UserName },
-                                        { activity: 'DT Weighment Completed on IDS' + IdsNo });
-                                    objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
-                                    objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', 'DT', 'completed');
-                                    //empty object when data is completly saved 
-                                    var tempTDObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
-                                    if (tempTDObj == undefined) {
-                                        globalData.arrDTData.push({
-                                            idsNo: IdsNo, arr_heading: [], arr_reading: [], arr_info: [],
-                                            rotaryType: undefined,
-                                            mode: undefined,
-                                            basketType: undefined,
-                                            Bath_Temp: undefined
-    
-                                        })
-                                    } else {
-                                        tempTDObj.arr_heading = [];
-                                        tempTDObj.arr_reading = [];
-                                        tempTDObj.arr_info = [];
-                                        tempTDObj.rotaryType = undefined;
-                                        tempTDObj.mode = undefined;
-                                        tempTDObj.basketType = undefined;
-                                        tempTDObj.Bath_Temp = undefined;
-    
-                                    }
-                                    return le;
-    
-                                
+
+                                }
+
+                                var regExp = /(\d{1,2})\:(\d{1,2})\:(\d{1,2})/;
+
+
+                                var currentCubicle = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+                                if (!(currentCubicle.Sys_IPQCType == 'Compression' && currentCubicle.Sys_Area == "Coating")) {
+                                    var returnBatchRes = await objBatchSummary.saveBatchSummaryDT(lastInsertedID, 0, productObj, IdsNo);
+                                }
+                                var objUpdateValidation = {
+                                    str_tableName: "tbl_cubical",
+                                    data: [
+                                        { str_colName: 'Sys_Validation', value: 0 },
+                                    ],
+                                    condition: [
+                                        { str_colName: 'Sys_IDSNo', value: IdsNo },
+                                    ]
+                                }
+                                await database.update(objUpdateValidation);
+                                // //Online printing code of Jar B 
+                                // const objIOnlinePrint = new IOnlinePrint();
+                                // objIOnlinePrint.RepSerNo = lastInsertedID;
+                                // objIOnlinePrint.reportOption = "Disintegration Tester";
+                                // objIOnlinePrint.testType = "Regular";
+                                // objIOnlinePrint.userId = tempUserObject.UserId;
+                                // objIOnlinePrint.username = tempUserObject.UserName;
+                                // objIOnlinePrint.idsNo = IdsNo
+                                // const objPrinterName = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == IdsNo);
+
+                                // await objPrintReport.generateOnlineReport(objIOnlinePrint, objPrinterName.Sys_PrinterName);
+                                le = `${protocolIncomingType}` + `R1`;
+                                var tempFlagAJar = false; // For time
+                                var tempFlagTemp = false // for Tempreture
+
+                                endTime = '00:00:00';
+                                for (let obj of tempTDObj.arr_reading) {
+                                    if (obj.A.trim() > endTime || obj.B.trim() > endTime) { endTime = obj.A.trim() > obj.B.trim() ? obj.A.trim() : obj.B.trim() }
+                                }
+
+                                if (parseInt(endTime.replace(regExp, "$1$2$3")) > parseInt(actualRunTime.replace(regExp, "$1$2$3"))) {
+                                    tempFlagAJar = true;
+                                }
+                                // for (const [i, dtVal] of jarA.entries()) {
+                                //     if (parseInt(dtVal.trim().replace(regExp, "$1$2$3")) > parseInt(actualRunTime.replace(regExp, "$1$2$3"))) {
+                                //         // return le = `${protocolIncomingType}` + `R2`;
+                                //         tempFlagAJar = true;
+                                //     }
+                                // }
+
+                                var Max_Temp = newDTData[4].A_tempMax > newDTData[4].B_tempMax ? newDTData[4].A_tempMax : newDTData[4].B_tempMax
+                                if ((parseFloat(objArrLimits.DT.T1Neg) > parseFloat(Max_Temp)) ||
+                                    (parseFloat(objArrLimits.DT.T1Pos) < parseFloat(Max_Temp))) {
+                                    tempFlagTemp = true;
+                                }
+                                if (tempFlagTemp == true || tempFlagAJar == true) {
+                                    le = `${protocolIncomingType}` + `R2`;
+                                }
+                                var objActivity = {};
+                                Object.assign(objActivity,
+                                    { strUserId: tempUserObject.UserId },
+                                    { strUserName: tempUserObject.UserName },
+                                    { activity: 'DT Weighment Completed on IDS' + IdsNo });
+                                objActivityLog.ActivityLogEntry(objActivity).catch(error => { console.log(error); });
+                                objInstrumentUsage.InstrumentUsage('DT', IdsNo, 'tbl_instrumentlog_dt', 'DT', 'completed');
+                                //empty object when data is completly saved 
+                                var tempTDObj = globalData.arrDTData.find(td => td.idsNo == IdsNo);
+                                if (tempTDObj == undefined) {
+                                    globalData.arrDTData.push({
+                                        idsNo: IdsNo, arr_heading: [], arr_reading: [], arr_info: [],
+                                        rotaryType: undefined,
+                                        mode: undefined,
+                                        basketType: undefined,
+                                        Bath_Temp: undefined
+
+                                    })
+                                } else {
+                                    tempTDObj.arr_heading = [];
+                                    tempTDObj.arr_reading = [];
+                                    tempTDObj.arr_info = [];
+                                    tempTDObj.rotaryType = undefined;
+                                    tempTDObj.mode = undefined;
+                                    tempTDObj.basketType = undefined;
+                                    tempTDObj.Bath_Temp = undefined;
+
+                                }
+                                return le;
+
+
                             }
                             else {
 
@@ -9554,6 +9560,7 @@ class BulkWeighment {
                                         { str_colName: "Stage", value: productObj.Sys_Stage },
                                         { str_colName: "Area", value: productObj.Sys_Area },
                                         { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
+                                        { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType }        //producttype add for coating area
                                     ],
                                 };
 
@@ -9928,6 +9935,7 @@ class BulkWeighment {
                                             { str_colName: "Lot", value: objLotData.LotNo },
                                             { str_colName: "Stage", value: productObj.Sys_Stage },
                                             { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
+                                            { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType }
                                         ],
                                     };
 
@@ -12240,6 +12248,7 @@ class BulkWeighment {
                                         { str_colName: 'MachineSpeed_Max', value: productObj.Sys_MachineSpeed_Max },
                                         { str_colName: 'GenericName', value: productObj.Sys_GenericName },
                                         { str_colName: 'BMRNo', value: productObj.Sys_BMRNo },
+                                        { str_colName: "WgmtModeNo", value: 7 },
 
                                     ]
                                 }
