@@ -335,7 +335,7 @@ class ProcessWTModel {
                 objTareCmd.SendCmd == "Y" ? appendVal = objTareCmd.TareCmd : appendVal = ""; // if tare command is configure not to send then it will not send  tare command.
             }
         }
-        else if (resultBal[0][0].Bal_Make.includes('Sato') || resultBal[0][0].Bal_Make.includes('SARTO')) {
+        else if (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO')) {
             var objTareCmd = jsonTareCmd.Satorious.find(mod => resultBal[0][0].Bal_Model.includes(mod.Model));
             if (objTareCmd == undefined) {
                 appendVal = jsonTareCmd.Satorious.find(mod => mod.Model == "Default").TareCmd;
@@ -369,7 +369,7 @@ class ProcessWTModel {
             if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                 tareCmd = ""
             }
-            else if (appendVal == "T" && (resultBal[0][0].Bal_Make.includes('Sato') || resultBal[0][0].Bal_Make.includes('SARTO'))) {
+            else if (appendVal == "T" && (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO'))) {
                 tareCmd = `SP10${escChar}${appendVal},`
             }
             else {
@@ -381,7 +381,7 @@ class ProcessWTModel {
             if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                 tareCmd = ""
             }
-            else if (resultBal[0][0].Bal_Make.includes('Sato') || resultBal[0][0].Bal_Make.includes('SARTO')) {
+            else if (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO')) {
                 tareCmd = `SP20${escChar}${appendVal},`
             }
             else {
@@ -482,7 +482,7 @@ class ProcessWTModel {
                     objTareCmd.SendCmd == "Y" ? appendVal = objTareCmd.TareCmd : appendVal = ""; // if tare command is configure not to send then it will not send  tare command.
                 }
             }
-            else if (resultBal[0][0].Bal_Make.includes('Sato') || resultBal[0][0].Bal_Make.includes('SARTO')) {
+            else if (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO')) {
                 var objTareCmd = jsonTareCmd.Satorious.find(mod => resultBal[0][0].Bal_Model.includes(mod.Model));
                 if (objTareCmd == undefined) {
                     appendVal = jsonTareCmd.Satorious.find(mod => mod.Model == "Default").TareCmd;
@@ -504,7 +504,7 @@ class ProcessWTModel {
                 if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                     tareCmd = ""
                 }
-                else if (appendVal == "T" && (resultBal[0][0].Bal_Make.includes('Sato') || resultBal[0][0].Bal_Make.includes('SARTO'))) {
+                else if (appendVal == "T" && (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO'))) {
                     tareCmd = `SP10${escChar}${appendVal},`
                 }
                 else {
@@ -516,7 +516,7 @@ class ProcessWTModel {
                 if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                     tareCmd = ""
                 }
-                else if (resultBal[0][0].Bal_Make.includes('Sato') || resultBal[0][0].Bal_Make.includes('SARTO')) {
+                else if (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO')) {
                     tareCmd = `SP20${escChar}${appendVal},`
                 }
                 else {
