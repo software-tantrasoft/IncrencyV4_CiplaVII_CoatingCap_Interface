@@ -335,7 +335,8 @@ class Group {
                         // { str_colName: 'RepoLabel10', value: resultdata.incompleteData.RepoLabel10 },
                         { str_colName: 'RepoLabel11', value: currentCubicalObj.Sys_Validation },
                         // { str_colName: 'RepoLabel12', value: resultdata.incompleteData.RepoLabel12 },
-                        { str_colName: 'RepoLabel14', value: cubicalObj.Sys_IPQCType },
+                        // { str_colName: 'RepoLabel14', value: cubicalObj.Sys_IPQCType },
+                        { str_colName: 'RepoLabel14', value: cubicalObj.Sys_Area == 'Coating' ? cubicalObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : cubicalObj.Sys_IPQCType },      // issue no 53 resolved productytpe set in repolabel14
                         { str_colName: 'PrintNo', value: 0 },
                         { str_colName: 'IsArchived', value: 0 },
                         { str_colName: 'GraphType', value: 0 },

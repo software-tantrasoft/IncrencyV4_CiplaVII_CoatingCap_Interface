@@ -258,7 +258,8 @@ class IncompleteDataSave {
                             { str_colName: 'CubicleLocation', value: productObj.Sys_dept },
                             { str_colName: 'RepoLabel10', value: res[0].NominalNomenclature },
                             { str_colName: 'RepoLabel11', value: productObj.Sys_Validation }, // this will store wether the test is validation or not 
-                            { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType },//added for MLV to save ipqc subtype //added by vivek on 21-10-2020
+                            // { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType },//added for MLV to save ipqc subtype //added by vivek on 21-10-2020
+                            { str_colName: 'RepoLabel14', value: productObj.Sys_Area == 'Coating' ? productObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : productObj.Sys_IPQCType },      // issue no 53 resolved productytpe set in repolabel14
                             // { str_colName: 'RepoLabel12', value:  },
                             // { str_colName: 'RepoLabel13', value:  },
                             { str_colName: 'PrintNo', value: 0 },

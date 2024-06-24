@@ -4706,8 +4706,7 @@ class BulkWeighment {
                                     { str_colName: 'BFGCode', value: productObj.Sys_BFGCode },
                                     { str_colName: 'ProductName', value: productObj.Sys_ProductName },
                                     { str_colName: 'ProductType', value: ProductType.productType },
-                                    { str_colName: 'Qty', value: productlimits.DT.noOfSamples },     //client requirement
-                                    // { str_colName: 'Qty', value: 6 },
+                                    { str_colName: 'Qty', value: 6 },  //discuss with sheetal mam
                                     { str_colName: 'Idsno', value: IdsNo },
                                     { str_colName: 'CubicalNo', value: productObj.Sys_CubicNo },
                                     { str_colName: 'BalanceId', value: currentCubicleObj.Sys_BalID },
@@ -4751,6 +4750,8 @@ class BulkWeighment {
                                     { str_colName: 'DT_BasketType', value: tempDTObj.basketType },
                                     { str_colName: 'DT_Jar', value: DTJAR.JarType },
                                     { str_colName: 'DT_SetTemp', value: tempDTObj.Bath_Temp },
+                                    // { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType },
+                                    { str_colName: 'RepoLabel14', value: productObj.Sys_Area == 'Coating' ? productObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : productObj.Sys_IPQCType },      // issue no 53 resolved productytpe set in repolabel14
                                 ]
                             }
 
@@ -5275,8 +5276,7 @@ class BulkWeighment {
                                         { str_colName: 'BFGCode', value: productObj.Sys_BFGCode },
                                         { str_colName: 'ProductName', value: productObj.Sys_ProductName },
                                         { str_colName: 'ProductType', value: ProductType.productType },
-                                        { str_colName: 'Qty', value: productlimits.DT.noOfSamples },   //client requirement
-                                        // { str_colName: 'Qty', value: 6 },
+                                        { str_colName: 'Qty', value: 6 },   //discuss with sheetal mam
                                         { str_colName: 'Idsno', value: IdsNo },
                                         { str_colName: 'CubicalNo', value: productObj.Sys_CubicNo },
                                         { str_colName: 'BalanceId', value: currentCubicleObj.Sys_BalID },
@@ -5322,6 +5322,8 @@ class BulkWeighment {
                                         { str_colName: 'DT_BasketType', value: tempDTObj.basketType },
                                         { str_colName: 'DT_Jar', value: "B" },
                                         { str_colName: 'DT_SetTemp', value: tempDTObj.bsetdata },
+                                        // { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType },
+                                        { str_colName: 'RepoLabel14', value: productObj.Sys_Area == 'Coating' ? productObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : productObj.Sys_IPQCType },    // issue no 53 resolved productytpe set in repolabel14
                                     ]
                                 }
                                 var resultCompleteDataJarB = await database.save(masterCompleteDataJarB);
@@ -9560,7 +9562,8 @@ class BulkWeighment {
                                         { str_colName: "Stage", value: productObj.Sys_Stage },
                                         { str_colName: "Area", value: productObj.Sys_Area },
                                         { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
-                                        { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType }        //producttype add for coating area
+                                        // { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType } , //producttype add for coating area
+                                        { str_colName: 'RepoLabel14', value: productObj.Sys_Area == 'Coating' ? productObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : productObj.Sys_IPQCType },     // issue no 53 resolved productytpe set in repolabel14
                                     ],
                                 };
 
@@ -9935,7 +9938,8 @@ class BulkWeighment {
                                             { str_colName: "Lot", value: objLotData.LotNo },
                                             { str_colName: "Stage", value: productObj.Sys_Stage },
                                             { str_colName: "DecimalPoint", value: objHardness.hardnessDecimal },
-                                            { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType }
+                                            // { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType },
+                                            { str_colName: 'RepoLabel14', value: productObj.Sys_Area == 'Coating' ? productObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : productObj.Sys_IPQCType },      //issue no 53 resolved productytpe set in repolabel14
                                         ],
                                     };
 
@@ -12249,6 +12253,8 @@ class BulkWeighment {
                                         { str_colName: 'GenericName', value: productObj.Sys_GenericName },
                                         { str_colName: 'BMRNo', value: productObj.Sys_BMRNo },
                                         { str_colName: "WgmtModeNo", value: 7 },
+                                        // { str_colName: 'RepoLabel14', value: productObj.Sys_IPQCType } ,
+                                        { str_colName: 'RepoLabel14', value: productObj.Sys_Area == 'Coating' ? productObj.Sys_IPQCType == 'Coating' ? 'coated' : 'uncoated' : productObj.Sys_IPQCType },       // issue no 53 resolved productytpe set in repolabel14
 
                                     ]
                                 }
