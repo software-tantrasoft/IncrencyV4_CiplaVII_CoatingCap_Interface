@@ -211,7 +211,7 @@ class Eccentricity {
                     data: "*",
                     condition: [
                         {
-                            str_colName: "Eccent_RepNo",
+                            str_colName: "MAX(Eccent_RepNo) AS Eccent_RepNo",
                             value: objFetchcalibpowerbackup.result[0].Inc_RepSerNo,
                             comp: "eq",
                         },
@@ -697,7 +697,7 @@ class Eccentricity {
 
                         const selectRepSrNoObj = {
                             str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                            data: 'Eccent_RepNo',
+                            data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
                             condition: [
                                 { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                             ]
@@ -744,7 +744,7 @@ class Eccentricity {
                         else {
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                                data: 'Eccent_RepNo',
+                                data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
                                 condition: [
                                     { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                                 ]
@@ -1209,7 +1209,7 @@ class Eccentricity {
                             console.log('done');
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                                data: 'Eccent_RepNo',
+                                data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
                                 condition: [
                                     { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                                 ]
@@ -1257,7 +1257,7 @@ class Eccentricity {
                             else {
                                 const selectRepSrNoObj = {
                                     str_tableName: 'tbl_calibration_eccentricity_master_incomplete',
-                                    data: 'Eccent_RepNo',
+                                    data: 'MAX(Eccent_RepNo) AS Eccent_RepNo',
                                     condition: [
                                         { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                                     ]

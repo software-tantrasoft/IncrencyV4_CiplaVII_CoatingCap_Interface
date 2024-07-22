@@ -1134,7 +1134,7 @@ class CalibrationModel {
 
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_periodic_master_incomplete',
-                                data: 'Periodic_RepNo',
+                                data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
                                 condition: [
                                     { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
                                 ]
@@ -1241,7 +1241,7 @@ class CalibrationModel {
 
                         const selectRepSrNoObj = {
                             str_tableName: 'tbl_calibration_periodic_master_incomplete',
-                            data: 'Periodic_RepNo',
+                            data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
                             condition: [
                                 { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
                             ]

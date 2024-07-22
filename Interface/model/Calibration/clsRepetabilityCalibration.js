@@ -727,7 +727,7 @@ class Repetabilty {
 
                 const selectRepSrNoObj = {
                     str_tableName: 'tbl_calibration_repetability_master_incomplete',
-                    data: 'Repet_RepNo',
+                    data: 'MAX(Repet_RepNo) AS Repet_RepNo',
                     condition: [
                         { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
                     ]
@@ -759,7 +759,7 @@ class Repetabilty {
                 else {
                     const selectRepSrNoObj = {
                         str_tableName: 'tbl_calibration_repetability_master_incomplete',
-                        data: 'Repet_RepNo',
+                        data: 'MAX(Repet_RepNo) AS Repet_RepNo',
                         condition: [
                             { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
                         ]
@@ -1258,7 +1258,7 @@ class Repetabilty {
 
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_repetability_master_incomplete',
-                                data: 'Repet_RepNo',
+                                data: 'MAX(Repet_RepNo) AS Repet_RepNo',
                                 condition: [
                                     { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
                                 ]
@@ -1290,7 +1290,7 @@ class Repetabilty {
                             else {
                                 const selectRepSrNoObj = {
                                     str_tableName: 'tbl_calibration_repetability_master_incomplete',
-                                    data: 'Repet_RepNo',
+                                    data: 'MAX(Repet_RepNo) AS Repet_RepNo',
                                     condition: [
                                         { str_colName: 'Repet_BalID', value: strBalId, comp: 'eq' },
                                     ]

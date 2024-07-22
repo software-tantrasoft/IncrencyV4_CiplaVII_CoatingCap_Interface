@@ -685,7 +685,7 @@ class Uncertinity {
                         await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
                         const selectRepSrNoObj = {
                             str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                            data: 'Uncertinity_RepNo',
+                            data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                             condition: [
                                 { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                             ]
@@ -740,7 +740,7 @@ class Uncertinity {
                         else {
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                                data: 'Uncertinity_RepNo',
+                                data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                                 condition: [
                                     { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                                 ]
@@ -1170,7 +1170,7 @@ class Uncertinity {
                             await CalibPowerBackup.deleteCalibPowerBackupData("U", IDSSrNo);
                             const selectRepSrNoObj = {
                                 str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                                data: 'Uncertinity_RepNo',
+                                data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                                 condition: [
                                     { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                                 ]
@@ -1225,7 +1225,7 @@ class Uncertinity {
                             else {
                                 const selectRepSrNoObj = {
                                     str_tableName: 'tbl_calibration_uncertinity_master_incomplete',
-                                    data: 'Uncertinity_RepNo',
+                                    data: 'MAX(Uncertinity_RepNo) AS Uncertinity_RepNo',
                                     condition: [
                                         { str_colName: 'Uncertinity_BalID', value: strBalId, comp: 'eq' },
                                     ]

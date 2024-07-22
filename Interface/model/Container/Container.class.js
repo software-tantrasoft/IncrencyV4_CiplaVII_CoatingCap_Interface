@@ -195,7 +195,7 @@ class Container {
                             { str_colName: 'Sys_IDS', value: idsNo, comp: 'eq' },
                         ]
                     }
-                    await database.update(updateObj);
+                    // await database.update(updateObj);
                     /* Added by Pradip Shinde on 28/09/2020
                     As per sheetal and pushkar if cubic type is IPC then if total bins are completed then batch
                      will end from interface side 
@@ -248,7 +248,7 @@ class Container {
                                 { str_colName: 'Bin_BatchNo', value: objBin.selBatch, comp: 'eq' }
                             ]
                         }
-                        await database.update(updateFlag);
+                        // await database.update(updateFlag);
                     }
                 }
                 //strBins = await this.sendIPCProductList(cubType, area);
@@ -410,7 +410,7 @@ class Container {
                         ]
         
                     } 
-                    var result = await database.update(batchCompletestatus);      //batchcomplete status 1 when only in IPC i.e. without corrioder
+                    // var result = await database.update(batchCompletestatus);      //batchcomplete status 1 when only in IPC i.e. without corrioder
 
                     var updateArchivedtable ={
                         str_tableName:   objUpdateBinInfo.str_tableName+ "_archived",
