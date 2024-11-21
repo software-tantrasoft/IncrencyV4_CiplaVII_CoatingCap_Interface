@@ -3521,49 +3521,66 @@ class BulkWeighment {
                     var testStartTime = actualProtocol.includes("START TIME");
                     if (testStartTime == true) {
                         var startTime = actualProtocol;
-                        if (actualProtocol.split("|")[1].trim())
-                            var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                        if (tempDTObj.basketType != undefined) {
 
+                            if (tempDTObj.basketType.includes("Bolus")) {
+                                if (await this.isValidTime(startTime.split("|")[1].trim()) && this.isValidTime(startTime.split("|")[2].trim())) {
+                                    var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[2].trim() };
 
-                        var jartypeST = actualProtocol.split("|")[1].trim().match(/\d+/g) == null ? obJARTypeDT.JarType = "B" : obJARTypeDT.JarType = "A"
-
-
-                        if (productObj.Sys_RotaryType == 'Single' && jartypeST == "A") {
-                            if (await this.isValidTime(startTime.split("|")[1].trim())) {
-                                var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[1].trim() };
-                                tempDTObj.arr_heading.push(stObj);
+                                    tempDTObj.arr_heading.push(stObj);
+                                } else {
+                                    const BulkInvalid = new bulkInvalid();
+                                    BulkInvalid.invalidObj.idsNo = IdsNo;
+                                    BulkInvalid.invalidObj.DT.invalid = true;
+                                    BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                    Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                }
                             } else {
-                                const BulkInvalid = new bulkInvalid();
-                                BulkInvalid.invalidObj.idsNo = IdsNo;
-                                BulkInvalid.invalidObj.DT.invalid = true;
-                                BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A START TIME,IS NOT VALID";
-                                Object.assign(objInvalid, BulkInvalid.invalidObj);
-                            }
-                        }
-                        else if (productObj.Sys_RotaryType == 'Single' && jartypeST == "B") {
-                            if (await this.isValidTime(startTime.split("|")[2].trim())) {
-                                var stObj = { "A_st": startTime.split("|")[2].trim(), "B_st": startTime.split("|")[2].trim() };
+                                if (actualProtocol.split("|")[1].trim())
+                                    var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
 
-                                tempDTObj.arr_heading.push(stObj);
-                            } else {
-                                const BulkInvalid = new bulkInvalid();
-                                BulkInvalid.invalidObj.idsNo = IdsNo;
-                                BulkInvalid.invalidObj.DT.invalid = true;
-                                BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
-                                Object.assign(objInvalid, BulkInvalid.invalidObj);
-                            }
-                        }
-                        else {
-                            if (await this.isValidTime(startTime.split("|")[1].trim()) && this.isValidTime(startTime.split("|")[2].trim())) {
-                                var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[2].trim() };
 
-                                tempDTObj.arr_heading.push(stObj);
-                            } else {
-                                const BulkInvalid = new bulkInvalid();
-                                BulkInvalid.invalidObj.idsNo = IdsNo;
-                                BulkInvalid.invalidObj.DT.invalid = true;
-                                BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
-                                Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                var jartypeST = actualProtocol.split("|")[1].trim().match(/\d+/g) == null ? obJARTypeDT.JarType = "B" : obJARTypeDT.JarType = "A"
+
+
+                                if (productObj.Sys_RotaryType == 'Single' && jartypeST == "A") {
+                                    if (await this.isValidTime(startTime.split("|")[1].trim())) {
+                                        var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[1].trim() };
+                                        tempDTObj.arr_heading.push(stObj);
+                                    } else {
+                                        const BulkInvalid = new bulkInvalid();
+                                        BulkInvalid.invalidObj.idsNo = IdsNo;
+                                        BulkInvalid.invalidObj.DT.invalid = true;
+                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A START TIME,IS NOT VALID";
+                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    }
+                                }
+                                else if (productObj.Sys_RotaryType == 'Single' && jartypeST == "B") {
+                                    if (await this.isValidTime(startTime.split("|")[2].trim())) {
+                                        var stObj = { "A_st": startTime.split("|")[2].trim(), "B_st": startTime.split("|")[2].trim() };
+
+                                        tempDTObj.arr_heading.push(stObj);
+                                    } else {
+                                        const BulkInvalid = new bulkInvalid();
+                                        BulkInvalid.invalidObj.idsNo = IdsNo;
+                                        BulkInvalid.invalidObj.DT.invalid = true;
+                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    }
+                                }
+                                else {
+                                    if (await this.isValidTime(startTime.split("|")[1].trim()) && this.isValidTime(startTime.split("|")[2].trim())) {
+                                        var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[2].trim() };
+
+                                        tempDTObj.arr_heading.push(stObj);
+                                    } else {
+                                        const BulkInvalid = new bulkInvalid();
+                                        BulkInvalid.invalidObj.idsNo = IdsNo;
+                                        BulkInvalid.invalidObj.DT.invalid = true;
+                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    }
+                                }
                             }
                         }
                     }
@@ -3571,46 +3588,62 @@ class BulkWeighment {
                     var testEndTime = actualProtocol.includes("END TIME");
                     if (testEndTime == true) {
                         var endTime = actualProtocol;
-                        var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
-                        var jar = actualProtocol.split("|")[1].trim().match(/\d+/g) == null ? JARTypeobj.JarType = "B" : JARTypeobj.JarType = "A"
+                        if (tempDTObj.basketType != undefined) {
 
-                        if (productObj.Sys_RotaryType == 'Single' && jar == "A") {
-
-                            if (await this.isValidTime(endTime.split("|")[1].trim())) {
-                                var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[1].trim() };
-                                tempDTObj.arr_heading.push(etObj);
+                            if (tempDTObj.basketType.includes("Bolus")) {
+                                if (await this.isValidTime(endTime.split("|")[1].trim()) && this.isValidTime(endTime.split("|")[2].trim())) {
+                                    var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[2].trim() };
+                                    tempDTObj.arr_heading.push(etObj);
+                                } else {
+                                    const BulkInvalid = new bulkInvalid();
+                                    BulkInvalid.invalidObj.idsNo = IdsNo;
+                                    BulkInvalid.invalidObj.DT.invalid = true;
+                                    BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                    Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                }
                             } else {
-                                const BulkInvalid = new bulkInvalid();
-                                BulkInvalid.invalidObj.idsNo = IdsNo;
-                                BulkInvalid.invalidObj.DT.invalid = true;
-                                BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A END TIME,IS NOT VALID";
-                                Object.assign(objInvalid, BulkInvalid.invalidObj);
-                            }
-                        }
-                        else if (productObj.Sys_RotaryType == 'Single' && jar == "B") {
+                                var JARTypeobj = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                                var jar = actualProtocol.split("|")[1].trim().match(/\d+/g) == null ? JARTypeobj.JarType = "B" : JARTypeobj.JarType = "A"
 
-                            if (await this.isValidTime(endTime.split("|")[2].trim())) {
-                                var etObj = { "A_et": endTime.split("|")[2].trim(), "B_et": endTime.split("|")[2].trim() };
-                                tempDTObj.arr_heading.push(etObj);
-                            } else {
-                                const BulkInvalid = new bulkInvalid();
-                                BulkInvalid.invalidObj.idsNo = IdsNo;
-                                BulkInvalid.invalidObj.DT.invalid = true;
-                                BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A END TIME,IS NOT VALID";
-                                Object.assign(objInvalid, BulkInvalid.invalidObj);
-                            }
+                                if (productObj.Sys_RotaryType == 'Single' && jar == "A") {
 
-                        }
-                        else {
-                            if (await this.isValidTime(endTime.split("|")[1].trim()) && this.isValidTime(endTime.split("|")[2].trim())) {
-                                var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[2].trim() };
-                                tempDTObj.arr_heading.push(etObj);
-                            } else {
-                                const BulkInvalid = new bulkInvalid();
-                                BulkInvalid.invalidObj.idsNo = IdsNo;
-                                BulkInvalid.invalidObj.DT.invalid = true;
-                                BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
-                                Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    if (await this.isValidTime(endTime.split("|")[1].trim())) {
+                                        var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[1].trim() };
+                                        tempDTObj.arr_heading.push(etObj);
+                                    } else {
+                                        const BulkInvalid = new bulkInvalid();
+                                        BulkInvalid.invalidObj.idsNo = IdsNo;
+                                        BulkInvalid.invalidObj.DT.invalid = true;
+                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A END TIME,IS NOT VALID";
+                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    }
+                                }
+                                else if (productObj.Sys_RotaryType == 'Single' && jar == "B") {
+
+                                    if (await this.isValidTime(endTime.split("|")[2].trim())) {
+                                        var etObj = { "A_et": endTime.split("|")[2].trim(), "B_et": endTime.split("|")[2].trim() };
+                                        tempDTObj.arr_heading.push(etObj);
+                                    } else {
+                                        const BulkInvalid = new bulkInvalid();
+                                        BulkInvalid.invalidObj.idsNo = IdsNo;
+                                        BulkInvalid.invalidObj.DT.invalid = true;
+                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A END TIME,IS NOT VALID";
+                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    }
+
+                                }
+                                else {
+                                    if (await this.isValidTime(endTime.split("|")[1].trim()) && this.isValidTime(endTime.split("|")[2].trim())) {
+                                        var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[2].trim() };
+                                        tempDTObj.arr_heading.push(etObj);
+                                    } else {
+                                        const BulkInvalid = new bulkInvalid();
+                                        BulkInvalid.invalidObj.idsNo = IdsNo;
+                                        BulkInvalid.invalidObj.DT.invalid = true;
+                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    }
+                                }
                             }
                         }
                     }
@@ -4079,7 +4112,7 @@ class BulkWeighment {
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
                                     }
-                                }else {
+                                } else {
                                     if (JARA[i].match(/\d+/g)) {
                                         obJARTypeDT.JarType = "A"
                                     }
@@ -4259,7 +4292,7 @@ class BulkWeighment {
                                         objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                     }
-                                }else {
+                                } else {
 
                                     if (productObj.Sys_RotaryType == 'Single' && (A_Min != 0 && B_Min != 0)) {
                                         const objBulkInvalid = new bulkInvalid();
@@ -4380,7 +4413,7 @@ class BulkWeighment {
                                         objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,INVALID TEMPERATURE";
                                         Object.assign(objInvalid, objBulkInvalid.invalidObj);
                                     }
-                                }else {
+                                } else {
                                     if (productObj.Sys_RotaryType == 'Single' && obJARTypeDT.JarType === 'A') {
                                         if (isNaN(A_tempMax) || A_tempMax === 0) {
                                             const objBulkInvalid = new bulkInvalid();
@@ -4825,7 +4858,8 @@ class BulkWeighment {
                                             // { str_colName: 'DT_Temp', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].A_tempMax },//as discussed with sheetal and shraddhanad for hosure
                                             { str_colName: 'DT_StartTm', value: startTime },
-                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            // { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_EndTm', value: endTime },  //according to CR/24-25/053 the startTime and endTime taking rom string
                                             { str_colName: 'DT_TimeMinSec', value: 0 },
                                             // { str_colName: 'DT_RunTime', value: runTime },
                                             { str_colName: 'DT_RunTime', value: dtVal.trim() },
@@ -4941,7 +4975,8 @@ class BulkWeighment {
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
                                             { str_colName: 'DT_StartTm', value: startTime },
-                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            // { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_EndTm', value: endTime }, //according to CR/24-25/053 the startTime and endTime taking rom string
                                             { str_colName: 'DT_TimeMinSec', value: 0 },
                                             { str_colName: 'DT_RunTime', value: dtVal.trim() },
                                             { str_colName: 'DT_Remark', value: 0 },
@@ -5034,8 +5069,10 @@ class BulkWeighment {
                                 return le;
 
                             } else if (jarType == "A/B") {
-                                var startTime = newDTData[0].B_st.trim();
-                                var endTime = newDTData[1].B_et.trim();
+                                var startTimeA = newDTData[0].A_st.trim();
+                                var endTimeA = newDTData[1].A_et.trim();
+                                var startTimeB = newDTData[0].B_st.trim();
+                                var endTimeB = newDTData[1].B_et.trim();
                                 var startTimeval = moment(startTime, 'HH:mm:ss');
                                 var endTimeval = moment(endTime, 'HH:mm:ss');
                                 var runTime = moment.utc(moment(endTimeval, "HH:mm:ss")
@@ -5058,8 +5095,9 @@ class BulkWeighment {
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             // { str_colName: 'DT_Temp', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].A_tempMax },//as discussed with sheetal and shraddhanad for hosure
-                                            { str_colName: 'DT_StartTm', value: startTime },
-                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_StartTm', value: startTimeA }, //according to CR/24-25/053 the startTime and endTime taking rom string
+                                            // { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_EndTm', value: endTimeA }, //according to CR/24-25/053 the startTime and endTime taking rom string
                                             { str_colName: 'DT_TimeMinSec', value: 0 },
                                             // { str_colName: 'DT_RunTime', value: runTime },
                                             { str_colName: 'DT_RunTime', value: dtVal.trim() },
@@ -5089,8 +5127,9 @@ class BulkWeighment {
                                             { str_colName: 'DT_Side', value: "NA" },
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
-                                            { str_colName: 'DT_StartTm', value: startTime },
-                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_StartTm', value: startTimeB }, //according to CR/24-25/053 the startTime and endTime taking rom string
+                                            { str_colName: 'DT_EndTm', value: endTimeB }, //according to CR/24-25/053 the startTime and endTime taking rom string
+                                            // { str_colName: 'DT_EndTm', value: endTm },
                                             { str_colName: 'DT_TimeMinSec', value: 0 },
                                             { str_colName: 'DT_RunTime', value: dtVal.trim() },
                                             { str_colName: 'DT_Remark', value: 0 },
@@ -5236,7 +5275,8 @@ class BulkWeighment {
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].A_tempMax },
                                             { str_colName: 'DT_StartTm', value: startTimeA },
-                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_EndTm', value: endTimeA }, //according to CR/24-25/053 the startTime and endTime taking rom string
+                                            // { str_colName: 'DT_EndTm', value: endTm },
                                             { str_colName: 'DT_TimeMinSec', value: 0 },
                                             //{ str_colName: 'DT_RunTime', value: runTimeA },
                                             { str_colName: 'DT_RunTime', value: dtVal.trim() },
@@ -5344,7 +5384,8 @@ class BulkWeighment {
                                             { str_colName: 'DT_BasketID', value: 0 },
                                             { str_colName: 'DT_Temp', value: newDTData[4].B_tempMax },
                                             { str_colName: 'DT_StartTm', value: startTimeB },
-                                            { str_colName: 'DT_EndTm', value: endTm },
+                                            { str_colName: 'DT_EndTm', value: endTime }, //according to CR/24-25/053 the startTime and endTime taking rom string
+                                            // { str_colName: 'DT_EndTm', value: endTm },
                                             { str_colName: 'DT_TimeMinSec', value: 0 },
                                             //{ str_colName: 'DT_RunTime', value: runTimeB },
                                             { str_colName: 'DT_RunTime', value: dtVal.trim() },
