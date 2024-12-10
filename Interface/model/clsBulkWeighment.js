@@ -3524,7 +3524,7 @@ class BulkWeighment {
                         if (tempDTObj.basketType != undefined) {
 
                             if (tempDTObj.basketType.includes("Bolus")) {
-                                if (await this.isValidTime(startTime.split("|")[1].trim()) && this.isValidTime(startTime.split("|")[2].trim())) {
+                                if (await this.isValidTime(startTime.split("|")[1].trim()) && await this.isValidTime(startTime.split("|")[2].trim())) {
                                     var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[2].trim() };
 
                                     tempDTObj.arr_heading.push(stObj);
@@ -3536,51 +3536,47 @@ class BulkWeighment {
                                     Object.assign(objInvalid, BulkInvalid.invalidObj);
                                 }
                             } else {
-                                if (actualProtocol.split("|")[1].trim())
                                     var obJARTypeDT = globalData.arrJARTypeDT.find(k => k.idsNo == IdsNo);
+                                    var jartypeST = actualProtocol.split("|")[1].trim().match(/\d+/g) == null ? obJARTypeDT.JarType = "B" : obJARTypeDT.JarType = "A"
 
-
-                                var jartypeST = actualProtocol.split("|")[1].trim().match(/\d+/g) == null ? obJARTypeDT.JarType = "B" : obJARTypeDT.JarType = "A"
-
-
-                                if (productObj.Sys_RotaryType == 'Single' && jartypeST == "A") {
-                                    if (await this.isValidTime(startTime.split("|")[1].trim())) {
-                                        var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[1].trim() };
-                                        tempDTObj.arr_heading.push(stObj);
-                                    } else {
-                                        const BulkInvalid = new bulkInvalid();
-                                        BulkInvalid.invalidObj.idsNo = IdsNo;
-                                        BulkInvalid.invalidObj.DT.invalid = true;
-                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A START TIME,IS NOT VALID";
-                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                    if (productObj.Sys_RotaryType == 'Single' && jartypeST == "A") {
+                                        if (await this.isValidTime(startTime.split("|")[1].trim())) {
+                                            var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[1].trim() };
+                                            tempDTObj.arr_heading.push(stObj);
+                                        } else {
+                                            const BulkInvalid = new bulkInvalid();
+                                            BulkInvalid.invalidObj.idsNo = IdsNo;
+                                            BulkInvalid.invalidObj.DT.invalid = true;
+                                            BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A START TIME,IS NOT VALID";
+                                            Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                        }
                                     }
-                                }
-                                else if (productObj.Sys_RotaryType == 'Single' && jartypeST == "B") {
-                                    if (await this.isValidTime(startTime.split("|")[2].trim())) {
-                                        var stObj = { "A_st": startTime.split("|")[2].trim(), "B_st": startTime.split("|")[2].trim() };
+                                    else if (productObj.Sys_RotaryType == 'Single' && jartypeST == "B") {
+                                        if (await this.isValidTime(startTime.split("|")[2].trim())) {
+                                            var stObj = { "A_st": startTime.split("|")[2].trim(), "B_st": startTime.split("|")[2].trim() };
 
-                                        tempDTObj.arr_heading.push(stObj);
-                                    } else {
-                                        const BulkInvalid = new bulkInvalid();
-                                        BulkInvalid.invalidObj.idsNo = IdsNo;
-                                        BulkInvalid.invalidObj.DT.invalid = true;
-                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
-                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                            tempDTObj.arr_heading.push(stObj);
+                                        } else {
+                                            const BulkInvalid = new bulkInvalid();
+                                            BulkInvalid.invalidObj.idsNo = IdsNo;
+                                            BulkInvalid.invalidObj.DT.invalid = true;
+                                            BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                            Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                        }
                                     }
-                                }
-                                else {
-                                    if (await this.isValidTime(startTime.split("|")[1].trim()) && this.isValidTime(startTime.split("|")[2].trim())) {
-                                        var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[2].trim() };
+                                    else {
+                                        if (await this.isValidTime(startTime.split("|")[1].trim()) && await this.isValidTime(startTime.split("|")[2].trim())) {
+                                            var stObj = { "A_st": startTime.split("|")[1].trim(), "B_st": startTime.split("|")[2].trim() };
 
-                                        tempDTObj.arr_heading.push(stObj);
-                                    } else {
-                                        const BulkInvalid = new bulkInvalid();
-                                        BulkInvalid.invalidObj.idsNo = IdsNo;
-                                        BulkInvalid.invalidObj.DT.invalid = true;
-                                        BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
-                                        Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                            tempDTObj.arr_heading.push(stObj);
+                                        } else {
+                                            const BulkInvalid = new bulkInvalid();
+                                            BulkInvalid.invalidObj.idsNo = IdsNo;
+                                            BulkInvalid.invalidObj.DT.invalid = true;
+                                            BulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B START TIME,IS NOT VALID";
+                                            Object.assign(objInvalid, BulkInvalid.invalidObj);
+                                        }
                                     }
-                                }
                             }
                         }
                     }
@@ -3591,7 +3587,7 @@ class BulkWeighment {
                         if (tempDTObj.basketType != undefined) {
 
                             if (tempDTObj.basketType.includes("Bolus")) {
-                                if (await this.isValidTime(endTime.split("|")[1].trim()) && this.isValidTime(endTime.split("|")[2].trim())) {
+                                if (await this.isValidTime(endTime.split("|")[1].trim()) && await this.isValidTime(endTime.split("|")[2].trim())) {
                                     var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[2].trim() };
                                     tempDTObj.arr_heading.push(etObj);
                                 } else {
@@ -3633,7 +3629,7 @@ class BulkWeighment {
 
                                 }
                                 else {
-                                    if (await this.isValidTime(endTime.split("|")[1].trim()) && this.isValidTime(endTime.split("|")[2].trim())) {
+                                    if (await this.isValidTime(endTime.split("|")[1].trim()) && await this.isValidTime(endTime.split("|")[2].trim())) {
                                         var etObj = { "A_et": endTime.split("|")[1].trim(), "B_et": endTime.split("|")[2].trim() };
                                         tempDTObj.arr_heading.push(etObj);
                                     } else {
@@ -3708,7 +3704,7 @@ class BulkWeighment {
                                     //     }
                                     // }
                                     // else {
-                                    if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
+                                    if (!await this.isValidTime(sample.split("|")[1].trim()) || !await this.isValidTime(sample.split("|")[2].trim())) {
                                         const objBulkInvalid = new bulkInvalid();
                                         objBulkInvalid.invalidObj.idsNo = IdsNo;
                                         objBulkInvalid.invalidObj.DT.invalid = true;
@@ -3754,7 +3750,7 @@ class BulkWeighment {
                                         }
                                     }
                                     else {
-                                        if (!await this.isValidTime(sample.split("|")[1].trim()) && await this.isValidTime(sample.split("|")[2].trim())) {
+                                        if (!await this.isValidTime(sample.split("|")[1].trim()) || !await this.isValidTime(sample.split("|")[2].trim())) {
                                             const objBulkInvalid = new bulkInvalid();
                                             objBulkInvalid.invalidObj.idsNo = IdsNo;
                                             objBulkInvalid.invalidObj.DT.invalid = true;
@@ -4179,15 +4175,38 @@ class BulkWeighment {
                         var haltDuration = actualProtocol;
                         //console.log(haltDuration);
                         if (productObj.Sys_RotaryType == 'Single') {
-                            let index = jar.JarType == 'A' ? 1 : 2;
+                            if (tempDTObj.basketType.includes("Bolus")) {
+                                if (!await this.isValidTime(haltDuration.split("|")[1].trim()) && objInvalid.DT.invalid == false) {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A HALT DURATION,IS NOT VALID";
 
-                            if (!await this.isValidTime(haltDuration.split("|")[index].trim())) {
-                                const objBulkInvalid = new bulkInvalid();
-                                objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                objBulkInvalid.invalidObj.DT.invalid = true;
-                                objBulkInvalid.invalidObj.DT.invalidMsg = `JAR ${obJARTypeDT.JarType} HALT DURATION,IS NOT VALID`;
-                                Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
+                                }
+
+                                if (!await this.isValidTime(haltDuration.split("|")[2].trim()) && objInvalid.DT.invalid == false) {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B HALT DURATION,IS NOT VALID";
+
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                                }
+                            }
+                            else {
+                                let index = jar.JarType == 'A' ? 1 : 2;
+
+                                if (!await this.isValidTime(haltDuration.split("|")[index].trim())) {
+                                    const objBulkInvalid = new bulkInvalid();
+                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                    objBulkInvalid.invalidObj.DT.invalid = true;
+                                    objBulkInvalid.invalidObj.DT.invalidMsg = `JAR ${obJARTypeDT.JarType} HALT DURATION,IS NOT VALID`;
+                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                                }
                             }
                         }
                         else {
@@ -5594,7 +5613,7 @@ class BulkWeighment {
             }
 
         } else {
-            if (!await this.isValidTime(countOne.split("|")[1].trim()) || await this.isValidTime(countOne.split("|")[2].trim())) {
+            if (!await this.isValidTime(countOne.split("|")[1].trim()) || !await this.isValidTime(countOne.split("|")[2].trim())) {
                 const objBulkInvalid = new bulkInvalid();
                 objBulkInvalid.invalidObj.idsNo = IdsNo;
                 objBulkInvalid.invalidObj.DT.invalid = true;
