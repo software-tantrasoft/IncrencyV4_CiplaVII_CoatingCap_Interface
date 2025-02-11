@@ -564,23 +564,23 @@ class MenuRequestModel {
                 let CubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == selectedIds)
                 switch (portInstrument.toUpperCase()) {
                     case 'DISINTEGRATION TESTER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'VERNIER':
                         await this.streamDataMenuMaking(result, strIdsIP, productType, 'Vernier', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'TABLET TESTER':
                     case 'HARDNESS':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'FRIABILATOR':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'TAPPED DENSITY':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'MOISTURE ANALYZER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'BALANCE':
                         if (CubicInfo.Sys_Area == 'Effervescent Granulation' ||
@@ -588,7 +588,7 @@ class MenuRequestModel {
                             || CubicInfo.Sys_Area == 'MFG-1 Processing Area' || CubicInfo.Sys_Area == 'MFG-1 Blending Area' || CubicInfo.Sys_Area == 'MFG-3 IPQC'
                             || CubicInfo.Sys_Area == 'MFG-2 Processing Area' || CubicInfo.Sys_Area == 'MFG-2 Blending Area' || CubicInfo.Sys_Area == 'MFG-8 Processing Area' || CubicInfo.Sys_Area == 'MFG-8 IPQC'
                             | CubicInfo.Sys_Area == 'MFG-5 Capsule' || CubicInfo.Sys_Area == 'MFG-6 Capsule' || CubicInfo.Sys_Area == 'Pellet IPQC') {
-                            this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
+                            await this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         } else {
                             await this.streamDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         }
@@ -613,7 +613,7 @@ class MenuRequestModel {
                             || CubicInfo.Sys_Area == 'MFG-1 Processing Area' || CubicInfo.Sys_Area == 'MFG-1 Blending Area' || CubicInfo.Sys_Area == 'MFG-3 IPQC'
                             || CubicInfo.Sys_Area == 'MFG-2 Processing Area' || CubicInfo.Sys_Area == 'MFG-2 Blending Area' || CubicInfo.Sys_Area == 'MFG-8 Processing Area' || CubicInfo.Sys_Area == 'MFG-8 IPQC'
                             | CubicInfo.Sys_Area == 'MFG-5 Capsule' || CubicInfo.Sys_Area == 'MFG-6 Capsule' || CubicInfo.Sys_Area == 'Pellet IPQC') {
-                            this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
+                                await this.bulkDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         } else {
                             await this.streamDataMenuMaking(result, strIdsIP, productType, 'Balance', portNo, productSamples, side,IsPSDPrd)
                         }
@@ -622,22 +622,22 @@ class MenuRequestModel {
                         await this.streamDataMenuMaking(result, strIdsIP, productType, 'Vernier', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'DISINTEGRATION TESTER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'DT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'HARDNESS':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'Hardness', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'FRIABILATOR':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'Friability', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'TAPPED DENSITY':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'TDT', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'MOISTURE ANALYZER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'LOD', portNo, productSamples, side,IsPSDPrd)
                         break;
                     case 'SIEVE SHAKER':
-                        this.bulkDataMenuMaking(result, strIdsIP, productType, 'SS', portNo, productSamples, side,IsPSDPrd)
+                        await this.bulkDataMenuMaking(result, strIdsIP, productType, 'SS', portNo, productSamples, side,IsPSDPrd)
                         break;
                 }
                 return 'Done';
@@ -649,8 +649,19 @@ class MenuRequestModel {
     //************************************************************************************************* */
     //
     //************************************************************************************************* */
-    bulkDataMenuMaking(result, strIdsIP, productType, instrument, portNo, productSamples, side,IsPSDPrd) {
+    async bulkDataMenuMaking(result, strIdsIP, productType, instrument, portNo, productSamples, side,IsPSDPrd) {
         productSamples = productSamples[0][0]
+        var slectProductSamplesFrib = {
+            str_tableName: 'tbl_product_master',
+            data: '*',
+            condition: [
+                { str_colName: 'ProductName', value: result[0][0].ProductName },
+                { str_colName: 'ProductId', value: result[0][0].ProductId },
+                { str_colName: 'ProductVersion', value: result[0][0].ProductVersion },
+                { str_colName: 'Version', value: result[0][0].Version }
+            ]
+        }
+        var productSamplesForFriab = await database.select(slectProductSamplesFrib);
         // console.log(strIdsIP, productType, instrument)
         // finding index of object holding current idsNo
         const index = globalData.arr_limits.findIndex(k => k.idsNo == strIdsIP);
@@ -792,8 +803,7 @@ class MenuRequestModel {
 
                         }
                     }
-                }else
-                    if (key == 'Param8_Nom') { // for Friability
+                } else if (key == 'Param8_Nom') { // for Friability
                         if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                             // check for product type and check friability is set 
                             if (productType == 1 && CubicInfo.Sys_FriabID != 'None' && instrument == 'Friability'
@@ -807,16 +817,14 @@ class MenuRequestModel {
                                         dp: result[0][0].Param8_DP,
                                         isonstd: result[0][0].Param8_IsOnStd,
                                         port: portNo,
-                                        noOfSamples: productSamples.Friability == 0 ? productSamples.Individual : productSamples.Friability,
+                                        noOfSamples: productSamplesForFriab[0][0].Friability == 0 ? productSamples.Individual : productSamplesForFriab[0][0].Friability,       //  Friability sample should take from product master base on CR/24-25/068
                                         side: side,
                                         unit: '%'
                                     }
                                 });
                             }
                         }
-                    }
-                    else
-                        if (key == 'Param13_T1Neg') { // for DT
+                } else if (key == 'Param13_T1Neg') { // for DT
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check DT is set 
                                 if (productType == 1 && CubicInfo.Sys_DTID != 'None' && instrument == 'DT'
@@ -839,7 +847,7 @@ class MenuRequestModel {
                                     });
                                 }
                             }
-                        } else if (key == 'Param15_T1Neg') { // for TDT
+                } else if (key == 'Param15_T1Neg') { // for TDT
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check TDT is set 
                                 if (productType == 1 && CubicInfo.Sys_TapDensityID != 'None' && instrument == 'TDT'
@@ -861,7 +869,7 @@ class MenuRequestModel {
                                     });
                                 }
                             }
-                        } else if (key == 'Param16_T1Pos') { // for LOD
+                } else if (key == 'Param16_T1Pos') { // for LOD
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check LOD is set 
                                 if (productType == 1 && CubicInfo.Sys_MoistID != 'None' &&
@@ -885,7 +893,7 @@ class MenuRequestModel {
                                     });
                                 }
                             }
-                        } else if (key == 'Param8_Upp' || key == 'Param11_Upp') { // for % fine and from tab_gran
+                } else if (key == 'Param8_Upp' || key == 'Param11_Upp') { // for % fine and from tab_gran
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check LOD is set 
                                 if ((productType == 1 || productType == 2) && CubicInfo.Sys_BalID != 'None' && instrument == 'Balance') {
@@ -906,8 +914,7 @@ class MenuRequestModel {
                                         });
                                 }
                             }
-                        }
-                        else if (key == 'Param9_Upp' || key == 'Param12_Upp' || key == 'Param13_Upp' || key == 'Param14_Upp' ||
+                } else if (key == 'Param9_Upp' || key == 'Param12_Upp' || key == 'Param13_Upp' || key == 'Param14_Upp' ||
                             key == 'Param15_Upp' || key == 'Param16_Upp' || key == 'Param17_Upp' || key == 'Param18_Upp') { // forParticke sizing and from tab_gran
                                 if(IsPSDPrd == 1){
                                     if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {  // without parameter particle size also perform
@@ -951,8 +958,7 @@ class MenuRequestModel {
                                         }
                                 //      }
                                 }                           
-                        }
-                        else if (key == 'Param7_Upp') { // for tab density and from tab_gran
+                } else if (key == 'Param7_Upp') { // for tab density and from tab_gran
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999 || parseFloat(result[0][0].Param7_Low) > 0 && parseFloat(result[0][0].Param7_Low) != 99999) {   // Min or Max
                                 // check for product type and check TDT is set 
                                 if ((productType == 1 || productType == 2) && CubicInfo.Sys_TapDensityID != 'None' && instrument == 'TDT'
@@ -974,7 +980,7 @@ class MenuRequestModel {
                                     });
                                 }
                             }
-                        } else if (key == 'Param1_Upp' || key == 'Param2_Upp' || key == 'Param3_Upp' ||
+                } else if (key == 'Param1_Upp' || key == 'Param2_Upp' || key == 'Param3_Upp' ||
                             key == 'Param4_Upp' || key == 'Param5_Upp' || key == 'Param6_Upp') { // for LOD and from tab_gran
                             if (globalData.arr_limits.find(k => k.LOD == undefined)) {
                                 if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
@@ -1132,7 +1138,7 @@ class MenuRequestModel {
                                     }
                                 }
                             }
-                        }
+                }
             }
 
         }
@@ -1175,6 +1181,17 @@ class MenuRequestModel {
         // finding index of object holding current idsNo
         // Here if Cubicle type is IPQC then we find actual 
         productSamples = productSamples[0][0];
+        var slectProductSamplesFrib = {
+            str_tableName: 'tbl_product_master',
+            data: '*',
+            condition: [
+                { str_colName: 'ProductName', value: result[0][0].ProductName },
+                { str_colName: 'ProductId', value: result[0][0].ProductId },
+                { str_colName: 'ProductVersion', value: result[0][0].ProductVersion },
+                { str_colName: 'Version', value: result[0][0].Version }
+            ]
+        }
+        var productSamplesForFriab = await database.select(slectProductSamplesFrib);
         const index = globalData.arr_limits.findIndex(k => k.idsNo == strIdsIP);
         const CubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(strIdsIP));
         /**********
@@ -1689,8 +1706,7 @@ class MenuRequestModel {
                                 });
                             }
                         }
-                    } else
-                        if (key == 'Param8_Nom') { // for Friability on Balance
+                    } else if (key == 'Param8_Nom') { // for Friability on Balance
                             if (parseFloat(result[0][0][key]) > 0 && parseFloat(result[0][0][key]) != 99999) {
                                 // check for product type and check balance is set 
 
@@ -1711,7 +1727,7 @@ class MenuRequestModel {
                                                     dp: result[0][0].Param8_DP,
                                                     isonstd: result[0][0].Param8_IsOnStd,
                                                     port: portNo,
-                                                    noOfSamples:  productSamples.Friability,
+                                                    noOfSamples:  productSamplesForFriab[0][0].Friability,               //  Friability sample should take from product master base on CR/24-25/068
                                                     side: side,
                                                     unit: '%'// added by vivek on 18-08-2020
                                                 }
@@ -1721,7 +1737,7 @@ class MenuRequestModel {
                                 }
 
                             }
-                        }
+                    }
                 }
             }
         }
