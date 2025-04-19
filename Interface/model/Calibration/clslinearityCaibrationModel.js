@@ -112,8 +112,12 @@ class LinearityModel {
                     if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                         TareCmd = ""
                     }
-                    else if (appendVal == "T" && tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
-                        TareCmd = `SP10${escChar}${appendVal},`
+                    else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+                        if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+                            TareCmd = `SP10${appendVal},`
+                        } else {
+                            TareCmd = `SP10${escChar}${appendVal},`
+                        }
                     }
                     else {
                         TareCmd = `SP10${appendVal},`
@@ -124,7 +128,7 @@ class LinearityModel {
                     if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                         TareCmd = ""
                     }
-                    else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
+                    else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
                         TareCmd = `SP20${escChar}${appendVal},`
                     }
                     else {

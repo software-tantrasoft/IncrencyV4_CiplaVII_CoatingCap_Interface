@@ -128,7 +128,11 @@ class ProcessWeighment {
                         tareCmd = ""
                     }
                     else if (appendVal == "T" && (resultBal[0][0].Bal_Make.includes('Sarto') || resultBal[0][0].Bal_Make.includes('SARTO'))) {
-                        tareCmd = `SP10${escChar}${appendVal},`
+                        if (resultBal[0][0].Bal_Model == "BCE323I-10IN") {
+                            tareCmd = `SP10${appendVal},`
+                        } else {
+                            tareCmd = `SP10${escChar}${appendVal},`
+                        }
                     }
                     else {
                         tareCmd = `SP10${appendVal},`

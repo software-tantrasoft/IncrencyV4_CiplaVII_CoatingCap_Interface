@@ -133,11 +133,12 @@ class CalibrationModel {
                         tempCubicInfo.Sys_Area == "Granulation"
                     ) {
                         TareCmd = "";
-                    } else if (
-                        appendVal == "T" &&
-                        tempBalace.balance_info[0].Bal_Make.includes("Sarto")
-                    ) {
-                        TareCmd = `SP10${escChar}${appendVal},`;
+                    } else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes("Sarto") || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+                        if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+                            TareCmd = `SP10${appendVal},`
+                        } else {
+                            TareCmd = `SP10${escChar}${appendVal},`
+                        }
                     } else {
                         TareCmd = `SP10${appendVal},`;
                     }
@@ -149,7 +150,7 @@ class CalibrationModel {
                         tempCubicInfo.Sys_Area == "Granulation"
                     ) {
                         TareCmd = "";
-                    } else if (tempBalace.balance_info[0].Bal_Make.includes("Sarto")) {
+                    } else if (tempBalace.balance_info[0].Bal_Make.includes("Sarto") || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
                         TareCmd = `SP20${escChar}${appendVal},`;
                     } else {
                         TareCmd = `SP20${appendVal},`;
@@ -347,8 +348,12 @@ class CalibrationModel {
                         if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                             TareCmd = ""
                         }
-                        else if (appendVal == "T" && tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
-                            TareCmd = `SP10${escChar}${appendVal},`
+                        else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+                            if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+                                TareCmd = `SP10${appendVal},`
+                            } else {
+                                TareCmd = `SP10${escChar}${appendVal},`
+                            }
                         }
                         else {
                             TareCmd = `SP10${appendVal},`
@@ -359,7 +364,7 @@ class CalibrationModel {
                         if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                             TareCmd = ""
                         }
-                        else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
+                        else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
                             TareCmd = `SP20${escChar}${appendVal},`
                         }
                         else {
@@ -762,7 +767,7 @@ class CalibrationModel {
 
 
                 if (objSentWt.Bal_NegTol <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= objSentWt.Bal_PosTol)) {
-                    
+
                     if (parseInt(srNo) == objBalRelWt.calibWt.length) {
                         console.log('done');
                         // let balCalDetPeri = globalData.arrBalCaibDet.        find(k => k.strBalId == strBalId);
@@ -900,7 +905,7 @@ class CalibrationModel {
 
     }
 
-    async  containsNumber(str) {
+    async containsNumber(str) {
         return /\d/.test(str);
     }
     async newverifyWeights(str_Protocol, IDSSrNo) {
@@ -1277,8 +1282,8 @@ class CalibrationModel {
                     }
                 } else {
                     tempcalibObj.Periodic = {};
-                    tempcalibObj.datetimecount = 0 ;
-                    return `HR40Invalid String,,,,` ;
+                    tempcalibObj.datetimecount = 0;
+                    return `HR40Invalid String,,,,`;
                 }
             }
         }

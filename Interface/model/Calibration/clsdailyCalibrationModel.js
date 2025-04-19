@@ -312,12 +312,12 @@ class CalibrationModel {
                 //return `CR${calibDId}0Daily Verification,Pending,,,`;
                 //}
                 //else {
-                  // if(objOwner.owner == 'analytical' && strBalId != 'None'){
-                    return `CR${calibDId}1Daily Verification,Pending,,,`;
-                  // }else{
-                  //   return "CR0";
-                  // }
-                
+                // if(objOwner.owner == 'analytical' && strBalId != 'None'){
+                return `CR${calibDId}1Daily Verification,Pending,,,`;
+                // }else{
+                //   return "CR0";
+                // }
+
                 //}
               } else {
                 //ont take calibartions
@@ -421,11 +421,12 @@ class CalibrationModel {
             tempCubicInfo.Sys_Area == "Granulation"
           ) {
             TareCmd = "";
-          } else if (
-            appendVal == "T" &&
-            tempBalace.balance_info[0].Bal_Make.includes("Sarto")
-          ) {
-            TareCmd = `SP10${escChar}${appendVal},`;
+          } else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes("Sarto") || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+            if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+              TareCmd = `SP10${appendVal},`
+            } else {
+              TareCmd = `SP10${escChar}${appendVal},`
+            }
           } else {
             TareCmd = `SP10${appendVal},`;
           }
@@ -437,7 +438,7 @@ class CalibrationModel {
             tempCubicInfo.Sys_Area == "Granulation"
           ) {
             TareCmd = "";
-          } else if (tempBalace.balance_info[0].Bal_Make.includes("Sarto")) {
+          } else if (tempBalace.balance_info[0].Bal_Make.includes("Sarto") || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
             TareCmd = `SP20${escChar}${appendVal},`;
           } else {
             TareCmd = `SP20${appendVal},`;
@@ -662,8 +663,12 @@ class CalibrationModel {
             if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
               TareCmd = ""
             }
-            else if (appendVal == "T" && tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
-              TareCmd = `SP10${escChar}${appendVal},`
+            else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+              if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+                TareCmd = `SP10${appendVal},`
+              } else {
+                TareCmd = `SP10${escChar}${appendVal},`
+              }
             }
             else {
               TareCmd = `SP10${appendVal},`
@@ -674,7 +679,7 @@ class CalibrationModel {
             if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
               TareCmd = ""
             }
-            else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
+            else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
               TareCmd = `SP20${escChar}${appendVal},`
             }
             else {
@@ -786,7 +791,7 @@ class CalibrationModel {
             { str_colName: 'Bal_ID', value: strBalId, comp: 'eq' },
           ]
         }
-         resultBal = await database.select(selectBalObj);
+        resultBal = await database.select(selectBalObj);
       }
 
 
@@ -805,7 +810,7 @@ class CalibrationModel {
         var weightVal = recieveWt.split(".");
         decimalValue = weightVal[1].length;
       }
-      if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0  || weightVal.length > 2 ) {
+      if (parseFloat(recieveWt) < parseFloat(resultBal[0][0].Bal_MinCap) || parseFloat(recieveWt) > parseFloat(resultBal[0][0].Bal_MaxCap) || decimalValue == 0 || weightVal.length > 2) {
         var strprotocol = `EMDC00INVALID SAMPLE,RECIEVED,,,`
         return strprotocol;
       }
@@ -1515,8 +1520,8 @@ class CalibrationModel {
             if (parseFloat(objSentWt.Bal_NegTol) <= parseFloat(recieveWt) && (parseFloat(recieveWt) <= parseFloat(objSentWt.Bal_PosTol))) {
               tempcalibObj.Daily = {};
               tempcalibObj.datetimecount = 0;
-              if(RepFromPC == "CR0"){
-                RepFromPC =  "HRc0";
+              if (RepFromPC == "CR0") {
+                RepFromPC = "HRc0";
               }
               return RepFromPC;
             } else {
@@ -1531,7 +1536,7 @@ class CalibrationModel {
         } else {
           tempcalibObj.Daily = {};
           tempcalibObj.datetimecount = 0;
-          return `HR40Invalid String,,,,` ;
+          return `HR40Invalid String,,,,`;
         }
       }
     }

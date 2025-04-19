@@ -133,11 +133,12 @@ class Eccentricity {
                         tempCubicInfo.Sys_Area == "Granulation"
                     ) {
                         TareCmd = "";
-                    } else if (
-                        appendVal == "T" &&
-                        tempBalace.balance_info[0].Bal_Make.includes("Sarto")
-                    ) {
-                        TareCmd = `SP10${escChar}${appendVal},`;
+                    } else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes("Sarto") || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+                        if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+                            TareCmd = `SP10${appendVal},`
+                        } else {
+                            TareCmd = `SP10${escChar}${appendVal},`
+                        }
                     } else {
                         TareCmd = `SP10${appendVal},`;
                     }
@@ -149,7 +150,7 @@ class Eccentricity {
                         tempCubicInfo.Sys_Area == "Granulation"
                     ) {
                         TareCmd = "";
-                    } else if (tempBalace.balance_info[0].Bal_Make.includes("Sarto")) {
+                    } else if (tempBalace.balance_info[0].Bal_Make.includes("Sarto") || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
                         TareCmd = `SP20${escChar}${appendVal},`;
                     } else {
                         TareCmd = `SP20${appendVal},`;
@@ -345,8 +346,12 @@ class Eccentricity {
                         if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                             TareCmd = ""
                         }
-                        else if (appendVal == "T" && tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
-                            TareCmd = `SP10${escChar}${appendVal},`
+                        else if (appendVal == "T" && (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO'))) {
+                            if (tempBalace.balance_info[0].Bal_Model == "BCE323I-10IN") {
+                                TareCmd = `SP10${appendVal},`
+                            } else {
+                                TareCmd = `SP10${escChar}${appendVal},`
+                            }
                         }
                         else {
                             TareCmd = `SP10${appendVal},`
@@ -357,7 +362,7 @@ class Eccentricity {
                         if (tempCubicInfo.Sys_Area == "Effervescent Granulation" || tempCubicInfo.Sys_Area == "Granulation") {
                             TareCmd = ""
                         }
-                        else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto')) {
+                        else if (tempBalace.balance_info[0].Bal_Make.includes('Sarto') || tempBalace.balance_info[0].Bal_Make.includes('SARTO')) {
                             TareCmd = `SP20${escChar}${appendVal},`
                         }
                         else {
@@ -749,7 +754,7 @@ class Eccentricity {
                                     { str_colName: 'Eccent_BalID', value: strBalId, comp: 'eq' },
                                 ]
                             }
-                            result = await database.select(selectRepSrNoObj) ;
+                            result = await database.select(selectRepSrNoObj);
                             let int_eccent_RepNo = result[0][0].Eccent_RepNo;
                             result = await comman.caibrationFails('E', strBalId, int_eccent_RepNo);
 
@@ -835,7 +840,7 @@ class Eccentricity {
         }
     }
 
-    async  containsNumber(str) {
+    async containsNumber(str) {
         return /\d/.test(str);
     }
     async newverifyWeights(str_Protocol, IDSSrNo) {
@@ -1347,10 +1352,10 @@ class Eccentricity {
                 //     return `HR40Invalid String,,,,`
                 // }
                 else {
-                    
+
                     tempcalibObj.Eccentricity = {};
                     tempcalibObj.datetimecount = 0;
-                    return `HR40Invalid String,,,,` ;
+                    return `HR40Invalid String,,,,`;
                 }
             }
         } catch (err) {
