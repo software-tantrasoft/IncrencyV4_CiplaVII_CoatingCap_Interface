@@ -4175,37 +4175,39 @@ class BulkWeighment {
                         var haltDuration = actualProtocol;
                         //console.log(haltDuration);
                         if (productObj.Sys_RotaryType == 'Single') {
-                            if (tempDTObj.basketType.includes("Bolus")) {
-                                if (!await this.isValidTime(haltDuration.split("|")[1].trim()) && objInvalid.DT.invalid == false) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A HALT DURATION,IS NOT VALID";
+                            if (tempDTObj.basketType != undefined) {
+                                if (tempDTObj.basketType.includes("Bolus")) {
+                                    if (!await this.isValidTime(haltDuration.split("|")[1].trim()) && objInvalid.DT.invalid == false) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR A HALT DURATION,IS NOT VALID";
 
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
+                                    }
+
+                                    if (!await this.isValidTime(haltDuration.split("|")[2].trim()) && objInvalid.DT.invalid == false) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B HALT DURATION,IS NOT VALID";
+
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
+
+                                    }
                                 }
+                                else {
+                                    let index = jar.JarType == 'A' ? 1 : 2;
 
-                                if (!await this.isValidTime(haltDuration.split("|")[2].trim()) && objInvalid.DT.invalid == false) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = "REPORT NOT SAVED,JAR B HALT DURATION,IS NOT VALID";
+                                    if (!await this.isValidTime(haltDuration.split("|")[index].trim())) {
+                                        const objBulkInvalid = new bulkInvalid();
+                                        objBulkInvalid.invalidObj.idsNo = IdsNo;
+                                        objBulkInvalid.invalidObj.DT.invalid = true;
+                                        objBulkInvalid.invalidObj.DT.invalidMsg = `JAR ${obJARTypeDT.JarType} HALT DURATION,IS NOT VALID`;
+                                        Object.assign(objInvalid, objBulkInvalid.invalidObj);
 
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
-                                }
-                            }
-                            else {
-                                let index = jar.JarType == 'A' ? 1 : 2;
-
-                                if (!await this.isValidTime(haltDuration.split("|")[index].trim())) {
-                                    const objBulkInvalid = new bulkInvalid();
-                                    objBulkInvalid.invalidObj.idsNo = IdsNo;
-                                    objBulkInvalid.invalidObj.DT.invalid = true;
-                                    objBulkInvalid.invalidObj.DT.invalidMsg = `JAR ${obJARTypeDT.JarType} HALT DURATION,IS NOT VALID`;
-                                    Object.assign(objInvalid, objBulkInvalid.invalidObj);
-
+                                    }
                                 }
                             }
                         }
@@ -4636,7 +4638,7 @@ class BulkWeighment {
                          * @description HERE WE MUST EMPTY `arr_heading` AND `arr_reading` after invalid data
                          * because array may contain invalid data
                          */
-
+                        console.log(objInvalid.DT.invalidMsg);
                         if (tempTDObj == undefined) {
                             globalData.arrDTData.push({
                                 idsNo: idsNo, arr_heading: [], arr_reading: [], arr_info: [],
