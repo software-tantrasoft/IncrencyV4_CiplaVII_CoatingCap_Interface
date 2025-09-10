@@ -2270,7 +2270,7 @@ class MenuSelect {
             noOfsamples = ("00" + noOfsamples).slice(-3);
             //***************commented and added by vivek to display Unit using MS protocl in Rage 19/08/2020*************************************** */
             //strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}LOD,${upperLimit},${lowerLimit},N.A,${timeOutPeriod},1`;
-            strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}LOD   ,${upperLimit},${lowerLimit},N.A,${timeOutPeriod},1,${tempLimitObj.LOD.unit},`;
+            strReturnProtocol = `MS${MenuType}${intInstrumentID}${side}LOD   ,${upperLimit},${lowerLimit},N.A,0000,1,${tempLimitObj.LOD.unit},`;
             //************************************************************************* *****************************************************/
             return strReturnProtocol;
             break;
