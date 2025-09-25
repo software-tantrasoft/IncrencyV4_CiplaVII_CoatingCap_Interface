@@ -362,7 +362,8 @@ class FetchDetails {
             data: '*',
             condition: [
                 { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
-                { str_colName: 'Periodic_CalbDate', value: todayDate, comp: 'eq' }
+                { str_colName: 'Periodic_CalbDate', value: todayDate, comp: 'eq' },
+                { str_colName: 'Periodic_IsRecalib', value: 0, comp: 'eq' }
             ]
         }
         var tempObj = globalData.arrBalCaibDet.find(k => k.strBalId == strBalId);
@@ -1116,15 +1117,71 @@ class FetchDetails {
             var balance = tempCubicInfo.Sys_BalID;
             var vernier = tempCubicInfo.Sys_VernierID;
             var binBalance = tempCubicInfo.Sys_BinBalID;
+
+            var todayDate = moment().format("YYYY-MM-DD");
+            var todaytime = moment().format("HH:mm:ss");
+            var timeLimit = (moment(7, "HH:mm:ss").format("HH:mm:ss"));
+            var momentDate = moment(todayDate, "YYYY-MM-DD");
+            var yesterday = (momentDate.subtract(1, 'days')).format("YYYY-MM-DD");
+
             // for Balance
             if (balance != 'None') {
+                  var selectObjfortodayentry = {
+                    str_tableName: "tbl_calibration_daily_master",
+                    data: "*",
+                    condition: [
+                        { str_colName: 'Daily_BalID', value: balance, comp: 'eq' },
+                        { str_colName: "Daily_CalbDate", value: todayDate, comp: "eq" },
+                        { str_colName: "Daily_IsRecalib", value: 0, comp: "eq" },
+                    ],
+                };
+
+                var selectObjfortodayentryres = await database.select(selectObjfortodayentry);
+
+                let periodicsipresent = false;
+                let isdailypresent = false;
+                ///periodic 
+                var selectObjforyesterdayperiodic = {
+                    str_tableName: "tbl_calibration_periodic_master",
+                    data: "MAX(Periodic_RepNo) AS Periodic_RepNo",
+                    condition: [
+                        { str_colName: 'Periodic_BalID', value: balance, comp: 'eq' },
+                        { str_colName: "Periodic_IsRecalib", value: 0, comp: "eq" },
+                    ],
+                };
+                var selectObjforyesterdayresperiodic = await database.select(selectObjforyesterdayperiodic);
+                if (selectObjforyesterdayresperiodic[0].length > 0 && selectObjforyesterdayresperiodic[0][0].Periodic_RepNo != null) {
+                    var selectObjforyesterdayperiodicofordata = {
+                        str_tableName: "tbl_calibration_periodic_master",
+                        data: "*",
+                        condition: [
+                            { str_colName: 'Periodic_RepNo', value: selectObjforyesterdayresperiodic[0][0].Periodic_RepNo, comp: 'eq' },
+                        ],
+                    };
+
+                    var selectObjforyesterdayresperiodicdata = await database.select(selectObjforyesterdayperiodicofordata);
+
+                    if (moment(selectObjforyesterdayresperiodicdata[0][0].Periodic_CalbDate).format("YYYY-MM-DD") == todayDate) {
+                        periodicsipresent = true;
+                    }
+                }
+
+                if (selectObjfortodayentryres[0].length > 0 || periodicsipresent) {
+                    isdailypresent = true;
+                }
+
+
                 var DailyDate = null;
                 var PeriodicDate = null;
+
                 var BalanceRecalibStatusObject = globalData.arrBalanceRecalibStatus.find(k => k.Bal_ID == balance);
                 if (BalanceRecalibStatusObject.RecalibSetDt_daily != null) {
                     DailyDate = BalanceRecalibStatusObject.RecalibSetDt_daily.toFormat('YYYY-MM-DD');
                     var todayDate = moment().format('YYYY-MM-DD');
-                    if ((DailyDate < todayDate) && systemHours >= 7) {
+                   var Dailytime = (moment(BalanceRecalibStatusObject.RecalibSetTm_daily, "HH:mm:ss")).format("HH:mm:ss");
+
+
+                    if (!isdailypresent && todaytime > timeLimit) {
                         BalanceRecalibStatusObject.RecalibSetDt_daily = null;
                         BalanceRecalibStatusObject.DailyBalRecalib = 0;
                         // settting 0 to table
@@ -1431,8 +1488,12 @@ class FetchDetails {
                 var BinBalanceRecalibStatusObject = globalData.arrBalanceRecalibStatusBin.find(k => k.Bal_ID == binBalance);
                 if (BinBalanceRecalibStatusObject.RecalibSetDt_daily != null) {
                     DailyDate = BinBalanceRecalibStatusObject.RecalibSetDt_daily.toFormat('YYYY-MM-DD');
+                    
                     var todayDate = moment().format('YYYY-MM-DD');
-                    if ((DailyDate < todayDate) && systemHours >= 7) {
+                    if((DailyDate < todayDate && (Dailytime > timeLimit && todaytime >= timeLimit)) ||
+                     (DailyDate == todayDate && (Dailytime <= timeLimit && todaytime >= timeLimit)) ||
+                      (DailyDate < todayDate && (Dailytime < timeLimit && todaytime < timeLimit)) ||
+                       (DailyDate < todayDate && DailyDate != yesterday)) {
                         BinBalanceRecalibStatusObject.RecalibSetDt_daily = null;
                         BinBalanceRecalibStatusObject.DailyBalRecalib = 0;
                         // settting 0 to table
@@ -1443,45 +1504,18 @@ class FetchDetails {
                             condition: [{ str_colName: 'Bal_ID', value: balance }]
                         }
                         await database.update(objUpdate);
-
-                        ///clearing powerbackup if (recalib periodic) entry is in powerbackup;
-
-                        var selectCalibPowerBackupData = {
-                            str_tableName: "tbl_calibpowerbackup",
-                            data: "*",
-                            condition: [
-                                { str_colName: "IdsNo", value: idsNo },
-                                { str_colName: "BalanceID", value: binBalance },
-                            ],
-                        };
-                        var result = await database.select(selectCalibPowerBackupData);
-                        if (result[0].length > 0) {
-                            var deleteObj = {
-                                str_tableName: "tbl_calibpowerbackup",
-                                condition: [
-                                    { str_colName: "IdsNo", value: idsNo },
-                                    { str_colName: "BalanceID", value: binBalance },
-                                ],
-                            };
-                            console.log(
-                                "calibpowerbakup discard  of recalibration on IDS " + idsNo
-                            );
-                            await database.delete(deleteObj);
-                            if (result[0][0].CalibrationType != "Daily") {
-                                await CalibPowerBackup.movingtocalibfailaftercalibpowerbackupdiscard(
-                                    "5",
-                                    idsNo
-                                );
-                            }
-                        }
-
-                        ///
                     }
                 }
                 if (BinBalanceRecalibStatusObject.RecalibSetDt_periodic != null) {
                     PeriodicDate = BinBalanceRecalibStatusObject.RecalibSetDt_periodic.toFormat('YYYY-MM-DD');
                     var todayDate = moment().format('YYYY-MM-DD');
-                    if ((PeriodicDate < todayDate) && systemHours >= 7) {
+                          var PeriodicTime = (moment(BinBalanceRecalibStatusObject.RecalibSetTm_Periodic, "HH:mm:ss")).format("HH:mm:ss");
+
+                    if ((PeriodicDate < todayDate && ((PeriodicTime > timeLimit) && todaytime >= timeLimit)) ||
+                     (PeriodicDate == todayDate && ((PeriodicTime <= timeLimit) && todaytime >= timeLimit)) ||
+                     (PeriodicDate < todayDate && (PeriodicTime < timeLimit && todaytime < timeLimit)) ||
+                     (PeriodicDate < todayDate && PeriodicDate != yesterday)) {
+
                         BinBalanceRecalibStatusObject.RecalibSetDt_periodic = null;
                         BinBalanceRecalibStatusObject.PeriodicBalRecalib = 0;
                         // settting 0 to table

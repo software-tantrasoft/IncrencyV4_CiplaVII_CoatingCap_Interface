@@ -140,48 +140,30 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
                             var systemDate = new Date();
                             var systemHours = systemDate.getHours();
 
-                            if (systemHours >= 7) {
+                            // if (systemHours >= 7) {
                                 // return "CR20PERIODIC CALIB,PENDING FOR BALANCE,,,";
                                 if (serverConfig.ProjectName == "RBH" || serverConfig.ProjectName == 'SunHalolGuj1') { // Set in serverconfig file
-                                    await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Linearity' } });
+                                    objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Linearity' } });
                                     //return `CR${calibPId}0LINEARITY CALIB,PENDING FOR BALANCE,,,`;
                                     //return `CR${calibPId}0Linearity,Calibration Pending,,,`;
                                     return `CR${calibPId}1Linearity,Calibration Pending,,,`;
                                 } else {
-                                    await objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Periodic' } });
+                                    objMonitor.monit({ case: 'CR', idsNo: IDSSrNo, data: { calibType: 'Periodic' } });
                                     //return `CR${calibPId}0PERIODIC CALIB,PENDING FOR BALANCE,,,`;
                                     //return `CR${calibPId}0Periodic Calibration,Pending,,,`;
                                     //if (serverConfig.ProjectName == 'MLVeer') {
                                     //    return `CR${calibPId}0Periodic Calibration,Pending,,,`;
                                     //}
                                     //else {
-                                        
-                                    var bln_isPresent = await comman.checkIfRecordInIncomplete('P', strBalId)
-                                    if (bln_isPresent) {
-                                        const selectRepSrNoObj = {
-                                            str_tableName: 'tbl_calibration_periodic_master_incomplete',
-                                            data: 'MAX(Periodic_RepNo) AS Periodic_RepNo',
-                                            condition: [
-                                                { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
-                                            ]
-                                        }
-                                        var result = await database.select(selectRepSrNoObj)
-                                        if(result.length > 0){
-                                            let int_periodic_RepNo = result[0][0].Periodic_RepNo;
-                                            await comman.caibrationFails('P', strBalId, int_periodic_RepNo)
-                                            return `CR${calibPId}1Periodic Calibration,Pending,,,`;
-                                        }
-                                    }else{
-                                        return `CR${calibPId}1Periodic Calibration,Pending,,,`;
-                                    }
+                                    return `CR${calibPId}1Periodic Calibration,Pending,,,`;
                                     //}
 
                                 }
-                            }
-                            else {
-                                //Dont take calibartions
-                                return `CR0`;
-                            }
+                            // }
+                            // else {
+                            //     //Dont take calibartions
+                            //     return `CR0`;
+                            // }
 
                             //resolve(`CR20PERIODIC CALIB,PENDING FOR BALANCE,,,`);
                             next();
@@ -332,6 +314,7 @@ exports.checkForPendingCalib = async (strBalId, IDSSrNo) => {
     return 'CR0';
 
 }
+
 async function checkIfCalibrationPresent(strBalId) {
     const selectObj = {
         str_tableName: 'tbl_balance_weights',
@@ -399,7 +382,8 @@ async function checkPeriodicEntry(calibDate, strBalId) {
         data: '*',
         condition: [
             { str_colName: 'Periodic_CalbDate', value: calibDate, comp: 'eq' },
-            { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' }
+            { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
+            { str_colName: 'Periodic_IsRecalib', value: 0, comp: 'eq' }
         ]
     }
     let res = await database.select(selectObj);
@@ -421,7 +405,7 @@ async function checkIfLatestEntryResBal(BalId) {
     // `SELECT * FROM `tbl_calibration_periodic_master` WHERE Periodic_RepNo = (SELECT MAX(Periodic_RepNo) AS Periodic_RepNo WHERE Periodic_BalID = 'TantraTest');`
     try {
         // console.log(`SELECT * FROM 'tbl_calibration_periodic_master' WHERE Periodic_RepNo = (SELECT MAX(Periodic_RepNo) AS Periodic_RepNo WHERE Periodic_BalID = '${BalId})'`)
-        let res = await database.execute(`SELECT * FROM tbl_calibration_periodic_master WHERE Periodic_RepNo = (SELECT MAX(Periodic_RepNo) AS Periodic_RepNo FROM tbl_calibration_periodic_master WHERE Periodic_BalID = '${BalId}')`);
+        let res = await database.execute(`SELECT * FROM tbl_calibration_periodic_master WHERE Periodic_RepNo = (SELECT MAX(Periodic_RepNo) AS Periodic_RepNo FROM tbl_calibration_periodic_master WHERE Periodic_BalID = '${BalId}' AND Periodic_IsRecalib = 0)`);
         if (res[0].length != 0) {
             return res[0][0].Periodic_CalbDate;
         } else {
@@ -475,6 +459,8 @@ exports.checkIfTodayIsPeriodicCalib = async (IDSSrNo) => {
         var today = new Date();
         var month = today.getMonth();
         var year = today.getFullYear();
+        // let now = new Date();
+        var systemHours = today.getHours();
         // cheeck if new balance 
         // for sun halol new bal condition is skipped as per chaitanya from plant
         // for MLV taken as per standard incrency as per sheetal and nawathe sir
@@ -490,11 +476,16 @@ exports.checkIfTodayIsPeriodicCalib = async (IDSSrNo) => {
                 calibDate = date1.format(calibDate, 'YYYY-MM-DD')
                 // here we have to check if calibration is pending or done for this date
                 let checkres = await checkPeriodicEntry(calibDate, strBalId);
-                if (calibDate == todayDate) {
-                    //logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine')
-                    return true;
+                   if (calibDate == todayDate) {
+                    if (systemHours < 7) {
+                        return false;
+                    } else {
+                        await logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine')
+                        return true;
+                    }
+
                 } if (calibDate <= todayDate && checkres.length == 0) {
-                    //logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine')
+                    await logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine')
                     return true;
                 } else {
                     return false;
@@ -510,10 +501,16 @@ exports.checkIfTodayIsPeriodicCalib = async (IDSSrNo) => {
                 let calibDate = res[0][0].Bal_CalbDueDt;
                 calibDate = date1.format(calibDate, 'YYYY-MM-DD');
                 let checkres = await checkPeriodicEntry(calibDate, strBalId);
+                // let isRecalib = checkres[0].Periodic_IsRecalib[0]
+                // console.log(isRecalib)
                 if ((todayDate == calibDate) && (checkres.length == 0)) {
-                    logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Todays)')
-                    console.log('today match', calibDate)
-                    return true; // calibration Pending   
+                    if (systemHours < 7) {
+                        return false;
+                    } else {
+                        await logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Todays)')
+                        console.log('today match', calibDate);
+                        return true; // calibration Pending 
+                    }
                 } else if (calibDate <= todayDate && checkres.length == 0) {
                     let lastCalibDate = await checkIfLatestEntryResBal(strBalId);
                     lastCalibDate = moment(lastCalibDate).format('YYYY-MM-DD')
@@ -527,7 +524,21 @@ exports.checkIfTodayIsPeriodicCalib = async (IDSSrNo) => {
                         return false;
                     }
 
-                } else {
+                } 
+                // else if (calibDate <= todayDate && isRecalib == 1) {
+                //     let lastCalibDate = await checkIfLatestEntryResBal(strBalId);
+                //     lastCalibDate = moment(lastCalibDate).format('YYYY-MM-DD')
+                //     if (lastCalibDate != 'no data') {
+                //         if (calibDate >= lastCalibDate) {
+                //             logFromPC.addtoProtocolLog('Calibration Cause:Normal Routine(Previous)')
+                //             return true;
+                //         }
+                //     } else {
+                //         return false;
+                //     }
+
+                // } 
+                else {
                     console.log('false codition', calibDate)
                     return false;
                 }
@@ -539,6 +550,7 @@ exports.checkIfTodayIsPeriodicCalib = async (IDSSrNo) => {
 
 
 }
+
 exports.checkIfTodayIsPeriodicCalibVernier = async (IDSSrNo) => {
     const tempCubicInfo = globalData.arrIdsInfo.find(k => k.Sys_IDSNo == parseInt(IDSSrNo));
     var tempVernier = tempCubicInfo.Sys_VernierID;

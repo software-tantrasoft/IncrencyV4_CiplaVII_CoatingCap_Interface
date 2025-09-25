@@ -57,20 +57,86 @@ class CalibrationModel {
       var noCalibRemarkRes = await database.select(selectNoCalibRemark);
       if (noCalibRemarkRes[0].length == 0) {
         //SELECT * FROM `tbl_calibration_daily_master` WHERE `Daily_BalID`=? and `Daily_CalbDate`=?
+        var dailyroutinending = false;
+        var todaydate = date.format(now, "YYYY-MM-DD");
+        var yesterday = new Date(now.getTime());
+        yesterday.setDate(now.getDate() - 1);
+        yesterday = date.format(yesterday, "YYYY-MM-DD");
+        var systemHours = now.getHours();
+
         var selectObj = {
           str_tableName: "tbl_calibration_daily_master",
           data: "*",
           condition: [
             { str_colName: "Daily_BalID", value: strBalId, comp: "eq" },
-            {
-              str_colName: "Daily_CalbDate",
-              value: date.format(now, "YYYY-MM-DD"),
-              comp: "eq",
-            },
+            {str_colName: "Daily_CalbDate", value: date.format(now, "YYYY-MM-DD"), comp: "eq",},
+            { str_colName: "Daily_IsRecalib", value: 0, comp: "eq" },
           ],
         };
+
         var selectDailyRes = await database.select(selectObj);
+        //
+        var selectObjforyesterday = {
+          str_tableName: "tbl_calibration_daily_master",
+          data: "*",
+          condition: [
+            { str_colName: 'Daily_BalID', value: strBalId, comp: 'eq' },
+            { str_colName: "Daily_CalbDate", value: yesterday, comp: "eq" },
+            { str_colName: "Daily_IsRecalib", value: 0, comp: "eq" },
+          ],
+        };
+        var selectObjforyesterdayres = await database.select(selectObjforyesterday);
+
+        var selectObjforyesterdayperiodic = {
+          str_tableName: "tbl_calibration_periodic_master",
+          data: "MAX(Periodic_RepNo) AS Periodic_RepNo",
+          condition: [
+            { str_colName: 'Periodic_BalID', value: strBalId, comp: 'eq' },
+            // { str_colName: "Periodic_CalbDate", value: yesterday, comp: "eq" },
+            { str_colName: "Periodic_IsRecalib", value: 0, comp: "eq" },
+          ],
+        };
+        var selectObjforyesterdayresperiodic = await database.select(selectObjforyesterdayperiodic);
+        var periodicentryfordailytoday = false;
+        var periodicentryfordailyyesterday = false;
+        if (selectObjforyesterdayresperiodic[0].length > 0 && selectObjforyesterdayresperiodic[0][0].Periodic_RepNo != null) {
+
+          //dataforperiodicyestndtoday
+          var selectObjforyesterdayperiodicofordata = {
+            str_tableName: "tbl_calibration_periodic_master",
+            data: "*",
+            condition: [
+              { str_colName: 'Periodic_RepNo', value: selectObjforyesterdayresperiodic[0][0].Periodic_RepNo, comp: 'eq' },
+            ], 
+          };
+
+          var selectObjforyesterdayresperiodicdata = await database.select(selectObjforyesterdayperiodicofordata);
+          //
+          if (date.format(selectObjforyesterdayresperiodicdata[0][0].Periodic_CalbDate, 'YYYY-MM-DD') == yesterday) {
+            periodicentryfordailyyesterday = true;
+          } else if (date.format(selectObjforyesterdayresperiodicdata[0][0].Periodic_CalbDate, 'YYYY-MM-DD') == todaydate) {
+            periodicentryfordailytoday = true;
+          }
+        }
+ 
+        if (selectDailyRes[0].length > 0) {
+          dailyroutinending = false;
+        } else if (selectObjforyesterdayres[0].length == 0 && periodicentryfordailytoday) {
+          dailyroutinending = false;
+        } else if (selectObjforyesterdayres[0].length == 0 && periodicentryfordailyyesterday && systemHours < 7) {
+          dailyroutinending = false;
+        } else if (selectObjforyesterdayres[0].length > 0 && (systemHours < 7)) {
+          dailyroutinending = false;
+        } else if (periodicentryfordailytoday && (systemHours < 7)) {
+          dailyroutinending = false;
+        } else if (periodicentryfordailytoday && (Number(selectObjforyesterdayresperiodicdata[0][0].Periodic_CalbTime.split(":")[0]) >= 7) && (systemHours >= 7)) {
+          dailyroutinending = false;
+        } else {
+          dailyroutinending = true;
+        }
+        // var selectDailyRes = await database.select(selectObj);
         await fetchDetails.pushCalibrationObj(strBalId, IDSSrNo);
+
         var found = globalData.calibrationStatus.some(function (el) {
           return el.BalId == strBalId;
         });
@@ -103,12 +169,16 @@ class CalibrationModel {
         var Response = await checkForPenCal.checkIfTodayIsPeriodicCalib(
           IDSSrNo
         );
+
         if (serverConfig.ProjectName == "SunHalolGuj1" || serverConfig.ProjectName == "MLVeer") {
           // setting false if today is periodic then ask daily first then periodic
           Response = false;
         }
+        
+        var systemDate = new Date();
+        var systemHours = systemDate.getHours();
+        
         if (Response == true) {
-
           if (found) {
             var resultFound = await checkForPenCal.checkForPendingCalib(
               strBalId,
@@ -116,8 +186,8 @@ class CalibrationModel {
             );
             return resultFound;
           } else {
-            // Skipped normal routine 12-7
-            return "CR0";
+            //   // Skipped normal routine 12-7
+            //   // return "CR0";
           }
         } else if (BalanceRecalibStatusObject.DailyBalRecalib == 1) {
           let TempCalibType = globalData.arrcalibType.find(
@@ -133,65 +203,79 @@ class CalibrationModel {
           }
           //return `CR${calibDId}0DAILY CALIB,PENDING FOR BALANCE,,,`;
           //return `CR${calibDId}0Daily Verification,Pending,,,`;
-          //logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
+          logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
           //if (serverConfig.ProjectName == 'MLVeer') {
           //  return `CR${calibDId}0Daily Verification,Pending,,,`;
           //}
           //else {
           return `CR${calibDId}1Daily Verification,Pending,,,`;
           //}
-        } else if (BalanceRecalibStatusObject.PeriodicBalRecalib == 1) {
-          let TempCalibType = globalData.arrcalibType.find(
-            (k) => k.idsNo == IDSSrNo
-          );
-          if (TempCalibType != undefined) {
-            TempCalibType.calibType = "periodic";
+        }else if (BalanceRecalibStatusObject.PeriodicBalRecalib == 1) {
+          //CHECKING FOR TODAYS DAILY
+          if (dailyroutinending) {
+            let TempCalibType = globalData.arrcalibType.find(
+              (k) => k.idsNo == IDSSrNo
+            );
+            if (TempCalibType != undefined) {
+              TempCalibType.calibType = "daily";
+            } else {
+              globalData.arrcalibType.push({
+                idsNo: IDSSrNo,
+                calibType: "daily",
+              });
+            }
+            let tempCalib = globalData.arrBalCaibDet.find(
+              (k) => k.strBalId == strBalId
+            );
+            await logFromPC.addtoProtocolLog('Calibration Cause:Recalibration routine');
+            return `CR${calibDId}1Daily Verification,Pending,,,`;
+
           } else {
-            globalData.arrcalibType.push({
-              idsNo: IDSSrNo,
-              calibType: "periodic",
-            });
+            let TempCalibType = globalData.arrcalibType.find(
+              (k) => k.idsNo == IDSSrNo
+            );
+            if (TempCalibType != undefined) {
+              TempCalibType.calibType = "periodic";
+            } else {
+              globalData.arrcalibType.push({
+                idsNo: IDSSrNo,
+                calibType: "periodic",
+              });
+            }
+            await fetchDetails.pushCalibrationObj(strBalId, IDSSrNo);
+            var resultFound = await checkForPenCal.checkForPendingCalib(
+              strBalId,
+              IDSSrNo
+            );
+            await logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
+            return resultFound;
           }
-          await fetchDetails.pushCalibrationObj(strBalId, IDSSrNo);
-          var resultFound = await checkForPenCal.checkForPendingCalib(
-            strBalId,
-            IDSSrNo
-          );
-          //logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
-          return resultFound;
+          /////////////////////////////////////////
         } else {
-          if (selectDailyRes[0].length !== 0) {
+          if (!dailyroutinending) {
             // here we recieves Daily calibration record so we want to check for other pending calibration
-            if (serverConfig.ProjectName == "SunHalolGuj1" || serverConfig.ProjectName == "MLVeer") {
+            if (serverConfig.ProjectName == "MLGoa") {
               var RepFromPC;
               var Response = await checkForPenCal.checkIfTodayIsPeriodicCalib(
                 IDSSrNo
               );
               if (Response) {
-
                 var resultFound = await checkForPenCal.checkForPendingCalib(
                   strBalId,
                   IDSSrNo
                 );
                 RepFromPC = resultFound;
-
-
               } else {
-
                 var objOwner = globalData.arrPreWeighCalibOwner.find(k => k.idsNo == IDSSrNo)
                 if (objOwner.owner == 'IPC') {
-
                   var flagcheck = globalData.arrIPCPeriodicFlag.find(k => k.idsNo == IDSSrNo);
-
                   if (flagcheck == undefined) {
                     globalData.arrIPCPeriodicFlag.push({ idsNo: IDSSrNo, flag: true });
                   }
                   else {
                     flagcheck.flag = flagcheck.flag;
                   }
-
                   flagcheck = globalData.arrIPCPeriodicFlag.find(k => k.idsNo == IDSSrNo);
-
                   if (flagcheck.flag == true) {
                     RepFromPC = await fetchDetails.checkForPeriodicDue(
                       IDSSrNo
@@ -204,16 +288,13 @@ class CalibrationModel {
                   }
                 }
                 else {
+                  
                   RepFromPC = await fetchDetails.checkForPeriodicDue(
                     IDSSrNo
                   );
+
                   //return `CR0`;
                 }
-
-
-
-
-
               }
               return RepFromPC;
             } else if (BalanceRecalibStatusObject.DailyBalRecalib == 1) {
@@ -230,7 +311,7 @@ class CalibrationModel {
               }
               //return `CR${calibDId}0DAILY CALIB,PENDING FOR BALANCE,,,`;
               //return `CR${calibDId}0Daily Verification,Pending,,,`;
-              //logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
+              await logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
               //if (serverConfig.ProjectName == 'MLVeer') {
               // return `CR${calibDId}0Daily Verification,Pending,,,`;
               //} else {
@@ -253,31 +334,18 @@ class CalibrationModel {
               }
               await fetchDetails.pushCalibrationObj(strBalId, IDSSrNo);
               //resolve("CR20PERIODIC CALIB,PENDING FOR BALANCE,,,");
-              //logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
-              if (
-                serverConfig.ProjectName == "RBH" ||
-                serverConfig.ProjectName == "SunHalolGuj1"
-              ) {
-                // Set in serverconfig file
-                //return `CR${calibPId}0LINEARITY CALIB,PENDING FOR BALANCE,,,`;
-                //return `CR${calibPId}0Linearity,Calibration Pending,,,`;
-                return `CR${calibPId}1Linearity,Calibration Pending,,,`;
-              } else {
-                //if (serverConfig.ProjectName == 'MLVeer') {
-                //  return `CR${calibPId}0Periodic Calibration,Pending,,,`;
-                //}
-                //else {
-                //return `CR${calibPId}0PERIODIC CALIB,PENDING FOR BALANCE,,,`;
-                //return `CR${calibPId}0Periodic Calibration,Pending,,,`;
-                return `CR${calibPId}1Periodic Calibration,Pending,,,`;
-                //}
+              await logFromPC.addtoProtocolLog('Calibration Cause:Recalibration')
+              // Set in serverconfig file
+              //return `CR${calibPId}0LINEARITY CALIB,PENDING FOR BALANCE,,,`;
+              //return `CR${calibPId}0Linearity,Calibration Pending,,,`;
+              return `CR${calibPId}1Linearity,Calibration Pending,,,`;
 
-              }
             } else {
+
               return "CR0";
             }
           } else {
-            // setting global variable to 'daily' in order to identify CP, CB coming for which CalibType
+           
             let TempCalibType = globalData.arrcalibType.find(
               (k) => k.idsNo == IDSSrNo
             );
@@ -289,42 +357,10 @@ class CalibrationModel {
                 calibType: "daily",
               });
             }
-            /* Suppose if daily and periodic calibration is on the same date, so the scenario is when 
-              periodic calibration done for today and on the next login on the same date it will ask daily
-              because no records found in `dailyMaster` according to logic so we have to check for today if 
-              Periodic done no need to ask daily calibration for today itself on next login
-              */
-            let tempCalib = globalData.arrBalCaibDet.find(
-              (k) => k.strBalId == strBalId
-            );
-            if (tempCalib.isPeriodicDone == true) {
-              return "CR0";
-            } else {
-              // Check for Daily Calibration
-              // this is for getting the system time
-              var systemDate = new Date();
-              var systemHours = systemDate.getHours();
-              if (systemHours >= 7) {
-                //return `CR${calibDId}0DAILY CALIB,PENDING FOR BALANCE,,,`;
-                //return `CR${calibDId}0Daily Verification,Pending,,,`;
-                //logFromPC.addtoProtocolLog('Calibration Cause:Normal routine')
-                //if (serverConfig.ProjectName == 'MLVeer') {
-                //return `CR${calibDId}0Daily Verification,Pending,,,`;
-                //}
-                //else {
-                // if(objOwner.owner == 'analytical' && strBalId != 'None'){
-                return `CR${calibDId}1Daily Verification,Pending,,,`;
-                // }else{
-                //   return "CR0";
-                // }
-
-                //}
-              } else {
-                //ont take calibartions
-                return `CR0`;
-              }
-              // resolve("CR10DAILY CALIB,PENDING FOR BALANCE,,,");
-            }
+            await logFromPC.addtoProtocolLog('Calibration Cause:Normal routine')
+          
+            return `CR${calibDId}1Daily Verification,Pending,,,`;
+            
           }
         }
       } else {
@@ -1213,10 +1249,6 @@ class CalibrationModel {
       throw new Error(err);
     }
   }
-
-
-
-
 
   async newverifyWeights(str_Protocol, IDSSrNo) {
     try {
