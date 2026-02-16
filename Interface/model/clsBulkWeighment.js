@@ -9282,10 +9282,7 @@ class BulkWeighment {
                         objHardness.ncnt = objHardness.ncnt + 1;
                     }
 
-                    if (
-                        receivedProtocol.includes("mm") &&
-                        objHardness.dimensionParam == 0
-                    ) {
+                    if (receivedProtocol.includes("mm") && objHardness.dimensionParam == 0 ) {
                         var includeMM = protocolValueData.includes("mm");
 
                         if (includeMM == true) {
@@ -9318,22 +9315,20 @@ class BulkWeighment {
 
                             objHardness.dimensionParam = 1;
                         }
-                    } else if (
-                        receivedProtocol.includes("mm") &&
-                        objHardness.dimensionParam == 1
-                    ) {
+                    } else if ( receivedProtocol.includes("mm") && objHardness.dimensionParam == 1) {
                         var includeMM = protocolValueData.includes("mm");
                         if (includeMM == true) {
 
                             objHardness.dimensionVal = protocolValueData.split("mm")[0].trim();
-                            if (objHardness.dimensionVal != "--") {
+                            if (objHardness.dimensionVal != "--") { 
                                 // objHardness.dimensionVal=Math.abs(objHardness.dimensionVal)
                                 if (isNaN(objHardness.dimensionVal) == true ||
                                     objHardness.dimensionVal.length == 0 ||
                                     objHardness.dimensionVal.includes("+") ||
                                     objHardness.dimensionVal.includes("-")) {
+                                    // objHardness.sampleNo += 1;
                                     console.log(`${objHardness.dimensionVal} this is invalid`);
-                                    objHardness.sampleNo = objHardness.dimensionParam == 0 ? objHardness.sampleNo : objHardness.sampleNo - 1
+                                    objHardness.sampleNo = objHardness.dimensionParam == 1 ? objHardness.sampleNo : objHardness.sampleNo - 1
                                     objHardness.dimensionParam = 0;
                                     objHardness.mgcnt = 0;
                                     objHardness.mmcnt = 0;
@@ -9351,13 +9346,10 @@ class BulkWeighment {
                             objHardness.dimensionParam = 2;
 
                         }
-                    } else if (
-                        (receivedProtocol.includes("n") || receivedProtocol.includes("N") ||
+                    } else if ((receivedProtocol.includes("n") || receivedProtocol.includes("N") ||
                             receivedProtocol.includes("Kp") || receivedProtocol.includes("kp") || receivedProtocol.includes("KP") ||
                             receivedProtocol.includes("kP") || receivedProtocol.includes("Sc") || receivedProtocol.includes("sc") ||
-                            receivedProtocol.includes("SC") || receivedProtocol.includes("sC")) &&
-                        objHardness.dimensionParam == 2
-                    ) {
+                            receivedProtocol.includes("SC") || receivedProtocol.includes("sC")) && objHardness.dimensionParam == 2 ) {
                         var includeNorKp
                         objHardness.dimensionParam = 0;
 
