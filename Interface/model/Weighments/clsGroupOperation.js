@@ -201,7 +201,8 @@ class Group {
                     ProductName: cubicalObj.Sys_ProductName,
                     PVersion: cubicalObj.Sys_PVersion,
                     Version: cubicalObj.Sys_Version,
-                    BatchNo: cubicalObj.Sys_Batch
+                    BatchNo: cubicalObj.Sys_Batch,
+                    ReportType: cubicalObj.Sys_RptType
                 }
 
                 var seqNo = await this.calculateSeqNo(sideVal, masterTable, detailTable, productInfoData)
@@ -473,7 +474,8 @@ class Group {
                 { str_colName: 'PVersion', value: inCompleteData.PVersion },
                 { str_colName: 'Version', value: inCompleteData.Version },
                 { str_colName: 'BatchNo', value: inCompleteData.BatchNo },
-                { str_colName: 'Side', value: selectedSide }
+                { str_colName: 'Side', value: selectedSide },
+                { str_colName:'ReportType', value: inCompleteData.ReportType}
             ]
         }
         let selectRes = await database.select(selectDetailData);
