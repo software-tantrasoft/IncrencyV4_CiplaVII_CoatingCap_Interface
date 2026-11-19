@@ -17,10 +17,12 @@ class FormulaFunctions {
             TType = T1Neg;
         }
         if (inComingObj.LimitOn.readUIntLE() == 0) { //Actual 
-            var lowerLimit = this.FormatNumberString(Math.abs(nominal - TType), digit);
+            // var lowerLimit = this.FormatNumberString(Math.abs(nominal - TType), digit);
+            var lowerLimit = Math.ceil(Math.abs((((nominal * TType) / 100) - nominal)) * 10 ** digit) / 10 ** digit;
             return lowerLimit;
         } else { // Percentage
-            var lowerLimit = this.FormatNumberString((((nominal * TType) / 100) - nominal), digit);
+            // var lowerLimit = this.FormatNumberString((((nominal * TType) / 100) - nominal), digit);
+            var lowerLimit = Math.ceil(Math.abs((((nominal * TType) / 100) - nominal)) * 10 ** digit) / 10 ** digit;
             return this.FormatNumberString(Math.abs(lowerLimit), digit);
         }
     }
@@ -47,7 +49,7 @@ class FormulaFunctions {
             default:
                 break;
         }
-        return parseFloat(Math.round(numberValue * dp) / dp).toFixed(intFormatNumber);
+        return parseFloat(Math.trunc(numberValue * dp) / dp).toFixed(intFormatNumber);
     }
     FormatNumber(num, places) {
         return Math.trunc(num * Math.pow(10, places)) / Math.pow(10, places);
@@ -96,8 +98,10 @@ class FormulaFunctions {
             )
             return objLowerLimit;
         } else { // Percentage
-            var lowerLimit1 = this.FormatNumberString((((nominal * T1Neg) / 100) - nominal), digit);
-            var lowerLimit2 = this.FormatNumberString((((nominal * T2Neg) / 100) - nominal), digit);
+            // var lowerLimit1 = this.FormatNumberString((((nominal * T1Neg) / 100) - nominal), digit);
+            // var lowerLimit2 = this.FormatNumberString((((nominal * T2Neg) / 100) - nominal), digit);
+            var lowerLimit1 = Math.ceil(Math.abs((((nominal * T1Neg) / 100) - nominal)) * 10 ** digit) / 10 ** digit;
+            var lowerLimit2 = Math.ceil(Math.abs((((nominal * T2Neg) / 100) - nominal)) * 10 ** digit) / 10 ** digit;            
             //return Math.abs(lowerLimit);
             Object.assign(objLowerLimit,
                 { lowerLimit1: Math.abs(lowerLimit1) },
